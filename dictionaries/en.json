@@ -1,0 +1,115 @@
+{
+  "navigation": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "reports": "My Reports",
+    "about": "About Us",
+    "contact": "Contact Us",
+    "login": "Login",
+    "upgrade": "Upgrade to Pro"
+  },
+  "languageSwitcher": {
+    "english": "English",
+    "hebrew": "Hebrew"
+  },
+  "hero": {
+    "title": "Welcome to Paynalyze.<br />Payroll Analysis Made Simple",
+    "subtitle": "Easily upload, analyze, and review your payroll reports.",
+    "uploadTitle": "Upload Your Payslip & Employment Contract",
+    "uploadSubtitle": "Submit your documents for expert payroll analysis. No need to enter personal details!",
+    "payslipUploadTitle": "Payslip Upload",
+    "payslipUploadText": "Drop your file here, or browse (PDF, TIF, PNG, JPG)",
+    "contractUploadTitle": "Employment Contract Upload",
+    "contractUploadText": "Drop your file here, or browse (PDF, TIF, PNG, JPG)",
+    "uploadButton": "Upload File",
+    "actionButtons": [
+      "Create a report",
+      "Create a company page",
+      "Document history",
+      "Preparing a claim",
+      "Check profitability",
+      "Create a warning letter",
+      "Professional Opinion & Calculations",
+      "Predicting success",
+      "Let's mediate",
+      "Final Claim Report & Tables",
+      "Serial employer identification",
+      "Refresh before testing"
+    ]
+  },
+  "howItWorks": {
+    "title": "How <span class=\"text-yellow\">Paynalyze</span> Works.",
+    "subtitle": "Easy Payroll Compliance in 3 Steps",
+    "steps": [
+      {
+        "title": "Upload Your Payslip",
+        "description": "Scan and submit your payroll document."
+      },
+      {
+        "title": "AI Legal Analysis",
+        "description": "Instantly detect violations and check compliance."
+      },
+      {
+        "title": "Get Your Report",
+        "description": "Download a detailed PDF with findings and legal references."
+      }
+    ]
+  },
+  "whyUs": {
+    "title": "Empowering <br />Fair Payroll Practices",
+    "description": "At Paynalyze, we are committed to protecting employees' rights by ensuring they receive fair and lawful compensation. Our AI-powered platform helps you easily verify payroll compliance, detect violations, and access legal insights—all in simple language.",
+    "withoutTitle": "Without Paynalyze",
+    "withoutItems": [
+      {
+        "title": "Manual Verification",
+        "description": "Time-consuming and prone to errors."
+      },
+      {
+        "title": "Legal Complexity",
+        "description": "Hard-to-understand legal jargon."
+      },
+      {
+        "title": "Limited Knowledge",
+        "description": "No access to legal precedents or relevant rulings."
+      },
+      {
+        "title": "No Clear Proof",
+        "description": "Lack of formal documentation to support claims."
+      }
+    ],
+    "withTitle": "With Paynalyze",
+    "withItems": [
+      {
+        "title": "Accurate Payroll Analysis",
+        "description": "Instantly detect underpayments and legal violations."
+      },
+      {
+        "title": "Simple Legal Explanations",
+        "description": "Understand complex laws in plain language."
+      },
+      {
+        "title": "Court Precedents",
+        "description": "View relevant legal rulings for similar cases."
+      },
+      {
+        "title": "Downloadable Reports",
+        "description": "Get detailed PDF reports with legal references."
+      }
+    ]
+  },
+  "pricingCta": {
+    "title": "Choose Your Plan Unlock Full Payroll Protection",
+    "subtitle": "Get detailed reports, legal insights, and full compliance verification.",
+    "button": "Upgrade to Pro"
+  },
+  "footer": {
+    "copyright": "© <a href=\"/en\" class=\"text-dark\">paynalyze.com</a> 2025 <span class=\"text-muted px-1\">|</span> All Rights Reserved.",
+    "links": "<a href=\"/en/privacy\" class=\"text-dark\">Privacy Policy</a> <span class=\"text-muted px-1\">|</span> <a href=\"/en/cookies\" class=\"text-dark\">Cookies Policy</a>"
+  },
+  "submitModal": {
+    "title": "Submitted Successfully!",
+    "text": "Our legal experts and AI system are analyzing your data.<br /> You'll receive a detailed report soon.",
+    "button": "Go to My Reports",
+    "statusText": "You can check the status in your Reports section."
+  }
+}

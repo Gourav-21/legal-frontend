@@ -63,7 +63,12 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
               </button>
             </div>
           </div>
-          <button className="btn ms-auto btn-outline-dark without-icon ms-2">{dictionary.navigation.login}</button>
+            <Link 
+            href={`/${lang}/signin`}
+            className="btn ms-auto btn-outline-dark without-icon ms-2" 
+            >
+            {dictionary.navigation.login}
+            </Link>
           <button 
             className="navbar-toggler ms-2" 
             type="button" 

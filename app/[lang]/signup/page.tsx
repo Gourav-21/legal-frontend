@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Locale } from "../../../i18n-config"; // Adjust path as needed
 import { getDictionary } from "../../../get-dictionary"; // Adjust path as needed
+import Link from "next/link";
 
 interface PricingProps {
   params: Promise<{ lang: Locale }>;
@@ -144,12 +145,12 @@ export default async function PricingPage(props: PricingProps) {
                   </button>
                 </div>
               </div>
-              <p className="mb-0 text-center">
-                Already have an Paynalyze account? 
-                <a href="#" className="link-primary fw-600">
+                <p className="mb-0 text-center">
+                Already have an Paynalyze account? 
+                <Link href={`/${lang}/signin`} className="link-primary fw-600">
                   Sign In
-                </a>
-              </p>
+                </Link>
+                </p>
             </div>
           </div>
         </div>

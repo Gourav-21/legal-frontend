@@ -111,5 +111,77 @@
     "text": "Our legal experts and AI system are analyzing your data.<br /> You'll receive a detailed report soon.",
     "button": "Go to My Reports",
     "statusText": "You can check the status in your Reports section."
+  },
+  "contact": {
+    "title": "Do you have questions?",
+    "subtitle": "Get in Touch With Us",
+    "description": "Fill out the form below and let us know how we can help.",
+    "supportText": "We're here to assist you with anything — from product support to partnership inquiries.",
+    "email": "support@paynalyze.com",
+    "form": {
+      "title": "Contact Us",
+      "subtitle": "Simply complete the form below and we will get in touch with you shortly.",
+      "name": "Your Name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "How Can We Help?",
+      "submit": "Send Message",
+      "placeholders": {
+        "name": "Enter your name",
+        "email": "Enter your email",
+        "phone": "Enter your phone",
+        "message": "Enter your message here"
+      }
+    }
+  },
+  "pricing": {
+    "title": "Choose the Right Plan for You",
+    "subtitle": "Get accurate payroll analysis and legal insights with flexible pricing options.",
+    "monthly": "Monthly",
+    "annually": "Annually",
+    "discountOffer": "10% off, all credits upfront",
+    "freePlan": {
+      "title": "Free Plan",
+      "price": "$0",
+      "period": "month",
+      "description": "1 Free Payslip Analysis",
+      "subDescription": "No personal details required.",
+      "buttonText": "Activated",
+      "features": [
+        "Basic legal insights",
+        "PDF report download",
+        "No court precedents",
+        "No priority support"
+      ]
+    },
+    "basicPlan": {
+      "title": "Basic Plan",
+      "badge": "Popular",
+      "price": "$9.99",
+      "period": "month",
+      "description": "5 Payslip",
+      "subDescription": "Analyses per month",
+      "buttonText": "Upgrade to Basic",
+      "features": [
+        "Legal explanations in simple language",
+        "PDF reports with legal references",
+        "No court precedents",
+        "No priority support"
+      ]
+    },
+    "proPlan": {
+      "title": "Pro Plan",
+      "price": "$19.99",
+      "period": "month",
+      "description": "Unlimited Payslip",
+      "subDescription": "& Contract Analyses",
+      "buttonText": "Upgrade to Pro",
+      "features": [
+        "Detailed legal explanations",
+        "Court precedents for violations",
+        "Downloadable PDF reports",
+        "Priority customer support"
+      ]
+    }
   }
 }

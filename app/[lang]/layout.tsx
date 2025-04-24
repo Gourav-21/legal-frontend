@@ -9,6 +9,9 @@ import "aos/dist/aos.css";
 import Script from "next/script";
 import AOSInit from "../aos-init"; // Adjusted path
 import { i18n, type Locale } from "../../i18n-config"; // Import i18n config
+import { getDictionary } from "../../get-dictionary"; // Import dictionary loader
+import Navbar from "../../components/Navbar"; // Import Navbar component
+import Footer from "../../components/Footer"; // Import Footer component
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +31,7 @@ export default async function RootLayout(
   }
 ) {
   const params = await props.params;
+  const dictionary = await getDictionary(params.lang); // Fetch dictionary
 
   const {
     children
@@ -42,12 +46,14 @@ export default async function RootLayout(
         />
         <link
           rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         />
       </head>
       <body className={inter.className}>
         <AOSInit />
+        <Navbar lang={params.lang} dictionary={dictionary} /> {/* Use Navbar component */}
         {children}
+        <Footer lang={params.lang} dictionary={dictionary} /> {/* Use Footer component */}
         <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" />
       </body>
     </html>

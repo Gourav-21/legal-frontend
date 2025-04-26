@@ -205,5 +205,41 @@
         "message": "הזן את הודעתך כאן"
       }
     }
+  },
+  "reports": {
+    "title": "הדוחות שלי",
+    "subtitle": "הצג והורד את ניתוחי השכר הקודמים שלך.",
+    "filter": {
+      "byDate": "לפי תאריך",
+      "dateOptions": {
+        "last30Days": "30 הימים האחרונים",
+        "last7Days": "7 הימים האחרונים",
+        "today": "הַיוֹם"
+      },
+      "byType": "לפי סוג",
+      "typeOptions": {
+        "all": "כֹּל",
+        "payslip": "תלוש שכר",
+        "contract": "חוֹזֶה",
+        "legalScenario": "תרחיש משפטי"
+      },
+      "byResult": "לפי תוצאה משפטית",
+      "resultOptions": {
+        "all": "כֹּל",
+        "compliant": "תואם",
+        "nonCompliant": "לא תואם"
+      }
+    },
+    "table": {
+      "date": "תַאֲרִיך",
+      "type": "סוּג",
+      "status": "סטָטוּס",
+      "downloadLink": "קישור להורדה",
+      "downloadButton": "הורד PDF"
+    },
+    "downloadAll": {
+      "button": "הורד את כל הדוחות",
+      "text": "קבל קובץ ZIP עם כל דוחות השכר הקודמים שלך."
+    }
   }
 }

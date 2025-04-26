@@ -2,24 +2,24 @@ import Image from "next/image";
 import { Locale } from "../../../i18n-config"; // Adjust path as needed
 import { getDictionary } from "../../../get-dictionary"; // Adjust path as needed
 
-interface PricingProps {
+interface ReportsPageProps {
   params: Promise<{ lang: Locale }>;
 }
 
-export default async function PricingPage(props: PricingProps) {
+export default async function ReportsPage(props: ReportsPageProps) {
   const params = await props.params;
   const { lang } = params;
   const dictionary = await getDictionary(lang);
 
-  const pricingDict = dictionary.pricing;
+  const reportsDict = dictionary.reports;
 
   return (
     <main>
       {/* Reports section */}
       <section className="reports-section">
         <div className="container">
-          <h1 className="text-center mt-4" data-aos="fade-up" data-aos-duration="1500">My Reports</h1>
-          <p className="text-lg text-center mb-4" data-aos="fade-up" data-aos-duration="1500">View and download your previous payroll analyses.</p>
+          <h1 className="text-center mt-4" data-aos="fade-up" data-aos-duration="1500">{reportsDict.title}</h1>
+          <p className="text-lg text-center mb-4" data-aos="fade-up" data-aos-duration="1500">{reportsDict.subtitle}</p>
 
           <div className="reports-card" data-aos="fade-up" data-aos-duration="1500">
             <div className="reports-filter">
@@ -27,32 +27,32 @@ export default async function PricingPage(props: PricingProps) {
                 <div className="col-md-4">
                   <div className="form-floating mb-4">
                     <select className="form-select" id="floatingSelectDate" aria-label="Floating label select example">
-                      <option defaultValue="Last 30 Days">Last 30 Days</option>
-                      <option value="1">Last 7 Days</option>
-                      <option value="2">Today</option>
+                      <option defaultValue="Last 30 Days">{reportsDict.filter.dateOptions.last30Days}</option>
+                      <option value="1">{reportsDict.filter.dateOptions.last7Days}</option>
+                      <option value="2">{reportsDict.filter.dateOptions.today}</option>
                     </select>
-                    <label htmlFor="floatingSelectDate">By Date</label>
+                    <label htmlFor="floatingSelectDate">{reportsDict.filter.byDate}</label>
                   </div>
                 </div>
                 <div className="col-md-4">
                   <div className="form-floating mb-4">
                     <select className="form-select" id="floatingSelectType" aria-label="Floating label select example">
-                      <option defaultValue="All">All</option>
-                      <option value="1">Payslip</option>
-                      <option value="2">Contract</option>
-                      <option value="3">Legal Scenario</option>
+                      <option defaultValue="All">{reportsDict.filter.typeOptions.all}</option>
+                      <option value="1">{reportsDict.filter.typeOptions.payslip}</option>
+                      <option value="2">{reportsDict.filter.typeOptions.contract}</option>
+                      <option value="3">{reportsDict.filter.typeOptions.legalScenario}</option>
                     </select>
-                    <label htmlFor="floatingSelectType">By Type</label>
+                    <label htmlFor="floatingSelectType">{reportsDict.filter.byType}</label>
                   </div>
                 </div>
                 <div className="col-md-4">
                   <div className="form-floating mb-4">
                     <select className="form-select" id="floatingSelectResult" aria-label="Floating label select example">
-                      <option defaultValue="All">All</option>
-                      <option value="1">Compliant</option>
-                      <option value="2">Non-compliant</option>
+                      <option defaultValue="All">{reportsDict.filter.resultOptions.all}</option>
+                      <option value="1">{reportsDict.filter.resultOptions.compliant}</option>
+                      <option value="2">{reportsDict.filter.resultOptions.nonCompliant}</option>
                     </select>
-                    <label htmlFor="floatingSelectResult">By Legal Result</label>
+                    <label htmlFor="floatingSelectResult">{reportsDict.filter.byResult}</label>
                   </div>
                 </div>
               </div>
@@ -61,10 +61,10 @@ export default async function PricingPage(props: PricingProps) {
               <table className="table">
                 <thead>
                   <tr>
-                    <th scope="col">Date</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Download Link</th>
+                    <th scope="col">{reportsDict.table.date}</th>
+                    <th scope="col">{reportsDict.table.type}</th>
+                    <th scope="col">{reportsDict.table.status}</th>
+                    <th scope="col">{reportsDict.table.downloadLink}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -73,11 +73,11 @@ export default async function PricingPage(props: PricingProps) {
                     <td>Payslip</td>
                     <td>
                       <div className="d-flex align-items-center">
-                        <i className="bi bi-check2 me-2"></i> Compliant
+                        <i className="bi bi-check2 me-2"></i> {reportsDict.filter.resultOptions.compliant}
                       </div>
                     </td>
                     <td>
-                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">Download PDF</button>
+                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">{reportsDict.table.downloadButton}</button>
                     </td>
                   </tr>
                   <tr>
@@ -85,11 +85,11 @@ export default async function PricingPage(props: PricingProps) {
                     <td>Contract</td>
                     <td>
                       <div className="d-flex align-items-center">
-                        <i className="bi bi-x me-1"></i> Non-compliant
+                        <i className="bi bi-x me-1"></i> {reportsDict.filter.resultOptions.nonCompliant}
                       </div>
                     </td>
                     <td>
-                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">Download PDF</button>
+                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">{reportsDict.table.downloadButton}</button>
                     </td>
                   </tr>
                   <tr>
@@ -97,11 +97,11 @@ export default async function PricingPage(props: PricingProps) {
                     <td>Legal Scenario</td>
                     <td>
                       <div className="d-flex align-items-center">
-                        <i className="bi bi-check2 me-2"></i> Compliant
+                        <i className="bi bi-check2 me-2"></i> {reportsDict.filter.resultOptions.compliant}
                       </div>
                     </td>
                     <td>
-                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">Download PDF</button>
+                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">{reportsDict.table.downloadButton}</button>
                     </td>
                   </tr>
                   <tr>
@@ -109,11 +109,11 @@ export default async function PricingPage(props: PricingProps) {
                     <td>Payslip</td>
                     <td>
                       <div className="d-flex align-items-center">
-                        <i className="bi bi-x me-1"></i> Non-compliant
+                        <i className="bi bi-x me-1"></i> {reportsDict.filter.resultOptions.nonCompliant}
                       </div>
                     </td>
                     <td>
-                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">Download PDF</button>
+                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">{reportsDict.table.downloadButton}</button>
                     </td>
                   </tr>
                   <tr>
@@ -121,11 +121,11 @@ export default async function PricingPage(props: PricingProps) {
                     <td>Contract</td>
                     <td>
                       <div className="d-flex align-items-center">
-                        <i className="bi bi-check2 me-2"></i> Compliant
+                        <i className="bi bi-check2 me-2"></i> {reportsDict.filter.resultOptions.compliant}
                       </div>
                     </td>
                     <td>
-                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">Download PDF</button>
+                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">{reportsDict.table.downloadButton}</button>
                     </td>
                   </tr>
                   <tr>
@@ -133,11 +133,11 @@ export default async function PricingPage(props: PricingProps) {
                     <td>Legal Scenario</td>
                     <td>
                       <div className="d-flex align-items-center">
-                        <i className="bi bi-x me-1"></i> Non-compliant
+                        <i className="bi bi-x me-1"></i> {reportsDict.filter.resultOptions.nonCompliant}
                       </div>
                     </td>
                     <td>
-                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">Download PDF</button>
+                      <button type="button" className="btn btn-sm btn-outline-dark without-icon ms-auto">{reportsDict.table.downloadButton}</button>
                     </td>
                   </tr>
                 </tbody>
@@ -147,9 +147,9 @@ export default async function PricingPage(props: PricingProps) {
 
           <div className="mt-5 text-center" data-aos="fade-up" data-aos-duration="1500">
             <button type="button" className="btn btn-primary ms-auto me-auto">
-              Download All Reports<span><i className="bi bi-arrow-right-short"></i></span>
+              {reportsDict.downloadAll.button}<span><i className="bi bi-arrow-right-short"></i></span>
             </button>
-            <p className="mb-0 mt-3 text-muted">Get a ZIP file with all your previous payroll reports.</p>
+            <p className="mb-0 mt-3 text-muted">{reportsDict.downloadAll.text}</p>
           </div>
         </div>
       </section>

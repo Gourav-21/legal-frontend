@@ -208,5 +208,41 @@
         "Priority customer support"
       ]
     }
+  },
+  "reports": {
+    "title": "My Reports",
+    "subtitle": "View and download your previous payroll analyses.",
+    "filter": {
+      "byDate": "By Date",
+      "dateOptions": {
+        "last30Days": "Last 30 Days",
+        "last7Days": "Last 7 Days",
+        "today": "Today"
+      },
+      "byType": "By Type",
+      "typeOptions": {
+        "all": "All",
+        "payslip": "Payslip",
+        "contract": "Contract",
+        "legalScenario": "Legal Scenario"
+      },
+      "byResult": "By Legal Result",
+      "resultOptions": {
+        "all": "All",
+        "compliant": "Compliant",
+        "nonCompliant": "Non-compliant"
+      }
+    },
+    "table": {
+      "date": "Date",
+      "type": "Type",
+      "status": "Status",
+      "downloadLink": "Download Link",
+      "downloadButton": "Download PDF"
+    },
+    "downloadAll": {
+      "button": "Download All Reports",
+      "text": "Get a ZIP file with all your previous payroll reports."
+    }
   }
 }

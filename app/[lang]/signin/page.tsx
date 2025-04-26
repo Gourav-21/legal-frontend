@@ -12,7 +12,7 @@ export default async function PricingPage(props: PricingProps) {
   const { lang } = params;
   const dictionary = await getDictionary(lang);
 
-  const pricingDict = dictionary.pricing;
+  const signinDict = dictionary.signin;
 
   return (
     <main>
@@ -25,43 +25,36 @@ export default async function PricingPage(props: PricingProps) {
             data-aos-duration="1500"
           >
             <div className="left-banner">
-              <h1 className="py-4 py-md-5 px-lg-5 px-3 mb-0">
-                Smarter Payroll<span className="text-yellow">,</span>
-                <br />
-                Legal Precision<span className="text-yellow">.</span>
-              </h1>
+              <h1 className="py-4 py-md-5 px-lg-5 px-3 mb-0" dangerouslySetInnerHTML={{ __html: signinDict.leftBannerTitle }}></h1>
               <Image
                 className="login-registration-img"
                 src="/img/login-registration-img.png"
-                alt=""
+                alt={signinDict.leftBannerImageAlt}
                 width={500}
                 height={400}
               />
             </div>
             <div className="right-form">
-              <h3>
-              Log in to <br />
-              <span className="text-primary">Paynalyze</span> first.
-              </h3>
-              <p className="mb-4">Access your payroll insights instantly.</p>
+              <h3 dangerouslySetInnerHTML={{ __html: signinDict.title }}></h3>
+              <p className="mb-4">{signinDict.subtitle}</p>
 
               <div className="form-floating mb-4">
               <input
                 type="email"
                 className="form-control"
                 id="floatingEmail"
-                placeholder="Enter your email"
+                placeholder={signinDict.emailPlaceholder}
               />
-              <label htmlFor="floatingEmail">Email</label>
+              <label htmlFor="floatingEmail">{signinDict.emailLabel}</label>
               </div>
               <div className="form-floating mb-4">
               <input
                 type="password"
                 className="form-control"
                 id="floatingPassword"
-                placeholder="Enter your password"
+                placeholder={signinDict.passwordPlaceholder}
               />
-              <label htmlFor="floatingPassword">Password</label>
+              <label htmlFor="floatingPassword">{signinDict.passwordLabel}</label>
               </div>
               <div className="row">
               <div className="col-6">
@@ -73,13 +66,13 @@ export default async function PricingPage(props: PricingProps) {
                   id="flexCheckDefault"
                 />
                 <label className="form-check-label" htmlFor="flexCheckDefault">
-                  Remember Me
+                  {signinDict.rememberMe}
                 </label>
                 </div>
               </div>
               <div className="col-6 text-end">
                 <a href="#" className="link-primary fw-600">
-                Forgot Password?
+                {signinDict.forgotPassword}
                 </a>
               </div>
               </div>
@@ -88,42 +81,42 @@ export default async function PricingPage(props: PricingProps) {
               type="submit"
               className="btn btn-lg btn-primary without-icon w-100 mb-4"
               >
-              Sign In
+              {signinDict.signInButton}
               </button>
               <div className="divider mb-4">
-              <span>OR</span>
+              <span>{signinDict.orDivider}</span>
               </div>
 
               <div className="row social-media-btn">
               <div className="col-sm-4 mb-3">
                 <button type="submit" className="btn btn-yellow w-100">
-                Google
+                {signinDict.googleButton}
                 <span>
-                  <Image src="/img/google.png" alt="" width={20} height={20} />
+                  <Image src="/img/google.png" alt={signinDict.googleImageAlt} width={20} height={20} />
                 </span>
                 </button>
               </div>
               <div className="col-sm-4 mb-3">
                 <button type="submit" className="btn btn-yellow w-100">
-                Facebook
+                {signinDict.facebookButton}
                 <span>
-                  <Image src="/img/Facebook.png" alt="" width={20} height={20} />
+                  <Image src="/img/Facebook.png" alt={signinDict.facebookImageAlt} width={20} height={20} />
                 </span>
                 </button>
               </div>
               <div className="col-sm-4 mb-3">
                 <button type="submit" className="btn btn-yellow w-100">
-                Apple
+                {signinDict.appleButton}
                 <span>
-                  <Image src="/img/Apple.png" alt="" width={20} height={20} />
+                  <Image src="/img/Apple.png" alt={signinDict.appleImageAlt} width={20} height={20} />
                 </span>
                 </button>
               </div>
               </div>
               <p className="mb-0 text-center">
-              Don't have a Paynalyze account?{" "}
+              {signinDict.noAccount}{" "}
               <Link href={`/${lang}/signup`} className="link-primary fw-600">
-                Sign Up
+                {signinDict.signUpLink}
               </Link>
               </p>
             </div>

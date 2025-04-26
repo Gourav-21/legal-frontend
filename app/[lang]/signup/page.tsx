@@ -3,16 +3,16 @@ import { Locale } from "../../../i18n-config"; // Adjust path as needed
 import { getDictionary } from "../../../get-dictionary"; // Adjust path as needed
 import Link from "next/link";
 
-interface PricingProps {
+interface SignUpPageProps {
   params: Promise<{ lang: Locale }>;
 }
 
-export default async function PricingPage(props: PricingProps) {
+export default async function SignUpPage(props: SignUpPageProps) {
   const params = await props.params;
   const { lang } = params;
   const dictionary = await getDictionary(lang);
 
-  const pricingDict = dictionary.pricing;
+  const signupDict = dictionary.signup;
 
   return (
     <main>
@@ -25,51 +25,45 @@ export default async function PricingPage(props: PricingProps) {
             data-aos-duration="1500"
           >
             <div className="left-banner">
-              <h1 className="py-4 py-md-5 px-lg-5 px-3 mb-0">
-                Smarter Payroll<span className="text-yellow">,</span>
-                <br />
-                Legal Precision<span className="text-yellow">.</span>
-              </h1>
-              <img
+              <h1 className="py-4 py-md-5 px-lg-5 px-3 mb-0" dangerouslySetInnerHTML={{ __html: signupDict.leftBannerTitle }}></h1>
+              <Image
                 className="login-registration-img"
-                src="img/login-registration-img.png"
-                alt=""
+                src="/img/login-registration-img.png"
+                alt="Signup Banner"
+                width={500} // Add appropriate width
+                height={400} // Add appropriate height
               />
             </div>
             <div className="right-form">
-              <h3>
-                Create your <span className="text-primary">Paynalyze</span>{" "}
-                account. <br />
-                Get started for free.
-              </h3>
-              <p className="mb-4">Get started with smarter payroll analysis.</p>
+              <h3 dangerouslySetInnerHTML={{ __html: signupDict.rightFormTitle }}></h3>
+              <p className="mb-4">{signupDict.rightFormSubtitle}</p>
 
               <div className="form-floating mb-4">
                 <input
                   type="text"
                   className="form-control"
                   id="floatingName"
-                  placeholder="Enter your name"
+                  placeholder={signupDict.namePlaceholder}
                 />
-                <label htmlFor="floatingName">Name</label>
+                <label htmlFor="floatingName">{signupDict.nameLabel}</label>
               </div>
               <div className="form-floating mb-4">
                 <input
                   type="email"
                   className="form-control"
                   id="floatingEmail"
-                  placeholder="Enter your email"
+                  placeholder={signupDict.emailPlaceholder}
                 />
-                <label htmlFor="floatingEmail">Email</label>
+                <label htmlFor="floatingEmail">{signupDict.emailLabel}</label>
               </div>
               <div className="form-floating mb-4">
                 <input
                   type="phone"
                   className="form-control"
                   id="floatingPhone"
-                  placeholder="Enter your phone"
+                  placeholder={signupDict.phonePlaceholder}
                 />
-                <label htmlFor="floatingPhone">Phone</label>
+                <label htmlFor="floatingPhone">{signupDict.phoneLabel}</label>
               </div>
               <div className="row">
                 <div className="col-sm-6">
@@ -78,9 +72,9 @@ export default async function PricingPage(props: PricingProps) {
                       type="password"
                       className="form-control"
                       id="floatingPassword"
-                      placeholder="Set a password"
+                      placeholder={signupDict.passwordPlaceholder}
                     />
-                    <label htmlFor="floatingPassword">Password</label>
+                    <label htmlFor="floatingPassword">{signupDict.passwordLabel}</label>
                   </div>
                 </div>
                 <div className="col-sm-6">
@@ -89,9 +83,9 @@ export default async function PricingPage(props: PricingProps) {
                       type="password"
                       className="form-control"
                       id="floatingReEnter"
-                      placeholder="Re-enter password"
+                      placeholder={signupDict.reEnterPasswordPlaceholder}
                     />
-                    <label htmlFor="floatingReEnter">Re-enter</label>
+                    <label htmlFor="floatingReEnter">{signupDict.reEnterPasswordLabel}</label>
                   </div>
                 </div>
               </div>
@@ -103,52 +97,49 @@ export default async function PricingPage(props: PricingProps) {
                   value=""
                   id="flexCheckDefault"
                 />
-                <label className="form-check-label" htmlFor="flexCheckDefault">
-                  I agree to the <a href="#">Terms of Service</a> and 
-                  <a href="#">Privacy Policy</a>.
-                </label>
+                <label className="form-check-label" htmlFor="flexCheckDefault" dangerouslySetInnerHTML={{ __html: signupDict.termsCheckboxLabel }}></label>
               </div>
 
               <button
                 type="submit"
                 className="btn btn-lg btn-primary without-icon w-100 mb-4"
-              >
-                Free Sign Up
+>
+                {signupDict.freeSignUpButton}
               </button>
               <div className="divider mb-4">
-                <span>OR</span>
+                <span>{signupDict.orDivider}</span>
               </div>
 
               <div className="row social-media-btn">
                 <div className="col-sm-4 mb-3">
                   <button type="submit" className="btn btn-yellow w-100">
-                    Google
+                    {signupDict.googleButton}
                     <span>
-                      <img src="img/google.png" alt="" />
+                      <Image src="/img/google.png" alt="Google" width={20} height={20} />
                     </span>
                   </button>
                 </div>
                 <div className="col-sm-4 mb-3">
                   <button type="submit" className="btn btn-yellow w-100">
-                    Facebook
+                    {signupDict.facebookButton}
                     <span>
-                      <img src="img/Facebook.png" alt="" />
+                      <Image src="/img/Facebook.png" alt="Facebook" width={20} height={20} />
                     </span>
                   </button>
                 </div>
                 <div className="col-sm-4 mb-3">
                   <button type="submit" className="btn btn-yellow w-100">
-                    Apple
+                    {signupDict.appleButton}
                     <span>
-                      <img src="img/Apple.png" alt="" />
+                      <Image src="/img/Apple.png" alt="Apple" width={20} height={20} />
                     </span>
                   </button>
                 </div>
               </div>
                 <p className="mb-0 text-center">
-                Already have an Paynalyze account? 
+                {signupDict.signInPrompt}{" "}
                 <Link href={`/${lang}/signin`} className="link-primary fw-600">
-                  Sign In
+                  {signupDict.signInLink}
                 </Link>
                 </p>
             </div>

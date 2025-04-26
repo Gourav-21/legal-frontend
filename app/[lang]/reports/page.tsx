@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Locale } from "../../../i18n-config"; // Adjust path as needed
 import { getDictionary } from "../../../get-dictionary"; // Adjust path as needed
 

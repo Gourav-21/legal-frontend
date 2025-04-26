@@ -134,6 +134,31 @@
       }
     }
   },
+  "about": {
+    "title": "Empowering Pay Transparency for Everyone",
+    "description": "We believe knowledge is power—and your paycheck shouldn't be a mystery. Paynalyze is built to help employees uncover the truth about their wages using cutting-edge AI and labor law intelligence.",
+    "stats": [
+      {"value": "25,000+", "text": "Payslips Analyzed"},
+      {"value": "1,200+", "text": "Labor Law Violations Detected"},
+      {"value": "100%", "text": "Confidential & Secure"},
+      {"value": "24×5", "text": "Dedicated Legal & Tech Support"}
+    ],
+    "whatWeDo": {
+      "title": "What We Do and Why We Do It",
+      "description": ["At Paynalyze, we help workers discover if they're being fairly compensated - by scanning payslips and employment contracts, analyzing the data, and providing easy-to-understand legal reports.",
+        "Our journey began with a simple idea: too many workers are unaware of their rights. What started as a passion project grew into a mission to bring clarity, transparency, and fairness to workplaces everywhere."]
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "To give every worker the tools to understand, question, and take control of their pay—because justice begins with transparency.",
+      "coreValues": [
+        {"title": "Transparency", "description": "We believe truth builds trust.", "icon": "Transparency.svg"},
+        {"title": "Empowerment", "description": "Knowledge should be accessible to all.", "icon": "Empowerment.svg"},
+        {"title": "Fairness", "description": "Every paycheck deserves a second look.", "icon": "Fairness.svg"},
+        {"title": "Innovation", "description": "We harness AI to simplify complex legal insights.", "icon": "Innovation.svg"}
+      ]
+    }
+  },
   "pricing": {
     "title": "Choose the Right Plan for You",
     "subtitle": "Get accurate payroll analysis and legal insights with flexible pricing options.",

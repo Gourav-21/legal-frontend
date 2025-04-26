@@ -35,7 +35,7 @@ export default async function PricingPage(props: PricingProps) {
                 src="/img/login-registration-img.png"
                 alt=""
                 width={500}
-                height={500}
+                height={400}
               />
             </div>
             <div className="right-form">

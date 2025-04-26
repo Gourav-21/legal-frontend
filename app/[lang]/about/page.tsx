@@ -2,20 +2,19 @@ import Image from "next/image";
 import { Locale } from "../../../i18n-config"; // Adjust path as needed
 import { getDictionary } from "../../../get-dictionary"; // Adjust path as needed
 
-interface PricingProps {
+interface AboutPageProps { // Renamed interface for clarity
   params: Promise<{ lang: Locale }>;
 }
 
-export default async function PricingPage(props: PricingProps) {
+export default async function AboutPage(props: AboutPageProps) { // Renamed component for clarity
   const params = await props.params;
   const { lang } = params;
   const dictionary = await getDictionary(lang);
-
-  const pricingDict = dictionary.pricing;
+  const aboutContent = dictionary.about; // Access the about section
 
   return (
     <main>
-      {/* contact us section */}
+      {/* about hero section */}
       <section
         className="about-hero-section"
         data-aos="fade-up"
@@ -24,15 +23,11 @@ export default async function PricingPage(props: PricingProps) {
         <div className="container text-center">
           <div className="row justify-content-center">
             <div className="col-md-10">
-              <h1>
-                Empowering Pay <br />
-                Transparency for Everyone
-              </h1>
+              {/* Use dictionary content for title */}
+              <h1 dangerouslySetInnerHTML={{ __html: aboutContent.title.replace('\n', '<br />') }}></h1>
+              {/* Use dictionary content for description */}
               <p className="text-lg mb-4">
-                We believe knowledge is power—and your paycheck shouldn&apos;t be a
-                mystery. Paynalyze is built to help employees uncover the truth
-                about their wages using cutting-edge AI and labor law
-                intelligence.
+                {aboutContent.description}
               </p>
             </div>
           </div>
@@ -49,22 +44,13 @@ export default async function PricingPage(props: PricingProps) {
         </video>
         <div className="container text-center">
           <div className="row">
-            <div className="col-sm-6 col-md-3 mt-4">
-              <h2 className="fw-300 mb-0">25,000+</h2>
-              <p>Payslips Analyzed</p>
-            </div>
-            <div className="col-sm-6 col-md-3 mt-4">
-              <h2 className="fw-300 mb-0">1,200+</h2>
-              <p>Labor Law Violations Detected</p>
-            </div>
-            <div className="col-sm-6 col-md-3 mt-4">
-              <h2 className="fw-300 mb-0">100%</h2>
-              <p>Confidential & Secure</p>
-            </div>
-            <div className="col-sm-6 col-md-3 mt-4">
-              <h2 className="fw-300 mb-0">24×5</h2>
-              <p>Dedicated Legal & Tech Support</p>
-            </div>
+            {/* Map over stats from dictionary */}
+            {aboutContent.stats.map((stat, index) => (
+              <div key={index} className="col-sm-6 col-md-3 mt-4">
+                <h2 className="fw-300 mb-0">{stat.value}</h2>
+                <p>{stat.text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -101,22 +87,12 @@ export default async function PricingPage(props: PricingProps) {
               />
             </div>
             <div className="col-md-6">
-              <h2 className="mt-4">
-                What We Do <br />
-                & Why We Do It.
-              </h2>
-              <p>
-                At Paynalyze, we help employees uncover whether they’re being
-                fairly compensated—by scanning payslips and employment
-                contracts, analyzing the data, and delivering easy-to-understand
-                legal reports.
-              </p>
-              <p>
-                Our journey began with a simple idea: too many workers are
-                unaware of their rights. What started as a passion project has
-                grown into a mission to bring clarity, transparency, and
-                fairness to workplaces everywhere.
-              </p>
+              {/* Use dictionary content for What We Do title */}
+              <h2 className="mt-4" dangerouslySetInnerHTML={{ __html: aboutContent.whatWeDo.title.replace('\n', '<br />') }}></h2>
+              {/* Map over What We Do description from dictionary */}
+              {aboutContent.whatWeDo.description.map((desc, index) => (
+                <p key={index}>{desc}</p>
+              ))}
             </div>
           </div>
         </div>
@@ -130,60 +106,29 @@ export default async function PricingPage(props: PricingProps) {
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-6">
-              <h2 className="mt-0 mt-lg-4">Our Mission</h2>
+              {/* Use dictionary content for Mission title */}
+              <h2 className="mt-0 mt-lg-4">{aboutContent.mission.title}</h2>
+              {/* Use dictionary content for Mission description */}
               <p>
-                To give every worker the tools to understand, question, and take
-                control of their pay—because justice begins with transparency.
+                {aboutContent.mission.description}
               </p>
 
               <h4>Our Core Values</h4>
               <ul className="icon-list">
-                <li>
-                  <Image
-                    src="/img/Transparency.svg"
-                    alt=""
-                    width={24}
-                    height={24}
-                  />{" "}
-                  <p>
-                    <span>Transparency</span> We believe truth builds trust.
-                  </p>
-                </li>
-                <li>
-                  <Image
-                    src="/img/Empowerment.svg"
-                    alt=""
-                    width={24}
-                    height={24}
-                  />{" "}
-                  <p>
-                    <span>Empowerment</span> Knowledge should be accessible to
-                    everyone.
-                  </p>
-                </li>
-                <li>
-                  <Image
-                    src="/img/Fairness.svg"
-                    alt=""
-                    width={24}
-                    height={24}
-                  />{" "}
-                  <p>
-                    <span>Fairness</span> Every paycheck deserves a second look.
-                  </p>
-                </li>
-                <li>
-                  <Image
-                    src="/img/Innovation.svg"
-                    alt=""
-                    width={24}
-                    height={24}
-                  />{" "}
-                  <p>
-                    <span>Innovation</span> We harness AI to simplify complex
-                    legal insights.
-                  </p>
-                </li>
+                {/* Map over Core Values from dictionary */}
+                {aboutContent.mission.coreValues.map((value, index) => (
+                  <li key={index}>
+                    <Image
+                      src={`/img/${value.icon}`}
+                      alt=""
+                      width={24}
+                      height={24}
+                    />{" "}
+                    <p>
+                      <span>{value.title}</span> {value.description}
+                    </p>
+                  </li>
+                ))}
               </ul>
             </div>
             <div className="col-md-6 vector-card-main">

@@ -289,5 +289,41 @@
     "appleButton": "Apple",
     "signInPrompt": "Already have an Paynalyze account?",
     "signInLink": "Sign In"
+  },
+  "subscribe": {
+    "title": "Subscribe to <span class=\"text-yellow\">Paynalyze Basic Plan</span> Subscription",
+    "price": "$9.99",
+    "period": "/ month",
+    "planDetails": {
+      "title": "Basic Plan Subscription",
+      "billing": "Billed monthly",
+      "price": "$9.99"
+    },
+    "subtotal": {
+      "title": "Subtotal",
+      "taxInfo": "Tax",
+      "price": "$9.99",
+      "taxAmount": "$3"
+    },
+    "totalDue": {
+      "title": "Total due today",
+      "price": "$12.99"
+    },
+    "paymentMethodTitle": "Choose Your <br />Payment Method.",
+    "cardInfoLabel": "Card information",
+    "cardPlaceholder": "1234   1234   1234   1234",
+    "expiryPlaceholder": "MM / YY",
+    "cvvPlaceholder": "CVV",
+    "cardholderNameLabel": "Cardholder name",
+    "cardholderNamePlaceholder": "Full name on card",
+    "countryLabel": "Country",
+    "countryDefault": "USA",
+    "countryOptionUSA": "USA",
+    "countryOptionIsrael": "Israel",
+    "addressPlaceholder": "Address",
+    "saveInfoCheckboxLabel": "Securely save my information for 1-click checkout",
+    "saveInfoCheckboxSubtext": "Pay faster on Paynalyze and everywhere Link is accepted.",
+    "subscribeButton": "Subscribe",
+    "termsText": "By confirming your subscription, you allow us to charge your card for this and future payments in accordance with terms. You can always cancel your subscription"
   }
 }

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
+import { useState, useRef, useEffect } from 'react';
 import { Locale } from "../i18n-config"; // Adjust path as needed
 
 interface NavbarProps {
@@ -11,6 +12,35 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
   const pathname = usePathname();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const collapseRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (collapseRef.current) {
+      const bsCollapse = new (window as any).bootstrap.Collapse(collapseRef.current, {
+        toggle: false
+      });
+      
+      if (isMenuOpen) {
+        bsCollapse.show();
+      } else {
+        bsCollapse.hide();
+      }
+
+      return () => bsCollapse.dispose();
+    }
+  }, [isMenuOpen]);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const closeMenu = () => {
+    if (isMenuOpen) {
+      setIsMenuOpen(false);
+    }
+  };
+
   return (
     <header>
       <nav className="navbar navbar-expand-lg">
@@ -19,22 +49,22 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
             <Image src="/img/logo.png" alt="Logo" width={150} height={40} />
           </Link>
 
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <div ref={collapseRef} className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <Link className={`nav-link ${pathname === `/${lang}` ? 'active' : ''}`} href={`/${lang}`}>{dictionary.navigation.home}</Link>
+                <Link className={`nav-link ${pathname === `/${lang}` ? 'active' : ''}`} href={`/${lang}`} onClick={closeMenu}>{dictionary.navigation.home}</Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${pathname === `/${lang}/pricing` ? 'active' : ''}`} href={`/${lang}/pricing`}>{dictionary.navigation.pricing}</Link>
+                <Link className={`nav-link ${pathname === `/${lang}/pricing` ? 'active' : ''}`} href={`/${lang}/pricing`} onClick={closeMenu}>{dictionary.navigation.pricing}</Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${pathname === `/${lang}/reports` ? 'active' : ''}`} href={`/${lang}/reports`}>{dictionary.navigation.reports}</Link>
+                <Link className={`nav-link ${pathname === `/${lang}/reports` ? 'active' : ''}`} href={`/${lang}/reports`} onClick={closeMenu}>{dictionary.navigation.reports}</Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${pathname === `/${lang}/about` ? 'active' : ''}`} href={`/${lang}/about`}>{dictionary.navigation.about}</Link>
+                <Link className={`nav-link ${pathname === `/${lang}/about` ? 'active' : ''}`} href={`/${lang}/about`} onClick={closeMenu}>{dictionary.navigation.about}</Link>
               </li>
               <li className="nav-item">
-                <Link className={`nav-link ${pathname === `/${lang}/contact` ? 'active' : ''}`} href={`/${lang}/contact`}>{dictionary.navigation.contact}</Link>
+                <Link className={`nav-link ${pathname === `/${lang}/contact` ? 'active' : ''}`} href={`/${lang}/contact`} onClick={closeMenu}>{dictionary.navigation.contact}</Link>
               </li>
             </ul>
             <div className="d-flex justify-content-center">
@@ -72,10 +102,9 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
           <button 
             className="navbar-toggler ms-2" 
             type="button" 
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarSupportedContent" 
+            onClick={toggleMenu}
             aria-controls="navbarSupportedContent" 
-            aria-expanded="false"
+            aria-expanded={isMenuOpen}
             aria-label="Toggle navigation"
           >
             <i className="bi bi-list"></i>

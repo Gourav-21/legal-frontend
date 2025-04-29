@@ -378,6 +378,12 @@ h6 {
   color: #0F0F14;
 }
 
+.btn.thumbnail-btn span { width: 35px; height: 35px; }
+
+.btn.thumbnail-btn span i {
+  font-size: 24px;
+}
+
 .btn span {
   width: 25px;
   height: 25px;
@@ -392,6 +398,7 @@ h6 {
   -o-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
 }
+
 
 .btn-outline-dark span {
   background-color: #0F0F14;
@@ -479,6 +486,22 @@ h6 {
   background-color: #fff;
 }
 
+.btn-icon {
+  padding: 8px;
+  font-size: 22px;
+  border-radius: 50%;
+  width: 45px;
+}
+
+.btn-icon.btn-sm {
+  padding: 5px;
+  font-size: 16px;
+  width: 35px;
+  height: 35px;
+}
+
+
+
 
 /* header */
 
@@ -496,9 +519,14 @@ header .navbar-brand img {
   width: 200px;
   object-position: left center;
 }
+
 header .navbar-brand {
   padding: 0px;
   margin-right: 0px;
+}
+
+header .navbar .navbar-nav .nav-item {
+  margin: 0px;
 }
 
 header .navbar .navbar-nav .nav-link {
@@ -850,9 +878,16 @@ header .navbar .nav-link:focus {
   background-color: rgba(253, 207, 111, 0.3);
   border-radius: 20px;
 }
+
 #analysis-content {
   display: none;
+  -webkit-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -ms-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
 }
+
 #analysis-section {
   display: none;
 
@@ -866,8 +901,15 @@ header .navbar .nav-link:focus {
 }
 
 @keyframes blink {
-  from, to { border-color: transparent }
-  50% { border-color: #555 }
+
+  from,
+  to {
+    border-color: transparent
+  }
+
+  50% {
+    border-color: #555
+  }
 }
 
 /* How it Works */
@@ -1089,7 +1131,7 @@ footer p {
 
 /* document submit modal */
 
-.submit-modal .btn-close {
+.modal .btn-close {
   color: #EB3223;
   position: absolute;
   background: transparent;
@@ -1102,10 +1144,23 @@ footer p {
   font-size: 34px;
 }
 
-.submit-modal .btn-close:hover,
-.submit-modal .btn-close:focus {
+.modal .btn-close:hover,
+.modal .btn-close:focus {
   outline: none !important;
   box-shadow: none;
+}
+
+.modal-body {
+
+  padding: 15px 30px;
+}
+
+.modal-header {
+  padding: 20px 40px 15px 30px;
+}
+
+.modal-footer {
+  padding: 15px 30px 20px 30px;
 }
 
 .submit-modal .modal-header {
@@ -1121,7 +1176,6 @@ footer p {
 
 .submit-modal .modal-content {
   border: none;
-  border-radius: 30px;
 
 }
 
@@ -1155,11 +1209,17 @@ footer p {
   }
 }
 
-.submit-modal .modal-footer {
-  justify-content: center;
+.modal-footer {
   background-color: rgba(239, 234, 220, 0.5);
   border-radius: 0 0 30px 30px;
-  padding: 30px;
+}
+
+.modal-content {
+  border-radius: 30px;
+}
+
+.submit-modal .modal-footer {
+  justify-content: center;
 }
 
 .submit-modal .modal-footer .btn-arrow {
@@ -1253,6 +1313,7 @@ footer p {
 
 .plan-features li {
   padding: 10px 0px 10px 25px;
+  margin: 0px;
   position: relative;
   list-style: none;
   color: #0F0F14;
@@ -1593,6 +1654,7 @@ img.what-why-img2 {
   left: -30px;
   bottom: 20px;
   z-index: -1;
+  width: 120px;
 }
 
 
@@ -1748,10 +1810,63 @@ img.what-why-img2 {
   box-shadow: 0 0 15px 0 rgba(15, 15, 20, 0.15);
 }
 
+.modal {
+  backdrop-filter: blur(3px);
+}
+
+.lawyer-card {
+  display: flex;
+  background-color: rgba(15, 15, 20, 0.02);
+  padding: 20px;
+  border-radius: 20px;
+  position: relative;
+  border: 1px solid rgba(15, 15, 20, 0.2);
+  -webkit-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -ms-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
+}
+
+.lawyer-card:hover, .lawyer-card:focus {
+  background-color: rgba(15, 15, 20, 0);
+  border: 1px solid rgba(15, 15, 20, 0.3);
+  transform: scale(0.99);
+  box-shadow: 5px 10px 20px 0 rgba(15, 15, 20, 0.1);
+}
+
+.lawyer-profile {
+  border-radius: 50%;
+  width: 120px;
+  max-height: 120px;
+}
+
+.lawyer-card .btn-outline-primary {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+.lawyer-info {
+  width: calc(100% - 135px);
+}
+
+.lawyer-info h4 { width: calc(100% - 155px);}
 
 
+.lawyer-info-list { padding: 0px;}
 
+.lawyer-info-list li {
+  list-style: none;
+  padding-left: 20px;
+  position: relative;
+}
 
+.lawyer-info-list li i {
+  position: absolute;
+  left: 0px;
+  color: rgba(15, 15, 20, 1);
+}
 
 
 
@@ -1961,6 +2076,32 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
   right: unset;
 }
 
+html[dir="rtl"] .modal .btn-close {
+  left: 15px;
+  right: unset;
+}
+
+html[dir="rtl"] .modal-header {
+  padding: 20px 30px 15px 40px;
+}
+
+html[dir="rtl"] .btn-icon.btn-sm { padding: 5px; }
+
+html[dir="rtl"] .lawyer-card .btn-outline-primary {
+  left: 20px;
+  right: unset;
+}
+html[dir="rtl"] .lawyer-info-list {
+  padding: 0px;
+}
+
+html[dir="rtl"] .lawyer-info-list li {
+  padding-left: 0px; padding-right: 20px;}
+
+html[dir="rtl"] .lawyer-info-list li i {
+  left: unset;
+right: 0px;}
+
 @media screen and (max-width:1399px) {
   .WhyUs-card::after {
       border-right: 84px solid transparent;
@@ -2015,7 +2156,7 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
       font-size: 18px;
   }
 
- 
+
 
   h2 {
       font-size: 30px;
@@ -2047,9 +2188,12 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
       margin-bottom: 30px;
   }
 
-  .btn span {
+  .btn span, .btn.thumbnail-btn span {
       width: 22px;
       height: 22px;
+  }
+  .btn.thumbnail-btn span i {
+      font-size: 20px;
   }
 
   .btn span img {
@@ -2094,9 +2238,11 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
   }
 
   .our-mission-img2 {
-      width: 100px;
-
+      width: 80px;
+      left: -15px;
   }
+
+
 
 
 }
@@ -2116,7 +2262,9 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
 
   .navbar-collapse {
       position: absolute;
-      background-color: #fdcf6f;
+      background-color: rgba(12, 117, 111, 0.9);
+      box-shadow: 0 10px 20px 0 rgba(12, 117, 111, 0.3);
+      backdrop-filter: blur(10px);
       left: 0;
       text-align: center;
       width: 100%;
@@ -2128,16 +2276,38 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
 
   header .navbar .navbar-nav .nav-link {
       font-size: 18px;
+      color: #fff;
       padding: 10px 10px;
   }
+
+  header .navbar .navbar-nav .nav-link.active {
+      color: #FDCF6F;
+  }
+
+
 
   header .navbar .nav-link.active::after {
       width: 6px;
       height: 6px;
       bottom: 3px;
       left: calc(50% - 3px);
-      background-color: #0C756F;
+      background-color: #FDCF6F;
   }
+
+  header .navbar .language {
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: transparent;
+  }
+
+  header .navbar .language a {
+      color: rgba(255, 255, 255, 1);
+
+  }
+
+  header .navbar .language .dropdown-menu a {
+      color: #0F0F14;
+  }
+
 
   .upload-container {
       min-height: 200px;
@@ -2356,8 +2526,35 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
   .about-hero-video {
       border-radius: 20px;
       height: 350px;
-
   }
+
+  .lawyer-card {
+      text-align: center;
+      display: block;
+  }
+
+  .lawyer-card .btn-outline-primary {
+      position: relative;
+      right: 0px;
+      top: 0px;
+      margin-top: 15px;
+      margin-left: auto;
+      margin-right: auto;
+  }
+  .lawyer-info {
+      width: 100%;
+      text-align: left;
+  }
+  .lawyer-info h4 {
+      width: 100%;
+      text-align: center;
+  }
+
+  html[dir="rtl"] .lawyer-info {
+      text-align: right;
+  }
+
+
 
 }
 
@@ -2405,6 +2602,7 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
       font-size: 14px;
       height: 40px;
       border-radius: 10px;
+      padding: 7px 7px 7px 14px;
   }
 
   .btn.btn-lg {
@@ -2459,5 +2657,62 @@ html[dir="rtl"] .input-group-vertical .language .dropdown-toggle::after {
 
   .successful-img img {
       width: 150px;
+  }
+
+  .result-card {
+      padding: 15px;
+  }
+
+  .modal-footer {
+      border-radius: 0 0 20px 20px;
+  }
+
+  .modal-header {
+      padding: 20px 40px 15px 20px;
+  }
+
+  .submit-modal .modal-body {
+      padding: 20px;
+  }
+
+  .modal-body {
+      padding: 15px 20px;
+  }
+
+  .modal-content {
+      border-radius: 20px;
+  }
+
+  h1 {
+      font-size: 27px;
+  }
+
+  h2 {
+      font-size: 24px;
+  }
+
+  .HowItWorks-section {
+      padding: 30px 0;
+  }
+
+  .text-lg {
+      font-size: 16px;
+  }
+
+  html[dir="rtl"] .modal .btn-close {
+      left: 5px;
+  }
+
+  .contact-card {
+      padding: 20px;
+      border-radius: 20px;
+  }
+
+  .btn-icon {
+      padding: 5px;
+      font-size: 18px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
   }
 }

@@ -48,14 +48,23 @@ export default async function RootLayout(
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         />
-      </head>
-      <body className={inter.className}>
-        <AOSInit />
-        <Navbar lang={params.lang} dictionary={dictionary} /> {/* Use Navbar component */}
-        {children}
-        <Footer lang={params.lang} dictionary={dictionary} /> {/* Use Footer component */}
-        <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" />
-      </body>
-    </html>
-  );
+        <link
+          href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Space+Grotesk:wght@300..700&display=swap"
+          rel="stylesheet"/>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+            crossOrigin="anonymous" referrerPolicy="no-referrer" />
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+
+            <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon"></link>
+          </head>
+          <body className={inter.className}>
+            <AOSInit />
+            <Navbar lang={params.lang} dictionary={dictionary} /> {/* Use Navbar component */}
+            {children}
+            <Footer lang={params.lang} dictionary={dictionary} /> {/* Use Footer component */}
+            <Script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" />
+          </body>
+        </html>
+        );
 }

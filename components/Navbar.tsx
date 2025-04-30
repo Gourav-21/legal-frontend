@@ -76,20 +76,20 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
               </li>
             </ul>
             <div className={`d-flex justify-content-center ${lang === 'he' ? 'me-2' : 'ms-2'}`}>
-              <div className="dropdown language">
+              <div className={`dropdown language ${lang === 'he' ? 'rtl' : ''}`}>
                 <a href="#" className="dropdown-toggle" data-bs-toggle="dropdown">
                   {/* Display current language based on lang param */}
                   {lang === 'he' ?
-                    <><Image src="/img/Israel.jpg" alt="Israel" width={20} height={15} /> {dictionary.languageSwitcher.hebrew}</> :
-                    <><Image src="/img/us.jpg" alt="US" width={20} height={15} /> {dictionary.languageSwitcher.english}</>
+                    <><Image src="/img/Israel.jpg" alt="Israel" width={20} height={15} /> Hebrew </> :
+                    <><Image src="/img/us.jpg" alt="US" width={20} height={15} /> English </>
                   }
                 </a>
-                <div className="dropdown-menu dropdown-menu-end">
-                  <Link href={`/en${pathname.substring(3)}`} className="dropdown-item">
-                    <Image src="/img/us.jpg" alt="US" width={20} height={15} /> {dictionary.languageSwitcher.english}
+                <div className={`dropdown-menu ${lang === 'he' ? 'dropdown-menu-start' : 'dropdown-menu-end'}`}>
+                  <Link href={`/en${pathname.substring(3)}`} className={`dropdown-item ${lang === 'he' ? 'text-end' : ''}`}>
+                    <Image src="/img/us.jpg" alt="US" width={20} height={15} /> English
                   </Link>
-                  <Link href={`/he${pathname.substring(3)}`} className="dropdown-item">
-                    <Image src="/img/Israel.jpg" alt="Israel" width={20} height={15} /> {dictionary.languageSwitcher.hebrew}
+                  <Link href={`/he${pathname.substring(3)}`} className={`dropdown-item ${lang === 'he' ? 'text-end' : ''}`}>
+                    <Image src="/img/Israel.jpg" alt="Israel" width={20} height={15} /> Hebrew
                   </Link>
                 </div>
               </div>

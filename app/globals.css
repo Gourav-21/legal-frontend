@@ -798,8 +798,11 @@ header .navbar .nav-link:focus {
   border-radius: 50%;
   font-size: 25px;
   line-height: 20px;
+  padding-bottom: 4px;
   cursor: pointer;
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 25px;
   height: 25px;
 }

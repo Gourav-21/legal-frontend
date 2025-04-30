@@ -121,8 +121,8 @@ export default async function AboutPage(props: AboutPageProps) { // Renamed comp
                     <Image
                       src={`/img/${value.icon}`}
                       alt=""
-                      width={40}
-                      height={40}
+                      width={60}
+                      height={60}
                     />{" "}
                     <p>
                       <span>{value.title}</span> {value.description}

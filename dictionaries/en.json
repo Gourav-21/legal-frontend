@@ -237,8 +237,9 @@
       "date": "Date",
       "type": "Type",
       "status": "Status",
-      "downloadLink": "Download Link",
-      "downloadButton": "Download PDF"
+      "actions": "Actions",
+      "viewButton": "View",
+      "downloadButton": "Download"
     },
     "downloadAll": {
       "button": "Download All Reports",

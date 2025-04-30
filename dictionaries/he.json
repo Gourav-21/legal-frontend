@@ -234,8 +234,9 @@
       "date": "תַאֲרִיך",
       "type": "סוּג",
       "status": "סטָטוּס",
-      "downloadLink": "קישור להורדה",
-      "downloadButton": "הורד PDF"
+      "downloadButton": "הורדה",
+      "actions": "קישור להורדה",
+      "viewButton": " נוֹף"
     },
     "downloadAll": {
       "button": "הורד את כל הדוחות",

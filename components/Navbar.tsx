@@ -16,19 +16,25 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
   const collapseRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (collapseRef.current) {
-      const bsCollapse = new (window as any).bootstrap.Collapse(collapseRef.current, {
+    let bsCollapse: any = null;
+
+    if (typeof window !== 'undefined' && collapseRef.current && window.bootstrap) {
+      bsCollapse = new window.bootstrap.Collapse(collapseRef.current, {
         toggle: false
       });
-      
+
       if (isMenuOpen) {
         bsCollapse.show();
       } else {
         bsCollapse.hide();
       }
-
-      return () => bsCollapse.dispose();
     }
+
+    return () => {
+      if (bsCollapse) {
+        bsCollapse.dispose();
+      }
+    };
   }, [isMenuOpen]);
 
   const toggleMenu = () => {

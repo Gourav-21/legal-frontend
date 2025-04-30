@@ -90,9 +90,9 @@ export default async function SignUpPage(props: SignUpPageProps) {
                 </div>
               </div>
 
-              <div className="form-check mb-4">
+              <div className={`${lang === 'he' ? '' : 'form-check'} mb-4`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
                 <input
-                  className="form-check-input"
+                  className={`form-check-input ${lang === 'he' ? 'mx-2' : ''}`}
                   type="checkbox"
                   value=""
                   id="flexCheckDefault"
@@ -103,7 +103,7 @@ export default async function SignUpPage(props: SignUpPageProps) {
               <button
                 type="submit"
                 className="btn btn-lg btn-primary without-icon w-100 mb-4"
->
+              >
                 {signupDict.freeSignUpButton}
               </button>
               <div className="divider mb-4">
@@ -136,12 +136,12 @@ export default async function SignUpPage(props: SignUpPageProps) {
                   </button>
                 </div>
               </div>
-                <p className="mb-0 text-center">
+              <p className="mb-0 text-center">
                 {signupDict.signInPrompt}{" "}
                 <Link href={`/${lang}/signin`} className="link-primary fw-600">
                   {signupDict.signInLink}
                 </Link>
-                </p>
+              </p>
             </div>
           </div>
         </div>

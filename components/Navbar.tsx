@@ -50,15 +50,15 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
   };
 
   return (
-    <header>
-      <nav className="navbar navbar-expand-lg">
-        <div className="container-fluid">
+    <header dir={lang === 'he' ? 'rtl' : 'ltr'}>
+      <nav className={`navbar navbar-expand-lg ${lang === 'he' ? 'rtl' : ''}`}>
+        <div className={`container-fluid ${lang === 'he' ? 'rtl' : ''}`}>
           <Link className="navbar-brand" href={`/${lang}`}>
             <Image src="/img/logo.png" alt="Logo" width={150} height={40} />
           </Link>
 
           <div ref={collapseRef} className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+            <ul className={`navbar-nav ${lang === 'he' ? 'me-auto' : 'ms-auto'} mb-2 mb-lg-0`}>
               <li className="nav-item">
                 <Link className={`nav-link ${pathname === `/${lang}` ? 'active' : ''}`} href={`/${lang}`} onClick={closeMenu}>{dictionary.navigation.home}</Link>
               </li>
@@ -75,7 +75,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
                 <Link className={`nav-link ${pathname === `/${lang}/contact` ? 'active' : ''}`} href={`/${lang}/contact`} onClick={closeMenu}>{dictionary.navigation.contact}</Link>
               </li>
             </ul>
-            <div className="d-flex justify-content-center">
+            <div className={`d-flex justify-content-center ${lang === 'he' ? 'me-2' : 'ms-2'}`}>
               <div className="dropdown language">
                 <a href="#" className="dropdown-toggle" data-bs-toggle="dropdown">
                   {/* Display current language based on lang param */}
@@ -103,7 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
           </div>
           <Link
             href={`/${lang}/signin`}
-            className="btn ms-auto btn-outline-dark without-icon ms-2"
+            className={`btn ${lang === 'he' ? 'me-auto' : 'ms-auto'} btn-outline-dark without-icon ${lang === 'he' ? 'ms-2' : 'ms-2'}`}
           >
             {dictionary.navigation.login}
           </Link>

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Locale } from "../../i18n-config"; // Import Locale type
 import { getDictionary } from "../../get-dictionary"; // Import dictionary loader
+import AiButtons from "@/components/ai-buttons";
 
 // Define props type to include lang
 interface HomeProps {
@@ -74,21 +75,7 @@ export default async function Home(props: HomeProps) {
               </div>
 
               {/* Action Buttons Grid */}
-              <div className="row">
-                {dictionary.hero.actionButtons.map((buttonText, index) => (
-                  <div key={index} className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-                    <button 
-                      type="button"
-                      className="btn btn-outline-dark thumbnail-btn" 
-                      data-bs-toggle="modal"
-                      data-bs-target="#exampleModal"
-                    >
-                      <div dangerouslySetInnerHTML={{ __html: buttonText.replace(' ', '<br>') }} />
-                      <span><i className="bi bi-arrow-right-short"></i></span>
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <AiButtons lang={lang} dictionary={dictionary} />
             </div>
           </div>
         </section>
@@ -200,45 +187,6 @@ export default async function Home(props: HomeProps) {
           </div>
         </section>
       </main>
-
-      {/* Submit Modal */}
-      <div 
-        className="modal fade submit-modal" 
-        id="exampleModal" 
-        tabIndex={-1} 
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                <i className="bi bi-x"></i>
-              </button>
-              <div className="successful-img">
-                <Image className="bounce-1" src="/img/Successfully-icon.svg" alt="" width={100} height={100} />
-              </div>
-            </div>
-            <div className="modal-body">
-              <h2>Submitted Successfully!</h2>
-              <p className="mb-0">
-                Our legal experts and AI system are analyzing your data.<br /> 
-                You&apos;ll receive a detailed report soon.
-              </p>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-sm btn-yellow mb-2">
-                Go to My Reports
-                <span><i className="bi bi-arrow-right-short"></i></span>
-              </button>
-              <div className="btn-arrow">
-                <Image className="bounce-2" src="/img/arrow1.svg" alt="" width={30} height={30} />
-              </div>
-              <p className="mb-0">You can check the status in your Reports section.</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

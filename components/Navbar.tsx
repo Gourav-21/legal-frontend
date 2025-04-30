@@ -18,7 +18,9 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
   useEffect(() => {
     let bsCollapse: any = null;
 
+    // @ts-ignore
     if (typeof window !== 'undefined' && collapseRef.current && window.bootstrap) {
+      // @ts-ignore
       bsCollapse = new window.bootstrap.Collapse(collapseRef.current, {
         toggle: false
       });
@@ -76,9 +78,9 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
             <div className="d-flex justify-content-center">
               <div className="dropdown language">
                 <a href="#" className="dropdown-toggle" data-bs-toggle="dropdown">
-                  {/* Display current language based on lang param */} 
-                  {lang === 'he' ? 
-                    <><Image src="/img/Israel.jpg" alt="Israel" width={20} height={15} /> {dictionary.languageSwitcher.hebrew}</> : 
+                  {/* Display current language based on lang param */}
+                  {lang === 'he' ?
+                    <><Image src="/img/Israel.jpg" alt="Israel" width={20} height={15} /> {dictionary.languageSwitcher.hebrew}</> :
                     <><Image src="/img/us.jpg" alt="US" width={20} height={15} /> {dictionary.languageSwitcher.english}</>
                   }
                 </a>
@@ -99,17 +101,17 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
               </button>
             </div>
           </div>
-            <Link 
+          <Link
             href={`/${lang}/signin`}
-            className="btn ms-auto btn-outline-dark without-icon ms-2" 
-            >
+            className="btn ms-auto btn-outline-dark without-icon ms-2"
+          >
             {dictionary.navigation.login}
-            </Link>
-          <button 
-            className="navbar-toggler ms-2" 
-            type="button" 
+          </Link>
+          <button
+            className="navbar-toggler ms-2"
+            type="button"
             onClick={toggleMenu}
-            aria-controls="navbarSupportedContent" 
+            aria-controls="navbarSupportedContent"
             aria-expanded={isMenuOpen}
             aria-label="Toggle navigation"
           >

@@ -78,6 +78,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
       const result = await response.json();
       setProcessingResult(result);
+      return result
       // Optionally, trigger the analysis display or show a success message
       // handleShowAnalysis(); // You might want to show analysis based on the API result
 
@@ -122,11 +123,17 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     // }
   };
 
-  
 const handleCreateReport = async (type:string) => {
+    var returnResult = null
+    if(processingResult == null) {
+        returnResult = await handleProcessDocuments()
+    }
     setIsVisible(false)
     setIsProcessing(true);
     setProcessingError(null);
+
+    console.log("processingResult",processingResult)
+    console.log("returnResult",returnResult)
   
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/report`, {
@@ -135,8 +142,8 @@ const handleCreateReport = async (type:string) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          payslip_text: processingResult?.payslip_text,
-          contract_text: processingResult?.contract_text,
+          payslip_text: processingResult?.payslip_text ? processingResult.payslip_text : returnResult?.payslip_text,
+          contract_text: processingResult?.contract_text ? processingResult.contract_text : returnResult?.contract_text,
           type: type,
           context: context
         })
@@ -154,7 +161,7 @@ const handleCreateReport = async (type:string) => {
     } catch (error: any) {
       console.error('Report creation error:', error);
       setProcessingError(error.message);
-      alert(`Error creating report: ${error.message}`);
+    //   alert(`Error creating report: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
@@ -209,11 +216,14 @@ const handleCreateReport = async (type:string) => {
             onClick={handleProcessDocuments}
             disabled={isProcessing || (payslipFiles.length === 0 && contractFiles.length === 0)}
           >
-            {processingResult != null ? 'Processed' : (
+            {/* {processingResult != null ? 'Processed' : (
                 <>
                 {isProcessing ? 'Processing...' : (dictionary.hero.processButton || 'Process Documents')}
                 </>
-            )}
+            )} */}
+                <>
+                {isProcessing ? 'Processing...' : processingResult != null ? 'Processed' : (dictionary.hero.processButton || 'Process Documents')}
+                </>
             {!isProcessing && <span><i className="bi bi-arrow-right-short"></i></span>}
           </button>
         </div>

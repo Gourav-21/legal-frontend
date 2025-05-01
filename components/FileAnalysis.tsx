@@ -412,7 +412,12 @@ const handleCreateReport = async (type:string) => {
             <li><span className="text-dark fw-700">Hourly Minimum Wage</span>: 34.32 NIS <br /><span className="text-muted">Previously: 5,880.02 NIS / 32.30 NIS per hour</span></li>
           </ul>
 
-          <div className="d-sm-flex align-items-center justify-content-between">
+          
+        </div>
+       {/* <div id="typing-output" dangerouslySetInnerHTML={{ __html: typedContent }} style={{ whiteSpace: 'pre-wrap' }} /> */}
+        <div id="typing-output" style={{ whiteSpace: 'pre-wrap' }}>
+        <ReactMarkdown>{typedContent}</ReactMarkdown>
+        <div className="d-sm-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center mt-4">
               <p className="mb-0 text-muted">Send Reports via:</p>
               <button type="submit" className="btn btn-dark btn-icon btn-sm ms-2">
@@ -428,10 +433,6 @@ const handleCreateReport = async (type:string) => {
               <span><i className="bi bi-arrow-right-short"></i></span>
             </button>
           </div>
-        </div>
-       {/* <div id="typing-output" dangerouslySetInnerHTML={{ __html: typedContent }} style={{ whiteSpace: 'pre-wrap' }} /> */}
-        <div id="typing-output" style={{ whiteSpace: 'pre-wrap' }}>
-        <ReactMarkdown>{typedContent}</ReactMarkdown>
         </div>
       </div>}
     </div>

@@ -177,20 +177,176 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         </div>
       </div>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Rendered individually for unique functionality */}
       <div className="row">
-        {dictionary.hero.actionButtons.map((buttonText: string, index: number) => (
-          <div key={index} className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+        {/* Example: Button 1 - Create a report */}
+        {dictionary.hero.actionButtons.createReport && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={handleShowAnalysis}
+              onClick={() => handleShowAnalysis()}
             >
-              <div dangerouslySetInnerHTML={{ __html: buttonText.replace(' ', '<br>') }} />
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createReport.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
             </button>
           </div>
-        ))}
+        )}
+
+        {/* Example: Button 2 - Create a company page */}
+        {dictionary.hero.actionButtons.createCompanyPage && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleShowAnalysis()}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createCompanyPage.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Add other buttons similarly, accessing them by index from dictionary.hero.actionButtons */}
+        {/* Example: Button 3 - Document history */}
+        {dictionary.hero.actionButtons.documentHistory && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleShowAnalysis()}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.documentHistory.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Example: Button 4 - Preparing a claim */}
+        {dictionary.hero.actionButtons.prepareClaim && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleShowAnalysis()}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.prepareClaim.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Button 5 - Check profitability */}
+        {dictionary.hero.actionButtons.checkProfitability && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleShowAnalysis()}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.checkProfitability.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Button 6 - Create warning letter */}
+        {dictionary.hero.actionButtons.createWarningLetter && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleShowAnalysis()}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createWarningLetter.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Button 7 - Professional Opinion & Calculations */}
+        {dictionary.hero.actionButtons.professionalOpinion && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleShowAnalysis()}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.professionalOpinion.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Button 8 - Predicting success */}
+        {dictionary.hero.actionButtons.predictSuccess && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleShowAnalysis()}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.predictSuccess.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Button 9 - Let's mediate */}
+        {dictionary.hero.actionButtons.mediate && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.mediate.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Button 10 - Final Claim Report */}
+        {dictionary.hero.actionButtons.finalClaimReport && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.finalClaimReport.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Button 11 - Serial employer */}
+        {dictionary.hero.actionButtons.identifySerialEmployer && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.identifySerialEmployer.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Button 12 - Refresh before testing */}
+        {dictionary.hero.actionButtons.refreshBeforeTest && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.refreshBeforeTest.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Processing Status Messages */}

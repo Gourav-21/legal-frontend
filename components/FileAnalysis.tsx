@@ -265,20 +265,7 @@ const handleCreateReport = async (type:string) => {
           </div>
         )}
 
-        {/* Example: Button 4 - Preparing a claim */}
-        {dictionary.hero.actionButtons.prepareClaim && (
-          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-            <button
-              type="button"
-              className="btn btn-outline-dark thumbnail-btn show-btn"
-              disabled
-            //   onClick={() => handleShowAnalysis()}
-            >
-              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.prepareClaim.replace(' ', '<br>') }} />
-              <span><i className="bi bi-arrow-right-short"></i></span>
-            </button>
-          </div>
-        )}
+        
 
         {/* Button 5 - Check profitability */}
         {dictionary.hero.actionButtons.checkProfitability && (
@@ -322,8 +309,23 @@ const handleCreateReport = async (type:string) => {
           </div>
         )}
 
-        {/* Button 8 - Predicting success */}
-        {dictionary.hero.actionButtons.predictSuccess && (
+                {/* Easy Explanation Button */}
+        {dictionary.hero.actionButtons.easyExplanation && (
+        <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+            <button
+            type="button"
+            className="btn btn-outline-dark thumbnail-btn show-btn"
+            onClick={() => handleCreateReport('easy')}
+            >
+            <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.easyExplanation.replace(' ', '<br>') }} />
+            <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+        </div>
+        )}
+
+        
+        {/* Example: Button 4 - Preparing a claim */}
+        {dictionary.hero.actionButtons.prepareClaim && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
             <button
               type="button"
@@ -331,22 +333,7 @@ const handleCreateReport = async (type:string) => {
               disabled
             //   onClick={() => handleShowAnalysis()}
             >
-              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.predictSuccess.replace(' ', '<br>') }} />
-              <span><i className="bi bi-arrow-right-short"></i></span>
-            </button>
-          </div>
-        )}
-
-        {/* Button 9 - Let's mediate */}
-        {dictionary.hero.actionButtons.mediate && (
-          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-            <button
-              type="button"
-              className="btn btn-outline-dark thumbnail-btn show-btn"
-              disabled
-            //   onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
-            >
-              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.mediate.replace(' ', '<br>') }} />
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.prepareClaim.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
             </button>
           </div>
@@ -382,20 +369,7 @@ const handleCreateReport = async (type:string) => {
           </div>
         )}
 
-        {/* Button 12 - Refresh before testing */}
-        {dictionary.hero.actionButtons.refreshBeforeTest && (
-          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-            <button
-              type="button"
-              className="btn btn-outline-dark thumbnail-btn show-btn"
-              disabled
-            //   onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
-            >
-              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.refreshBeforeTest.replace(' ', '<br>') }} />
-              <span><i className="bi bi-arrow-right-short"></i></span>
-            </button>
-          </div>
-        )}
+        
       </div>
 
       {/* Processing Status Messages */}

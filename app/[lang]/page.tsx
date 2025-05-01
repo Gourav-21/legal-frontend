@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Locale } from "../../i18n-config"; // Import Locale type
 import { getDictionary } from "../../get-dictionary"; // Import dictionary loader
-import AiButtons from "@/components/ai-buttons";
+import FileAnalysis from "@/components/FileAnalysis";
 
 // Define props type to include lang
 interface HomeProps {
@@ -43,39 +43,8 @@ export default async function Home(props: HomeProps) {
               <h3 className="mb-1">{dictionary.hero.uploadTitle}</h3>
               <p className="mb-3">{dictionary.hero.uploadSubtitle}</p>
               
-              {/* File Upload Section */}
-              <div className="row">
-                {/* Payslip Upload */}
-                <div className="col-lg-6" data-aos="fade-up" data-aos-duration="1500">
-                  <div className="upload-file">
-                    <div className="file-list" id="fileListPayslip"></div>
-                    <div className="upload-container" id="uploadBoxPayslip">
-                      <i className="bi bi-cloud-upload-fill"></i>
-                      <h4 className="mb-1">{dictionary.hero.payslipUploadTitle}</h4>
-                      <p className="mb-3">{dictionary.hero.payslipUploadText}</p>
-                      <input type="file" id="fileInputPayslip" multiple hidden />
-                      <button className="btn btn-sm without-icon btn-fileupload">{dictionary.hero.uploadButton}</button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contract Upload */}
-                <div className="col-lg-6 mt-4 mt-lg-0" data-aos="fade-up" data-aos-duration="1500">
-                  <div className="upload-file">
-                    <div className="file-list" id="fileListContract"></div>
-                    <div className="upload-container" id="uploadBoxContract">
-                      <i className="bi bi-cloud-upload-fill"></i>
-                      <h4 className="mb-1">{dictionary.hero.contractUploadTitle}</h4>
-                      <p className="mb-3">{dictionary.hero.contractUploadText}</p>
-                      <input type="file" id="fileInputContract" multiple hidden />
-                      <button className="btn btn-sm without-icon btn-fileupload">{dictionary.hero.uploadButton}</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons Grid */}
-              <AiButtons lang={lang} dictionary={dictionary} />
+              {/* Combined File Upload and Analysis Component */}
+              <FileAnalysis lang={lang} dictionary={dictionary} />
             </div>
           </div>
         </section>

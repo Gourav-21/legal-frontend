@@ -19,11 +19,15 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // File Upload States
   const [payslipFiles, setPayslipFiles] = useState<UploadedFile[]>([]);
   const [contractFiles, setContractFiles] = useState<UploadedFile[]>([]);
+  const [context, setContext] = useState<string>(''); // State for additional context input
 
   // Analysis States
   const [isVisible, setIsVisible] = useState(false);
   const [typedContent, setTypedContent] = useState('');
   const animationStartedRef = React.useRef(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processingResult, setProcessingResult] = useState<any>(null); // State to hold API response
+  const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error
 
   // Analysis Handlers
   const scrollToAnalysis = () => {
@@ -31,6 +35,55 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     if (analysisSection) {
       const y = analysisSection.getBoundingClientRect().top + window.pageYOffset - 30;
       window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  const handleProcessDocuments = async () => {
+    if (payslipFiles.length === 0 && contractFiles.length === 0) {
+      alert('Please upload at least one payslip or contract file.'); // Or use a more sophisticated notification
+      return;
+    }
+
+    setIsProcessing(true);
+    setProcessingResult(null);
+    setProcessingError(null);
+
+    const formData = new FormData();
+
+    payslipFiles.forEach(uploadedFile => {
+      formData.append('files', uploadedFile.file);
+      formData.append('doc_types', 'payslip');
+    });
+
+    contractFiles.forEach(uploadedFile => {
+      formData.append('files', uploadedFile.file);
+      formData.append('doc_types', 'contract');
+    });
+
+    try {
+      // Assuming your backend API is running on the same origin or configured for CORS
+      // Adjust the URL '/api/process' if your backend is hosted elsewhere or has a different prefix
+      const response = await fetch('http://127.0.0.1:8000/api/process', { // IMPORTANT: Adjust this URL if needed
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setProcessingResult(result);
+      // Optionally, trigger the analysis display or show a success message
+      // handleShowAnalysis(); // You might want to show analysis based on the API result
+
+    } catch (error: any) {
+      console.error('Error processing documents:', error);
+      setProcessingError(error.message || 'An unexpected error occurred.');
+      alert(`Error processing files: ${error.message || 'An unexpected error occurred.'}`); // Placeholder error message
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -96,6 +149,34 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         </div>
       </div>
 
+      {/* Process Documents Button */}
+      <div className="row mt-4" data-aos="fade-up" data-aos-duration="1500">
+        <div className="col-9">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter additional context for document analysis..."
+            value={context}
+            onChange={(e) => setContext(e.target.value)}
+          />
+        </div>
+        <div className="col-3">
+          <button
+            type="button"
+            className="btn btn-success w-100 p-4"
+            onClick={handleProcessDocuments}
+            disabled={isProcessing || (payslipFiles.length === 0 && contractFiles.length === 0)}
+          >
+            {processingResult != null ? 'Processed' : (
+                <>
+                {isProcessing ? 'Processing...' : (dictionary.hero.processButton || 'Process Documents')}
+                </>
+            )}
+            {!isProcessing && <span><i className="bi bi-arrow-right-short"></i></span>}
+          </button>
+        </div>
+      </div>
+
       {/* Action Buttons */}
       <div className="row">
         {dictionary.hero.actionButtons.map((buttonText: string, index: number) => (
@@ -111,6 +192,13 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           </div>
         ))}
       </div>
+
+      {/* Processing Status Messages */}
+      {processingError && (
+        <div className="alert alert-danger mt-3" role="alert">
+          Error: {processingError}
+        </div>
+      )}
 
       {/* Analysis Section */}
       <div className="result-card mt-4" id="analysis-section" style={{ display: isVisible ? 'block' : 'none' }}>

@@ -22,20 +22,20 @@
     "contractUploadTitle": "העלאת חוזה העסקה",
     "contractUploadText": "גרור את הקובץ לכאן, או דפדף (PDF, TIF, PNG, JPG)",
     "uploadButton": "העלה קובץ",
-    "actionButtons": [
-      "צור דוח",
-      "צור דף חברה",
-      "היסטוריית מסמכים",
-      "הכנת תביעה",
-      "בדוק רווחיות",
-      "צור מכתב אזהרה",
-      "חוות דעת מקצועית וחישובים",
-      "חיזוי הצלחה",
-      "בואו נגשר",
-      "דוח תביעה סופי וטבלאות",
-      "זיהוי מעסיק סדרתי",
-      "רענן לפני בדיקה"
-    ]
+    "actionButtons": {
+  "createReport": "צור דוח",
+  "createCompanyPage": "צור דף חברה",
+  "documentHistory": "היסטוריית מסמכים",
+  "prepareClaim": "הכנת תביעה",
+  "checkProfitability": "בדוק רווחיות",
+  "createWarningLetter": "צור מכתב אזהרה",
+  "professionalOpinion": "חוות דעת מקצועית וחישובים",
+  "predictSuccess": "חיזוי הצלחה",
+  "mediate": "בואו נגשר",
+  "finalClaimReport": "דוח תביעה סופי וטבלאות",
+  "identifySerialEmployer": "זיהוי מעסיק סדרתי",
+  "refreshBeforeTest": "רענן לפני בדיקה"
+}
   },
   "howItWorks": {
     "title": "איך <span class=\"text-yellow\">Paynalyze</span> עובד.",

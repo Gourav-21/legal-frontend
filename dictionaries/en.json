@@ -22,20 +22,20 @@
     "contractUploadTitle": "Employment Contract Upload",
     "contractUploadText": "Drop your file here, or browse (PDF, TIF, PNG, JPG)",
     "uploadButton": "Upload File",
-    "actionButtons": [
-      "Create a report",
-      "Create a company page",
-      "Document history",
-      "Preparing a claim",
-      "Check profitability",
-      "Create a warning letter",
-      "Professional Opinion & Calculations",
-      "Predicting success",
-      "Let's mediate",
-      "Final Claim Report & Tables",
-      "Serial employer identification",
-      "Refresh before testing"
-    ]
+    "actionButtons": {
+  "createReport": "Create a report",
+  "createCompanyPage": "Create a company page",
+  "documentHistory": "Document history",
+  "prepareClaim": "Preparing a claim",
+  "checkProfitability": "Check profitability",
+  "createWarningLetter": "Create a warning letter",
+  "professionalOpinion": "Professional Opinion & Calculations",
+  "predictSuccess": "Predicting success",
+  "mediate": "Let's mediate",
+  "finalClaimReport": "Final Claim Report & Tables",
+  "identifySerialEmployer": "Serial employer identification",
+  "refreshBeforeTest": "Refresh before testing"
+}
   },
   "howItWorks": {
     "title": "How <span class=\"text-yellow\">Paynalyze</span> Works.",

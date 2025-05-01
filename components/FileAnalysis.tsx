@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Locale } from "@/i18n-config";
 import FileUpload from './FileUpload';
+import ReactMarkdown from 'react-markdown';
 
 interface FileAnalysisProps {
   lang: Locale;
@@ -20,6 +22,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   const [payslipFiles, setPayslipFiles] = useState<UploadedFile[]>([]);
   const [contractFiles, setContractFiles] = useState<UploadedFile[]>([]);
   const [context, setContext] = useState<string>(''); // State for additional context input
+  const router = useRouter();
 
   // Analysis States
   const [isVisible, setIsVisible] = useState(false);
@@ -101,22 +104,61 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     }, 5);
   };
 
-  const handleShowAnalysis = () => {
-    if (!animationStartedRef.current) {
-      animationStartedRef.current = true;
-      setIsVisible(true);
+  const handleShowAnalysis = (content:string) => {
+    // if (!animationStartedRef.current) {
+    //   animationStartedRef.current = true;
+        setTypedContent('');
+        setIsVisible(true);
 
       setTimeout(() => {
         scrollToAnalysis();
         setTimeout(() => {
-          const content = document.getElementById('analysis-content')?.innerHTML || '';
+        //   const content = document.getElementById('analysis-content')?.innerHTML || '';
           typeContent(content);
         }, 100);
       }, 100);
-    } else {
-      scrollToAnalysis();
-    }
+    // } else {
+    //   scrollToAnalysis();
+    // }
   };
+
+  
+const handleCreateReport = async (type:string) => {
+    setIsVisible(false)
+    setIsProcessing(true);
+    setProcessingError(null);
+  
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payslip_text: processingResult?.payslip_text,
+          contract_text: processingResult?.contract_text,
+          type: type,
+          context: context
+        })
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Report creation failed');
+      }
+  
+      const result = await response.json();
+      console.log(result); // Log the response to the termina
+      // Handle successful report creation
+      handleShowAnalysis(result.legal_analysis);
+    } catch (error: any) {
+      console.error('Report creation error:', error);
+      setProcessingError(error.message);
+      alert(`Error creating report: ${error.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };  
 
   return (
     <div>
@@ -185,7 +227,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleShowAnalysis()}
+              onClick={() => handleCreateReport('report') }
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createReport.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -199,7 +241,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleShowAnalysis()}
+            //   onClick={() => handleShowAnalysis()}
+            disabled
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createCompanyPage.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -214,7 +257,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleShowAnalysis()}
+              onClick={() => router.push(`/reports`)}
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.documentHistory.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -228,7 +271,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleShowAnalysis()}
+              disabled
+            //   onClick={() => handleShowAnalysis()}
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.prepareClaim.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -242,7 +286,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleShowAnalysis()}
+              onClick={() => handleCreateReport('profitability') }
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.checkProfitability.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -256,7 +300,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleShowAnalysis()}
+              onClick={() => handleCreateReport('warning_letter') }
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createWarningLetter.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -270,7 +314,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleShowAnalysis()}
+              onClick={() => handleCreateReport('professional') }
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.professionalOpinion.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -284,7 +328,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleShowAnalysis()}
+              disabled
+            //   onClick={() => handleShowAnalysis()}
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.predictSuccess.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -298,7 +343,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
+              disabled
+            //   onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.mediate.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -312,7 +358,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
+              disabled
+            //   onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.finalClaimReport.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -326,7 +373,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
+              disabled
+            //   onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.identifySerialEmployer.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -340,7 +388,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
+              disabled
+            //   onClick={() => { /* TODO: Add specific handler */ handleShowAnalysis(); }}
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.refreshBeforeTest.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -357,7 +406,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       )}
 
       {/* Analysis Section */}
-      <div className="result-card mt-4" id="analysis-section" style={{ display: isVisible ? 'block' : 'none' }}>
+     {isVisible && <div className="result-card mt-4" id="analysis-section" style={{ display: isVisible ? 'block' : 'none' }}>
         <div id="analysis-content" style={{ display: 'none' }}>
           <br />
           <h3>Economic Feasibility Analysis Results</h3>
@@ -396,8 +445,11 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             </button>
           </div>
         </div>
-        <div id="typing-output" dangerouslySetInnerHTML={{ __html: typedContent }} style={{ whiteSpace: 'pre-wrap' }} />
-      </div>
+       {/* <div id="typing-output" dangerouslySetInnerHTML={{ __html: typedContent }} style={{ whiteSpace: 'pre-wrap' }} /> */}
+        <div id="typing-output" style={{ whiteSpace: 'pre-wrap' }}>
+        <ReactMarkdown>{typedContent}</ReactMarkdown>
+        </div>
+      </div>}
     </div>
   );
 };

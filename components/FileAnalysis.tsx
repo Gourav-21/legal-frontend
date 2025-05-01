@@ -66,7 +66,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     try {
       // Assuming your backend API is running on the same origin or configured for CORS
       // Adjust the URL '/api/process' if your backend is hosted elsewhere or has a different prefix
-      const response = await fetch('http://127.0.0.1:8000/api/process', { // IMPORTANT: Adjust this URL if needed
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/process`, {
         method: 'POST',
         body: formData,
       });
@@ -84,7 +84,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     } catch (error: any) {
       console.error('Error processing documents:', error);
       setProcessingError(error.message || 'An unexpected error occurred.');
-      alert(`Error processing files: ${error.message || 'An unexpected error occurred.'}`); // Placeholder error message
+    //   alert(`Error processing files: ${error.message || 'An unexpected error occurred.'}`); // Placeholder error message
     } finally {
       setIsProcessing(false);
     }
@@ -129,7 +129,7 @@ const handleCreateReport = async (type:string) => {
     setProcessingError(null);
   
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/report', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

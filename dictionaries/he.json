@@ -385,5 +385,38 @@
         "contactButton": "צור קשר עכשיו"
       }
     ]
+  },
+  "law": {
+    "title": "ניהול חוקי עבודה",
+    "subtitle": "צפה, הוסף, ערוך ומחק חוקי עבודה במערכת שלנו",
+    "databaseTitle": "מאגר חוקי עבודה",
+    "databaseSubtitle": "נהל את כל חוקי העבודה שלך במקום אחד",
+    "newLawPlaceholder": "הזן את טקסט חוק העבודה...",
+    "addButton": "הוסף חוק חדש",
+    "addingButton": "מוסיף...",
+    "loading": "טוען...",
+    "loadingLaws": "טוען חוקים...",
+    "noLaws": "לא נמצאו חוקי עבודה. הוסף את החוק הראשון שלך למעלה.",
+    "lawTextHeader": "טקסט החוק",
+    "actionsHeader": "פעולות",
+    "saveTip": "שמור שינויים",
+    "saveButton": "שמור",
+    "cancelTip": "בטל עריכה",
+    "cancelButton": "בטל",
+    "editTip": "ערוך חוק זה",
+    "editButton": "ערוך",
+    "deleteTip": "מחק חוק זה",
+    "deleteButton": "מחק",
+    "confirmDelete": "האם אתה בטוח שברצונך למחוק חוק זה?",
+    "errors": {
+      "fetchFailed": "שגיאה בטעינת חוקים",
+      "genericFetch": "נכשל בטעינת חוקים",
+      "addFailed": "שגיאה בהוספת חוק",
+      "genericAdd": "נכשל בהוספת חוק",
+      "deleteFailed": "שגיאה במחיקת חוק",
+      "genericDelete": "נכשל במחיקת חוק",
+      "updateFailed": "שגיאה בעדכון חוק",
+      "genericUpdate": "נכשל בעדכון חוק"
+    }
   }
 }

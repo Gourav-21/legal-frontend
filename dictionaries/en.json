@@ -388,5 +388,38 @@
         "contactButton": "Contact Now"
       }
     ]
+  },
+  "law": {
+    "title": "Labor Law Management",
+    "subtitle": "View, add, edit, and delete labor laws in our system",
+    "databaseTitle": "Labor Law Database",
+    "databaseSubtitle": "Manage all your labor laws in one place",
+    "newLawPlaceholder": "Enter the labor law text...",
+    "addButton": "Add New Law",
+    "addingButton": "Adding...",
+    "loading": "Loading...",
+    "loadingLaws": "Loading laws...",
+    "noLaws": "No labor laws found. Add your first law above.",
+    "lawTextHeader": "Law Text",
+    "actionsHeader": "Actions",
+    "saveTip": "Save changes",
+    "saveButton": "Save",
+    "cancelTip": "Cancel editing",
+    "cancelButton": "Cancel",
+    "editTip": "Edit this law",
+    "editButton": "Edit",
+    "deleteTip": "Delete this law",
+    "deleteButton": "Delete",
+    "confirmDelete": "Are you sure you want to delete this law?",
+    "errors": {
+      "fetchFailed": "Error fetching laws",
+      "genericFetch": "Failed to fetch laws",
+      "addFailed": "Error adding law",
+      "genericAdd": "Failed to add law",
+      "deleteFailed": "Error deleting law",
+      "genericDelete": "Failed to delete law",
+      "updateFailed": "Error updating law",
+      "genericUpdate": "Failed to update law"
+    }
   }
 }

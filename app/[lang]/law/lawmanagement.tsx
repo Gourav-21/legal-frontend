@@ -216,7 +216,7 @@ export function LawManagement({ dictionary }: { dictionary: any }) {
                           law.text
                         )}
                       </td>
-                      <td className="text-end">
+                      <td className="text-end" dir='ltr'>
                         {editLawId === law.id ? (
                           <div className="btn-group">
                             <button

@@ -18,7 +18,7 @@ export function LawManagement({ dictionary }: { dictionary: any }) {
     const [editLawText, setEditLawText] = useState('');
   
     // Backend API URL - replace with your FastAPI backend URL
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
   
     // Fetch all laws on component mount
     useEffect(() => {

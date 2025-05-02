@@ -161,106 +161,38 @@ export default async function Home(props: HomeProps) {
                 <div className="modal-dialog modal-lg modal-dialog-centered">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <h1 className="modal-title fs-5" id="exampleModalLabel">Choose Your Expert Labor Lawyer</h1>
+                            <h1 className="modal-title fs-5" id="exampleModalLabel">{dictionary.lawyerModal.title}</h1>
                             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"><i className="bi bi-x"></i></button>
                         </div>
                         <div className="modal-body p-3 p-sm-4">
-                            <div className="lawyer-card mb-3">
-                                <img src="img/lawyer-pic1.jpg" className="lawyer-profile me-3" alt="David Levi" />
-                                <div className="lawyer-info">
-                                    <h4 className="mt-2">David Levi</h4>
-                                    <div className="row">
-                                        <div className="col-lg-6">
-                                            <ul className="text-sm lawyer-info-list">
-                                                <li><i className="bi bi-geo-alt"></i> Tel Aviv, Israel</li>
-                                                <li><i className="bi bi-bullseye"></i> 17 years <small className="text-muted">of experience in labor law</small></li>
-                                                <li><i className="bi bi-star"></i> 4.9 <small className="text-muted"> | 120+ client reviews</small></li>
-                                            </ul>
+                            {dictionary.lawyerModal.lawyers.map((lawyer, index) => (
+                                <div key={index} className={`lawyer-card${index < dictionary.lawyerModal.lawyers.length - 1 ? ' mb-3' : ''}`}>
+                                    <img src={`img/lawyer-pic${index + 1}.jpg`} className="lawyer-profile me-3" alt={lawyer.name} />
+                                    <div className="lawyer-info">
+                                        <h4 className="mt-2">{lawyer.name}</h4>
+                                        <div className="row">
+                                            <div className="col-lg-6">
+                                                <ul className="text-sm lawyer-info-list">
+                                                    <li><i className="bi bi-geo-alt"></i> {lawyer.location}</li>
+                                                    <li><i className="bi bi-bullseye"></i> {lawyer.experience}</li>
+                                                    <li><i className="bi bi-star"></i> {lawyer.rating}</li>
+                                                </ul>
+                                            </div>
+                                            <div className="col-lg-6">
+                                                <h6>{lawyer.specialtiesTitle}</h6>
+                                                <ul className="text-sm">
+                                                    {lawyer.specialties.map((specialty, specialtyIndex) => (
+                                                        <li key={specialtyIndex}>{specialty}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
                                         </div>
-                                        <div className="col-lg-6">
-                                            <h6>Specialties</h6>
-                                            <ul className="text-sm">
-                                                <li>Wage disputes</li>
-                                                <li>Wrongful termination</li>
-                                                <li>Severance pay claims</li>
-                                            </ul>
-                                        </div>
+                                        <button type="submit" className="btn btn-sm btn-outline-primary without-icon">
+                                            {lawyer.contactButton}
+                                        </button>
                                     </div>
-                                    <button type="submit" className="btn btn-sm btn-outline-primary without-icon">Contact Now</button>
                                 </div>
-                            </div>
-                            <div className="lawyer-card mb-3">
-                                <img src="img/lawyer-pic2.jpg" className="lawyer-profile me-3" alt="Amir Shalev" />
-                                <div className="lawyer-info">
-                                    <h4 className="mt-2">Amir Shalev</h4>
-                                    <div className="row">
-                                        <div className="col-lg-6">
-                                            <ul className="text-sm lawyer-info-list">
-                                                <li><i className="bi bi-geo-alt"></i> Jerusalem, Israel</li>
-                                                <li><i className="bi bi-bullseye"></i> 12 years <small className="text-muted">of experience in labor law</small></li>
-                                                <li><i className="bi bi-star"></i> 4.8 <small className="text-muted"> | 100+ client reviews</small></li>
-                                            </ul>
-                                        </div>
-                                        <div className="col-lg-6">
-                                            <h6>Specialties</h6>
-                                            <ul className="text-sm">
-                                                <li>Employment contracts</li>
-                                                <li>Unpaid overtime disputes</li>
-                                                <li>Labor court representation</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <button type="submit" className="btn btn-sm btn-outline-primary without-icon">Contact Now</button>
-                                </div>
-                            </div>
-                            <div className="lawyer-card mb-3">
-                                <img src="img/lawyer-pic4.jpg" className="lawyer-profile me-3" alt="Michal Barak" />
-                                <div className="lawyer-info">
-                                    <h4 className="mt-2">Michal Barak</h4>
-                                    <div className="row">
-                                        <div className="col-lg-6">
-                                            <ul className="text-sm lawyer-info-list">
-                                                <li><i className="bi bi-geo-alt"></i> Ramat Gan, Israel</li>
-                                                <li><i className="bi bi-bullseye"></i> 11 years <small className="text-muted">of experience in labor law</small></li>
-                                                <li><i className="bi bi-star"></i> 4.8 <small className="text-muted"> | 90+ client reviews</small></li>
-                                            </ul>
-                                        </div>
-                                        <div className="col-lg-6">
-                                            <h6>Specialties</h6>
-                                            <ul className="text-sm">
-                                                <li>Minimum wage violations</li>
-                                                <li>Employee benefits disputes</li>
-                                                <li>Unfair dismissal cases</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <button type="submit" className="btn btn-sm btn-outline-primary without-icon">Contact Now</button>
-                                </div>
-                            </div>
-                            <div className="lawyer-card">
-                                <img src="img/lawyer-pic3.jpg" className="lawyer-profile me-3" alt="Eitan Moyal" />
-                                <div className="lawyer-info">
-                                    <h4 className="mt-2">Eitan Moyal</h4>
-                                    <div className="row">
-                                        <div className="col-lg-6">
-                                            <ul className="text-sm lawyer-info-list">
-                                                <li><i className="bi bi-geo-alt"></i> Be'er Sheva, Israel</li>
-                                                <li><i className="bi bi-bullseye"></i> 20 years <small className="text-muted">of experience in labor law</small></li>
-                                                <li><i className="bi bi-star"></i> 4.7 <small className="text-muted"> | 95+ client reviews</small></li>
-                                            </ul>
-                                        </div>
-                                        <div className="col-lg-6">
-                                            <h6>Specialties</h6>
-                                            <ul className="text-sm">
-                                                <li>Union disputes</li>
-                                                <li>Workplace harassment cases</li>
-                                                <li>Retaliation claims</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <button type="submit" className="btn btn-sm btn-outline-primary without-icon">Contact Now</button>
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </div>

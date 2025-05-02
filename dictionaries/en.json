@@ -331,5 +331,62 @@
     "saveInfoCheckboxSubtext": "Pay faster on Paynalyze and everywhere Link is accepted.",
     "subscribeButton": "Subscribe",
     "termsText": "By confirming your subscription, you allow us to charge your card for this and future payments in accordance with terms. You can always cancel your subscription"
+  },
+  "lawyerModal": {
+    "title": "Choose Your Expert Labor Lawyer",
+    "lawyers": [
+      {
+        "name": "David Levi",
+        "location": "Tel Aviv, Israel",
+        "experience": "17 years of experience in labor law",
+        "rating": "4.9 | 120+ client reviews",
+        "specialtiesTitle": "Specialties",
+        "specialties": [
+          "Wage disputes",
+          "Wrongful termination",
+          "Severance pay claims"
+        ],
+        "contactButton": "Contact Now"
+      },
+      {
+        "name": "Amir Shalev",
+        "location": "Jerusalem, Israel",
+        "experience": "12 years of experience in labor law",
+        "rating": "4.8 | 100+ client reviews",
+        "specialtiesTitle": "Specialties",
+        "specialties": [
+          "Employment contracts",
+          "Unpaid overtime disputes",
+          "Labor court representation"
+        ],
+        "contactButton": "Contact Now"
+      },
+      {
+        "name": "Michal Barak",
+        "location": "Ramat Gan, Israel",
+        "experience": "11 years of experience in labor law",
+        "rating": "4.8 | 90+ client reviews",
+        "specialtiesTitle": "Specialties",
+        "specialties": [
+          "Minimum wage violations",
+          "Employee benefits disputes",
+          "Unfair dismissal cases"
+        ],
+        "contactButton": "Contact Now"
+      },
+      {
+        "name": "Eitan Moyal",
+        "location": "Be'er Sheva, Israel",
+        "experience": "20 years of experience in labor law",
+        "rating": "4.7 | 95+ client reviews",
+        "specialtiesTitle": "Specialties",
+        "specialties": [
+          "Union disputes",
+          "Workplace harassment cases",
+          "Retaliation claims"
+        ],
+        "contactButton": "Contact Now"
+      }
+    ]
   }
 }

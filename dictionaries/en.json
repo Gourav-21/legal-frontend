@@ -23,18 +23,24 @@
     "contractUploadText": "Drop your file here, or browse (PDF, TIF, PNG, JPG)",
     "uploadButton": "Upload File",
     "actionButtons": {
-  "createReport": "Create a report",
-  "createCompanyPage": "Create a company page",
-  "documentHistory": "Document history",
-  "prepareClaim": "Preparing a claim",
-  "checkProfitability": "Check profitability",
-  "createWarningLetter": "Create a warning letter",
-  "professionalOpinion": "Professional Opinion & Calculations",
-  "predictSuccess": "Predicting success",
-  "finalClaimReport": "Final Claim Report & Tables",
-  "identifySerialEmployer": "Serial employer identification",
-  "easyExplanation": "Easy Explanation"
-}
+      "createReport": "Create a report",
+      "createCompanyPage": "Create a company page",
+      "documentHistory": "Document history",
+      "prepareClaim": "Preparing a claim",
+      "checkProfitability": "Check profitability",
+      "createWarningLetter": "Create a warning letter",
+      "professionalOpinion": "Professional Opinion & Calculations",
+      "predictSuccess": "Predicting success",
+      "finalClaimReport": "Final Claim Report & Tables",
+      "identifySerialEmployer": "Serial employer identification",
+      "easyExplanation": "Easy Explanation"
+    },
+    "sharing": {
+      "title": "Send Reports via:",
+      "whatsapp": "Send via WhatsApp",
+      "email": "Send via Email",
+      "findLawyer": "Find Your Lawyer"
+    }
   },
   "howItWorks": {
     "title": "How <span class=\"text-yellow\">Paynalyze</span> Works.",

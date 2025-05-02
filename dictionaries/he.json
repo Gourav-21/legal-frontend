@@ -23,18 +23,24 @@
     "contractUploadText": "גרור את הקובץ לכאן, או דפדף (PDF, TIF, PNG, JPG)",
     "uploadButton": "העלה קובץ",
     "actionButtons": {
-  "createReport": "צור דוח",
-  "createCompanyPage": "צור דף חברה",
-  "documentHistory": "היסטוריית מסמכים",
-  "prepareClaim": "הכנת תביעה",
-  "checkProfitability": "בדוק רווחיות",
-  "createWarningLetter": "צור מכתב אזהרה",
-  "professionalOpinion": "חוות דעת מקצועית וחישובים",
-  "predictSuccess": "חיזוי הצלחה",
-  "finalClaimReport": "דוח תביעה סופי וטבלאות",
-  "identifySerialEmployer": "זיהוי מעסיק סדרתי",
-  "easyExplanation": "הסבר פשוט"
-}
+      "createReport": "צור דוח",
+      "createCompanyPage": "צור דף חברה",
+      "documentHistory": "היסטוריית מסמכים",
+      "prepareClaim": "הכנת תביעה",
+      "checkProfitability": "בדוק רווחיות",
+      "createWarningLetter": "צור מכתב אזהרה",
+      "professionalOpinion": "חוות דעת מקצועית וחישובים",
+      "predictSuccess": "חיזוי הצלחה",
+      "finalClaimReport": "דוח תביעה סופי וטבלאות",
+      "identifySerialEmployer": "זיהוי מעסיק סדרתי",
+      "easyExplanation": "הסבר פשוט"
+    },
+    "sharing": {
+      "title": "שלח דוחות באמצעות:",
+      "whatsapp": "שלח באמצעות וואטסאפ",
+      "email": "שלח באמצעות אימייל",
+      "findLawyer": "מצא את עורך הדין שלך"
+    }
   },
   "howItWorks": {
     "title": "איך <span class=\"text-yellow\">Paynalyze</span> עובד.",

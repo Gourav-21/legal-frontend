@@ -9,10 +9,11 @@ export interface Law {
 }
 
 interface LawPageProps {
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }
 
-export default async function LawPage({ params }: LawPageProps) {
+export default async function LawPage(props: LawPageProps) {
+  const params = await props.params;
   const dictionary = await getDictionary(params.lang);
 
   return (

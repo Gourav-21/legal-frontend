@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useRef, useState } from 'react';
+import imageCompression from 'browser-image-compression';
 
 interface FileUploadProps {
   id: string;
@@ -22,40 +23,84 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, la
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  console.log(files)
 
-  const handleFiles = useCallback((incomingFiles: FileList) => {
-    const newFiles: UploadedFile[] = Array.from(incomingFiles).map(file => ({
-      id: `${file.name}-${Date.now()}`,
-      file,
-      progress: 0,
-    }));
+  // Helper function to check if a file is an image
+  const isImageFile = (file: File): boolean => {
+    return file.type.startsWith('image/');
+  };
 
-    // Use functional update to ensure we have the latest state
-    onFilesChange(prevFiles => [...prevFiles, ...newFiles]);
+  // Function to compress image files
+  const compressImageFile = async (file: File, id: string): Promise<File> => {
+    if (!isImageFile(file)) {
+      // For non-image files, simulate progress and return immediately
+      setTimeout(() => {
+        onFilesChange(prevFiles => prevFiles.map(f => f.id === id ? { ...f, progress: 100 } : f));
+      }, 100);
+      return file;
+    }
 
-    // Simulate progress using functional updates
-    newFiles.forEach(newFile => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 10;
-        if (progress >= 100) {
-          clearInterval(interval);
-          // Use functional update for progress completion
-          onFilesChange(prevFiles =>
-            prevFiles.map(f =>
-              f.id === newFile.id ? { ...f, progress: 100 } : f
-            )
-          );
-        } else {
-          // Use functional update for progress update
-          onFilesChange(prevFiles =>
-            prevFiles.map(f =>
-              f.id === newFile.id ? { ...f, progress: progress } : f
-            )
-          );
-        }
-      }, 200);
+    onFilesChange(prevFiles => prevFiles.map(f => f.id === id ? { ...f, progress: 10 } : f));
+    try {
+      const options = {
+        maxSizeMB: 2, // Increased max file size to 2MB for better quality
+        maxWidthOrHeight: 2048, // Increased max dimension to 2048px
+        useWebWorker: true,
+        fileType: file.type,
+        initialQuality: 0.9 // Higher quality setting (0.9 instead of default 0.7)
+      };
+
+      onFilesChange(prevFiles => prevFiles.map(f => f.id === id ? { ...f, progress: 40 } : f));
+
+      const compressedFile = await imageCompression(file, options);
+      onFilesChange(prevFiles => prevFiles.map(f => f.id === id ? { ...f, progress: 80 } : f));
+
+      // Set final progress to 100% after a small delay to make it visible
+      setTimeout(() => {
+        onFilesChange(prevFiles => prevFiles.map(f => f.id === id ? { ...f, progress: 100 } : f));
+      }, 100);
+
+      console.log(`Original size: ${file.size / 1024 / 1024} MB, Compressed size: ${compressedFile.size / 1024 / 1024} MB`);
+      return compressedFile;
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      onFilesChange(prevFiles => prevFiles.map(f => f.id === id ? { ...f, progress: 100 } : f));
+      return file; // Return original file if compression fails
+    }
+  };
+
+  const handleFiles = useCallback(async (incomingFiles: FileList) => {
+    // Create array to hold file processing promises
+    const processFilePromises = Array.from(incomingFiles).map(async file => {
+      const id = `${file.name}-${Date.now()}`;
+      // Add file with initial progress of 0
+      onFilesChange(prevFiles => [
+        ...prevFiles,
+        {
+          id,
+          file,
+          progress: 0
+        }]);
+      const processedFile = await compressImageFile(file, id);
+
+      // Update the file reference with the processed file
+      onFilesChange(prevFiles =>
+        prevFiles.map(f => f.id === id ? { ...f, file: processedFile } : f)
+      );
+
+      return {
+        id,
+        file: processedFile,
+        progress: isImageFile(file) ? 80 : 100 // Progress will be updated in compressImageFile
+      };
     });
+
+    await Promise.all(processFilePromises);
+    
+    // Reset the file input to allow re-uploading the same file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   }, [onFilesChange]); // Add onFilesChange to dependency array
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -90,6 +135,11 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, la
   const handleRemoveFile = useCallback((fileId: string) => {
     // Use functional update for removing files
     onFilesChange(prevFiles => prevFiles.filter(f => f.id !== fileId));
+    
+    // Reset the file input to allow re-uploading the same file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   }, [onFilesChange]); // Add onFilesChange to dependency array
 
   const getFileIcon = (fileName: string): string => {
@@ -108,7 +158,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, la
               <i className={`fa-regular ${getFileIcon(uploadedFile.file.name)} file-icon text-muted`}></i>
               <div>
                 <h6>{uploadedFile.file.name}</h6>
-                <p className="text-muted">{(uploadedFile.file.size / 1024 / 1024).toFixed(2)} MB</p>
+                <p className="text-muted">{(uploadedFile.file.size / 1024 / 1024).toFixed(2)} MB {uploadedFile.progress < 100 && <span className="text-danger ">{"compressing"}</span>}</p>
               </div>
             </div>
             <div className="progress-close-btn">

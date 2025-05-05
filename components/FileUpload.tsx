@@ -70,8 +70,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, la
   };
 
   const handleFiles = useCallback(async (incomingFiles: FileList) => {
-    // Create array to hold file processing promises
-    const processFilePromises = Array.from(incomingFiles).map(async file => {
+    // Process files sequentially one at a time
+    for (const file of Array.from(incomingFiles)) {
       const id = `${file.name}-${Date.now()}`;
       // Add file with initial progress of 0
       onFilesChange(prevFiles => [
@@ -87,15 +87,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, la
       onFilesChange(prevFiles =>
         prevFiles.map(f => f.id === id ? { ...f, file: processedFile } : f)
       );
-
-      return {
-        id,
-        file: processedFile,
-        progress: isImageFile(file) ? 80 : 100 // Progress will be updated in compressImageFile
-      };
-    });
-
-    await Promise.all(processFilePromises);
+    }
     
     // Reset the file input to allow re-uploading the same file
     if (fileInputRef.current) {

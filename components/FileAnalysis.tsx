@@ -342,7 +342,8 @@ const handleCreateReport = async (type:string) => {
         <button
           type="button"
           className="btn btn-outline-dark thumbnail-btn show-btn"
-          disabled
+          onClick={() => handleCreateReport('claim')}
+          disabled={isProcessing}
         >
           <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.prepareClaim.replace(' ', '<br>') }} />
           <span><i className="bi bi-arrow-right-short"></i></span>
@@ -356,7 +357,8 @@ const handleCreateReport = async (type:string) => {
         <button
           type="button"
           className="btn btn-outline-dark thumbnail-btn show-btn"
-          disabled
+          onClick={() => handleCreateReport('table')}
+          disabled={isProcessing}
         >
           <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.finalClaimReport.replace(' ', '<br>') }} />
           <span><i className="bi bi-arrow-right-short"></i></span>

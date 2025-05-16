@@ -1,36 +1,75 @@
+# Legal Frontend Project
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-First, run the development server:
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+*   **Node.js**: Make sure you have Node.js version 20 or newer installed. You can download it from [nodejs.org](https://nodejs.org/).
+    *   It's recommended to use the Node.js version specified in the `engines` field of your `package.json` file, or the latest Long Term Support (LTS) version if not specified.
+
+### Environment Variables
+
+This project uses environment variables to manage configuration settings, such as API endpoints.
+
+1.  **Create a local environment file**:
+    Copy the example environment file to a new file named `.env`. You can do this by running the following command in your terminal from the project root:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+2.  **Configure variables**:
+    Open the `.env` file and update the variables as needed. For example:
+
+    ```env
+    NEXT_PUBLIC_BACKEND_URL=http://your-backend-api-url.com
+    ```
+    Replace `http://your-backend-api-url.com` with the actual URL of your backend service.
+
+
+### Installation & Development
+
+1.  **Install dependencies**:
+    Navigate to the project directory and install the required dependencies:
+
+    ```bash
+    npm install
+    ```
+    Alternatively, you can use `yarn install`, `pnpm install`, or `bun install` depending on your preferred package manager.
+
+2.  **Run the development server**:
+    Once the dependencies are installed, start the development server:
+
+    ```bash
+    npm run dev
+    ```
+    Or `yarn dev`, `pnpm dev`, `bun dev`.
+
+    This will start the application in development mode. Open [http://localhost:3000](http://localhost:3000) (or the port shown in your terminal) in your browser to see the result. The page will auto-update as you edit the files. The main page to start editing is typically `app/page.tsx`.
+
+## Building for Production
+
+To create a production-ready build of the application, run:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
 ```
+Or `yarn build`, `pnpm build`, `bun run build`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This command compiles and optimizes your application for production. The output will be in the `.next` folder.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Running in Production Mode
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+After building the application, you can start the production server using:
 
-## Learn More
+```bash
+npm run start
+```
+Or `yarn start`, `pnpm start`, `bun run start`.
 
-To learn more about Next.js, take a look at the following resources:
+This will serve the optimized application. It's recommended to run this behind a reverse proxy like Nginx or on a platform that handles this for you.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

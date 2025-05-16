@@ -23,8 +23,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, la
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  console.log(files)
-
   // Helper function to check if a file is an image
   const isImageFile = (file: File): boolean => {
     return file.type.startsWith('image/');

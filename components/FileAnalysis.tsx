@@ -21,6 +21,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // File Upload States
   const [payslipFiles, setPayslipFiles] = useState<UploadedFile[]>([]);
   const [contractFiles, setContractFiles] = useState<UploadedFile[]>([]);
+  const [attendanceFiles, setAttendanceFiles] = useState<UploadedFile[]>([]); // New state for attendance reports
   const [context, setContext] = useState<string>(''); // State for additional context input
   const router = useRouter();
 
@@ -42,8 +43,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   };
 
   const handleProcessDocuments = async () => {
-    if (payslipFiles.length === 0 && contractFiles.length === 0) {
-      alert('Please upload at least one payslip or contract file.'); // Or use a more sophisticated notification
+    if (payslipFiles.length === 0 && contractFiles.length === 0 && attendanceFiles.length === 0) {
+      alert('Please upload at least one payslip, contract, or attendance file.'); // Or use a more sophisticated notification
       return;
     }
 
@@ -61,6 +62,11 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     contractFiles.forEach(uploadedFile => {
       formData.append('files', uploadedFile.file);
       formData.append('doc_types', 'contract');
+    });
+
+    attendanceFiles.forEach(uploadedFile => { // Add attendance files to formData
+      formData.append('files', uploadedFile.file);
+      formData.append('doc_types', 'attendance');
     });
 
     try {
@@ -144,6 +150,7 @@ const handleCreateReport = async (type:string) => {
         body: JSON.stringify({
           payslip_text: processingResult?.payslip_text ? processingResult.payslip_text : returnResult?.payslip_text,
           contract_text: processingResult?.contract_text ? processingResult.contract_text : returnResult?.contract_text,
+          attendance_text: processingResult?.attendance_text ? processingResult.attendance_text : returnResult?.attendance_text,
           type: type,
           context: context
         })
@@ -172,7 +179,7 @@ const handleCreateReport = async (type:string) => {
       {/* File Upload Section */}
       <div className="row">
         {/* Payslip Upload */}
-        <div className="col-lg-6" data-aos="fade-up" data-aos-duration="1500">
+        <div className="col-lg-4" data-aos="fade-up" data-aos-duration="1500">
           <FileUpload
             id="payslip"
             title={dictionary.hero.payslipUploadTitle}
@@ -185,7 +192,7 @@ const handleCreateReport = async (type:string) => {
         </div>
 
         {/* Contract Upload */}
-        <div className="col-lg-6 mt-4 mt-lg-0" data-aos="fade-up" data-aos-duration="1500">
+        <div className="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-duration="1500">
           <FileUpload
             id="contract"
             title={dictionary.hero.contractUploadTitle}
@@ -194,6 +201,19 @@ const handleCreateReport = async (type:string) => {
             lang={lang}
             files={contractFiles}
             onFilesChange={setContractFiles}
+          />
+        </div>
+
+        {/* Attendance Report Upload */}
+        <div className="col-lg-4 mt-4 mt-lg-0" data-aos="fade-up" data-aos-duration="1500">
+          <FileUpload
+            id="attendance"
+            title={dictionary.hero.attendanceUploadTitle}
+            text={dictionary.hero.attendanceUploadText}
+            buttonText={dictionary.hero.uploadButton}
+            lang={lang}
+            files={attendanceFiles}
+            onFilesChange={setAttendanceFiles}
           />
         </div>
       </div>
@@ -214,7 +234,7 @@ const handleCreateReport = async (type:string) => {
             type="button"
             className="btn btn-success w-100 p-4"
             onClick={handleProcessDocuments}
-            disabled={isProcessing || (payslipFiles.length === 0 && contractFiles.length === 0)}
+            disabled={isProcessing || (payslipFiles.length === 0 && contractFiles.length === 0 && attendanceFiles.length === 0)}
           >
             {/* {processingResult != null ? 'Processed' : (
                 <>

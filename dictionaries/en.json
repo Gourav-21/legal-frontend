@@ -21,6 +21,8 @@
     "payslipUploadText": "Drop your file here, or browse (PDF, TIF, PNG, JPG)",
     "contractUploadTitle": "Employment Contract Upload",
     "contractUploadText": "Drop your file here, or browse (PDF, TIF, PNG, JPG)",
+    "attendanceUploadTitle": "Attendance reports Upload",
+    "attendanceUploadText": "Drop your file here, or browse (PDF, TIF, PNG, JPG)",
     "uploadButton": "Upload File",
     "actionButtons": {
       "createReport": "Create a report",

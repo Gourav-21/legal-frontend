@@ -21,6 +21,8 @@
     "payslipUploadText": "גרור את הקובץ לכאן, או דפדף (PDF, TIF, PNG, JPG)",
     "contractUploadTitle": "העלאת חוזה העסקה",
     "contractUploadText": "גרור את הקובץ לכאן, או דפדף (PDF, TIF, PNG, JPG)",
+    "attendanceUploadTitle": "העלאת דוחות נוכחות",
+    "attendanceUploadText": "גרור את הקובץ לכאן, או דפדף (PDF, TIF, PNG, JPG)",
     "uploadButton": "העלה קובץ",
     "actionButtons": {
       "createReport": "צור דוח",

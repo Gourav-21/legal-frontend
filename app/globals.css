@@ -826,7 +826,7 @@ header .navbar .nav-link:focus {
   text-overflow: ellipsis;
   font-weight: 700;
   font-size: 12px;
-  max-width: 200px;
+  max-width: 105px;
   margin-bottom: 0px;
 }
 
@@ -2106,144 +2106,144 @@ html[dir="rtl"] .lawyer-info-list li i {
 right: 0px;}
 
 @media screen and (max-width:1399px) {
-  .WhyUs-card::after {
-      border-right: 84px solid transparent;
-  }
+    .WhyUs-card::after {
+        border-right: 84px solid transparent;
+    }
 
-  .file-item h6 {
-      max-width: 165px;
-  }
+    .file-item h6 {
+        max-width: 77px;
+    }
 
-  html[dir="rtl"] .WhyUs-card::after {
-      border-left: 84px solid transparent;
-  }
+    html[dir="rtl"] .WhyUs-card::after {
+        border-left: 84px solid transparent;
+    }
 
 }
 
 @media screen and (max-width:1279px) {
-  header .navbar-brand img {
-      width: 150px;
-  }
+    header .navbar-brand img {
+        width: 150px;
+    }
 
-  header .navbar .navbar-nav .nav-link {
-      font-size: 14px;
-      padding: 5px 7px;
-  }
+    header .navbar .navbar-nav .nav-link {
+        font-size: 14px;
+        padding: 5px 7px;
+    }
 
-  header .navbar {
-      padding: 10px 0px;
-  }
+    header .navbar {
+        padding: 10px 0px;
+    }
 
-  h1 {
-      font-size: 37px;
-  }
+    h1 {
+        font-size: 37px;
+    }
 
-  .text-lg {
-      font-size: 18px;
-  }
+    .text-lg {
+        font-size: 18px;
+    }
 
-  .vector1 {
-      width: 180px;
-      top: -149px;
-  }
+    .vector1 {
+        width: 180px;
+        top: -149px;
+    }
 
-  h3 {
-      font-size: 20px;
-  }
+    h3 {
+        font-size: 20px;
+    }
 
-  body {
-      font-size: 14px;
-  }
+    body {
+        font-size: 14px;
+    }
 
-  h4 {
-      font-size: 18px;
-  }
+    h4 {
+        font-size: 18px;
+    }
 
 
 
-  h2 {
-      font-size: 30px;
-  }
+    h2 {
+        font-size: 30px;
+    }
 
-  .HowITWorks-card-left .HowITWorks-card-body {
-      padding: 60px 60px 20px 20px;
-  }
+    .HowITWorks-card-left .HowITWorks-card-body {
+        padding: 60px 60px 20px 20px;
+    }
 
-  .HowITWorks-card-body {
-      padding: 60px 60px 20px 60px;
-  }
+    .HowITWorks-card-body {
+        padding: 60px 60px 20px 60px;
+    }
 
-  .HowITWorks-card-right .HowITWorks-card-body {
-      padding: 60px 20px 20px 60px;
-  }
+    .HowITWorks-card-right .HowITWorks-card-body {
+        padding: 60px 20px 20px 60px;
+    }
 
-  section {
-      padding: 30px 0px;
-  }
+    section {
+        padding: 30px 0px;
+    }
 
-  footer {
-      margin-top: 30px;
-  }
+    footer {
+        margin-top: 30px;
+    }
 
-  .HowItWorks-section {
-      margin-top: 30px;
-      padding: 60px 0;
-      margin-bottom: 30px;
-  }
+    .HowItWorks-section {
+        margin-top: 30px;
+        padding: 60px 0;
+        margin-bottom: 30px;
+    }
 
-  .btn span, .btn.thumbnail-btn span {
-      width: 22px;
-      height: 22px;
-  }
-  .btn.thumbnail-btn span i {
-      font-size: 20px;
-  }
+    .btn span,
+    .btn.thumbnail-btn span {
+        width: 22px;
+        height: 22px;
+    }
 
-  .btn span img {
-      max-width: 16px;
-  }
+    .btn.thumbnail-btn span i {
+        font-size: 20px;
+    }
 
-  .file-item h6 {
-      max-width: 115px;
-  }
+    .btn span img {
+        max-width: 16px;
+    }
 
-  .form-floating>.form-select {
-      padding-top: 20px;
-      padding-bottom: 5px;
-      height: 45px;
-  }
 
-  .form-select {
-      padding: 5px 12px;
-      font-size: 14px;
-      height: 45px;
-      border-radius: 12px;
-  }
 
-  .form-floating>.form-control:focus~label,
-  .form-floating>.form-control:not(:placeholder-shown)~label,
-  .form-floating>.form-select~label {
-      transform: scale(.75) translateY(-10px) translateX(5px);
-  }
+    .form-floating>.form-select {
+        padding-top: 20px;
+        padding-bottom: 5px;
+        height: 45px;
+    }
 
-  .right-form {
-      padding: 30px;
-  }
+    .form-select {
+        padding: 5px 12px;
+        font-size: 14px;
+        height: 45px;
+        border-radius: 12px;
+    }
 
-  .vector-card-main {
-      padding-left: 30px;
-      padding-right: 30px;
-  }
+    .form-floating>.form-control:focus~label,
+    .form-floating>.form-control:not(:placeholder-shown)~label,
+    .form-floating>.form-select~label {
+        transform: scale(.75) translateY(-10px) translateX(5px);
+    }
 
-  .vector-card-main .coin2 {
-      right: 0px;
-      width: 50px;
-  }
+    .right-form {
+        padding: 30px;
+    }
 
-  .our-mission-img2 {
-      width: 80px;
-      left: -15px;
-  }
+    .vector-card-main {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .vector-card-main .coin2 {
+        right: 0px;
+        width: 50px;
+    }
+
+    .our-mission-img2 {
+        width: 80px;
+        left: -15px;
+    }
 
 
 
@@ -2251,471 +2251,477 @@ right: 0px;}
 }
 
 @media screen and (max-width:1199.5px) {
-  .WhyUs-card::after {
-      border-right: 68px solid transparent;
-  }
+    .WhyUs-card::after {
+        border-right: 68px solid transparent;
+    }
 
-  html[dir="rtl"] .WhyUs-card::after {
-      border-left: 68px solid transparent;
-  }
+    html[dir="rtl"] .WhyUs-card::after {
+        border-left: 68px solid transparent;
+    }
+
+    .file-item h6 {
+        max-width: 48px;
+    }
 
 }
 
 @media screen and (max-width:992.5px) {
 
-  .navbar-collapse {
-      position: absolute;
-      background-color: rgba(12, 117, 111, 0.9);
-      box-shadow: 0 10px 20px 0 rgba(12, 117, 111, 0.3);
-      backdrop-filter: blur(10px);
-      left: 0;
-      text-align: center;
-      width: 100%;
-      z-index: 2;
-      border-radius: 15px;
-      padding: 15px 0;
-      top: 100%;
-  }
+    .navbar-collapse {
+        position: absolute;
+        background-color: rgba(12, 117, 111, 0.9);
+        box-shadow: 0 10px 20px 0 rgba(12, 117, 111, 0.3);
+        backdrop-filter: blur(10px);
+        left: 0;
+        text-align: center;
+        width: 100%;
+        z-index: 2;
+        border-radius: 15px;
+        padding: 15px 0;
+        top: 100%;
+    }
 
-  header .navbar .navbar-nav .nav-link {
-      font-size: 18px;
-      color: #fff;
-      padding: 10px 10px;
-  }
+    header .navbar .navbar-nav .nav-link {
+        font-size: 18px;
+        color: #fff;
+        padding: 10px 10px;
+    }
 
-  header .navbar .navbar-nav .nav-link.active {
-      color: #FDCF6F;
-  }
-
-
-
-  header .navbar .nav-link.active::after {
-      width: 6px;
-      height: 6px;
-      bottom: 3px;
-      left: calc(50% - 3px);
-      background-color: #FDCF6F;
-  }
-
-  header .navbar .language {
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      background: transparent;
-  }
-
-  header .navbar .language a {
-      color: rgba(255, 255, 255, 1);
-
-  }
-
-  header .navbar .language .dropdown-menu a {
-      color: #0F0F14;
-  }
+    header .navbar .navbar-nav .nav-link.active {
+        color: #FDCF6F;
+    }
 
 
-  .upload-container {
-      min-height: 200px;
-  }
 
-  .vector1 {
-      display: none;
-  }
+    header .navbar .nav-link.active::after {
+        width: 6px;
+        height: 6px;
+        bottom: 3px;
+        left: calc(50% - 3px);
+        background-color: #FDCF6F;
+    }
 
-  .coin1 {
+    header .navbar .language {
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        background: transparent;
+    }
 
-      left: -50px;
-      width: 60px;
-  }
+    header .navbar .language a {
+        color: rgba(255, 255, 255, 1);
 
-  .coin2 {
-      right: -50px;
-      width: 60px;
-  }
+    }
 
-  .HowITWorks-card-left .HowITWorks-card-body,
-  .HowITWorks-card-right .HowITWorks-card-body,
-  .HowITWorks-card-body {
-      padding: 60px 20px 20px 20px;
-      text-align: left;
-  }
+    header .navbar .language .dropdown-menu a {
+        color: #0F0F14;
+    }
 
 
-  .file-item h6 {
-      max-width: 225px;
-  }
+    .upload-container {
+        min-height: 200px;
+    }
 
-  .WhyUs-img {
-      display: none;
+    .vector1 {
+        display: none;
+    }
 
-  }
+    .coin1 {
 
-  .WhyUs-card::after {
-      display: none;
-  }
+        left: -50px;
+        width: 60px;
+    }
 
-  .WhyUs-card {
-      border-radius: 30px;
-  }
+    .coin2 {
+        right: -50px;
+        width: 60px;
+    }
 
-  .HowITWorks-icon {
-      padding: 20px;
-      width: 80px;
-      margin: 0px auto -50px 20px;
-      height: 80px;
-  }
+    .HowITWorks-card-left .HowITWorks-card-body,
+    .HowITWorks-card-right .HowITWorks-card-body,
+    .HowITWorks-card-body {
+        padding: 60px 20px 20px 20px;
+        text-align: left;
+    }
 
-  .HowITWorks-card-right .HowITWorks-icon,
-  .HowITWorks-card-left .HowITWorks-icon {
-      margin: 0px auto -50px 20px;
-  }
 
-  .HowITWorks-card-right .counting,
-  .counting {
-      bottom: unset;
-      top: 10px;
-      left: unset;
-      right: 20px;
-  }
+    .file-item h6 {
+        max-width: 225px;
+    }
 
-  .PricingCTA {
+    .WhyUs-img {
+        display: none;
 
-      padding: 30px 30px 0px 30px;
-      border-radius: 30px;
-  }
+    }
 
-  .PricingCTA-section .coin1 {
-      left: -30px;
-  }
+    .WhyUs-card::after {
+        display: none;
+    }
 
-  .PricingCTA-section .coin2 {
-      right: -30px;
-  }
+    .WhyUs-card {
+        border-radius: 30px;
+    }
 
-  .vector-card {
-      border-radius: 20px;
-  }
+    .HowITWorks-icon {
+        padding: 20px;
+        width: 80px;
+        margin: 0px auto -50px 20px;
+        height: 80px;
+    }
 
-  .thumbnail-btn {
-      font-size: 16px;
-  }
+    .HowITWorks-card-right .HowITWorks-icon,
+    .HowITWorks-card-left .HowITWorks-icon {
+        margin: 0px auto -50px 20px;
+    }
 
-  html[dir="rtl"] .HowITWorks-card-left .HowITWorks-card-body,
-  html[dir="rtl"] .HowITWorks-card-right .HowITWorks-card-body,
-  html[dir="rtl"] .HowITWorks-card-body {
-      text-align: right;
-  }
+    .HowITWorks-card-right .counting,
+    .counting {
+        bottom: unset;
+        top: 10px;
+        left: unset;
+        right: 20px;
+    }
 
-  html[dir="rtl"] .HowITWorks-card-right .counting,
-  html[dir="rtl"] .counting {
-      left: 20px;
-      right: unset;
-  }
+    .PricingCTA {
 
-  html[dir="rtl"] .HowITWorks-card-right .HowITWorks-icon,
-  html[dir="rtl"] .HowITWorks-card-left .HowITWorks-icon,
-  html[dir="rtl"] .HowITWorks-icon {
-      margin: 0px 20px -50px auto;
-  }
+        padding: 30px 30px 0px 30px;
+        border-radius: 30px;
+    }
 
-  html[dir="rtl"] .WhyUs-card {
-      border-radius: 30px;
-  }
+    .PricingCTA-section .coin1 {
+        left: -30px;
+    }
 
-  .SignUp-SignIn-card .left-banner {
-      width: 100%;
-  }
+    .PricingCTA-section .coin2 {
+        right: -30px;
+    }
 
-  .right-form {
-      width: 100%;
-  }
+    .vector-card {
+        border-radius: 20px;
+    }
+
+    .thumbnail-btn {
+        font-size: 16px;
+    }
+
+    html[dir="rtl"] .HowITWorks-card-left .HowITWorks-card-body,
+    html[dir="rtl"] .HowITWorks-card-right .HowITWorks-card-body,
+    html[dir="rtl"] .HowITWorks-card-body {
+        text-align: right;
+    }
+
+    html[dir="rtl"] .HowITWorks-card-right .counting,
+    html[dir="rtl"] .counting {
+        left: 20px;
+        right: unset;
+    }
+
+    html[dir="rtl"] .HowITWorks-card-right .HowITWorks-icon,
+    html[dir="rtl"] .HowITWorks-card-left .HowITWorks-icon,
+    html[dir="rtl"] .HowITWorks-icon {
+        margin: 0px 20px -50px auto;
+    }
+
+    html[dir="rtl"] .WhyUs-card {
+        border-radius: 30px;
+    }
+
+    .SignUp-SignIn-card .left-banner {
+        width: 100%;
+    }
+
+    .right-form {
+        width: 100%;
+    }
 }
 
 @media screen and (max-width:767.5px) {
-  .file-item h6 {
-      max-width: 135px;
-  }
+    .file-item h6 {
+        max-width: 135px;
+    }
 
 }
 
 @media screen and (max-width:575px) {
 
-  header .navbar {
-      width: calc(100% - 20px);
-      margin-left: 10px;
-      margin-top: 10px;
-  }
+    header .navbar {
+        width: calc(100% - 20px);
+        margin-left: 10px;
+        margin-top: 10px;
+    }
 
-  .HowItWorks-section {
-      background-position: -10px 0px;
-      margin-left: 10px;
-      width: calc(100% - 20px);
-      border-radius: 20px;
-  }
+    .HowItWorks-section {
+        background-position: -10px 0px;
+        margin-left: 10px;
+        width: calc(100% - 20px);
+        border-radius: 20px;
+    }
 
-  footer {
-      margin-bottom: 10px;
-      margin-left: 10px;
-      width: calc(100% - 20px);
-  }
+    footer {
+        margin-bottom: 10px;
+        margin-left: 10px;
+        width: calc(100% - 20px);
+    }
 
-  .Upload-document {
-      padding: 20px 20px 20px 20px;
-      border-radius: 20px;
+    .Upload-document {
+        padding: 20px 20px 20px 20px;
+        border-radius: 20px;
 
-  }
+    }
 
-  .file-item h6 {
-      max-width: 110px;
-  }
+    .file-item h6 {
+        max-width: 110px;
+    }
 
-  .WhyUs-card {
-      border-radius: 20px;
-      padding: 20px;
-  }
+    .WhyUs-card {
+        border-radius: 20px;
+        padding: 20px;
+    }
 
-  .PricingCTA {
-      padding: 20px 20px 0px 20px;
-      border-radius: 20px;
-  }
+    .PricingCTA {
+        padding: 20px 20px 0px 20px;
+        border-radius: 20px;
+    }
 
-  .plan-card {
-      border-radius: 20px;
-  }
+    .plan-card {
+        border-radius: 20px;
+    }
 
-  .plan-card-header {
-      padding: 15px;
-      border-radius: 15px;
-  }
+    .plan-card-header {
+        padding: 15px;
+        border-radius: 15px;
+    }
 
-  html[dir="rtl"] .WhyUs-card {
-      border-radius: 20px;
-      padding: 20px;
-  }
+    html[dir="rtl"] .WhyUs-card {
+        border-radius: 20px;
+        padding: 20px;
+    }
 
-  html[dir="rtl"] .HowItWorks-section {
-      margin-right: 10px;
-      margin-left: 0;
-      background-position: -10px 0px;
-  }
+    html[dir="rtl"] .HowItWorks-section {
+        margin-right: 10px;
+        margin-left: 0;
+        background-position: -10px 0px;
+    }
 
-  html[dir="rtl"] header .navbar {
-      margin-right: 10px;
-      margin-left: 0px;
-  }
+    html[dir="rtl"] header .navbar {
+        margin-right: 10px;
+        margin-left: 0px;
+    }
 
-  html[dir="rtl"] footer {
-      margin-right: 10px;
-      margin-left: 0px;
+    html[dir="rtl"] footer {
+        margin-right: 10px;
+        margin-left: 0px;
 
-  }
+    }
 
-  .reports-filter {
-      padding: 20px 20px 0px 20px;
-  }
+    .reports-filter {
+        padding: 20px 20px 0px 20px;
+    }
 
-  .reports-card {
-      border-radius: 20px;
-  }
+    .reports-card {
+        border-radius: 20px;
+    }
 
-  .reports-card .table thead th:first-child,
-  .reports-card .table tbody td:first-child {
-      padding-left: 20px;
-  }
+    .reports-card .table thead th:first-child,
+    .reports-card .table tbody td:first-child {
+        padding-left: 20px;
+    }
 
-  .reports-card .table thead th:last-child,
-  .reports-card .table tbody td:last-child {
-      padding-right: 20px;
-  }
+    .reports-card .table thead th:last-child,
+    .reports-card .table tbody td:last-child {
+        padding-right: 20px;
+    }
 
-  .about-hero-video {
-      border-radius: 20px;
-      height: 350px;
-  }
+    .about-hero-video {
+        border-radius: 20px;
+        height: 350px;
+    }
 
-  .lawyer-card {
-      text-align: center;
-      display: block;
-  }
+    .lawyer-card {
+        text-align: center;
+        display: block;
+    }
 
-  .lawyer-card .btn-outline-primary {
-      position: relative;
-      right: 0px;
-      top: 0px;
-      margin-top: 15px;
-      margin-left: auto;
-      margin-right: auto;
-  }
-  .lawyer-info {
-      width: 100%;
-      text-align: left;
-  }
-  .lawyer-info h4 {
-      width: 100%;
-      text-align: center;
-  }
+    .lawyer-card .btn-outline-primary {
+        position: relative;
+        right: 0px;
+        top: 0px;
+        margin-top: 15px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 
-  html[dir="rtl"] .lawyer-info {
-      text-align: right;
-  }
+    .lawyer-info {
+        width: 100%;
+        text-align: left;
+    }
+
+    .lawyer-info h4 {
+        width: 100%;
+        text-align: center;
+    }
+
+    html[dir="rtl"] .lawyer-info {
+        text-align: right;
+    }
 
 
 
 }
 
 @media screen and (max-width:479.5px) {
-  .file-item {
-      width: 100%;
-  }
+    .file-item {
+        width: 100%;
+    }
 
-  .file-item h6 {
-      max-width: 145px;
-  }
+    .file-item h6 {
+        max-width: 145px;
+    }
 
-  header .navbar-brand img {
-      width: 130px;
-  }
+    header .navbar-brand img {
+        width: 130px;
+    }
 
-  .pricing-switch-head .form-switch {
-      width: 100%;
-      text-align: center;
-  }
+    .pricing-switch-head .form-switch {
+        width: 100%;
+        text-align: center;
+    }
 
-  .pricing-switch-head .off-arrow {
-      margin-bottom: 0px;
-      margin-top: 10px;
-      margin-left: 0px;
-  }
+    .pricing-switch-head .off-arrow {
+        margin-bottom: 0px;
+        margin-top: 10px;
+        margin-left: 0px;
+    }
 
-  .pricing-switch-head .off-arrow img {
-      -webkit-transform: scaleY(-1) !important;
-      transform: scaleY(-1) !important;
-  }
+    .pricing-switch-head .off-arrow img {
+        -webkit-transform: scaleY(-1) !important;
+        transform: scaleY(-1) !important;
+    }
 
 
 
-  .btn-sm.without-icon,
-  html[dir="rtl"] .btn-sm.without-icon {
-      padding: 5px 10px 5px 10px;
-      line-height: 20px;
-      font-size: 12px;
-      height: 30px;
-      border-radius: 8px;
-  }
+    .btn-sm.without-icon,
+    html[dir="rtl"] .btn-sm.without-icon {
+        padding: 5px 10px 5px 10px;
+        line-height: 20px;
+        font-size: 12px;
+        height: 30px;
+        border-radius: 8px;
+    }
 
-  .btn {
-      font-size: 14px;
-      height: 40px;
-      border-radius: 10px;
-      padding: 7px 7px 7px 14px;
-  }
+    .btn {
+        font-size: 14px;
+        height: 40px;
+        border-radius: 10px;
+        padding: 7px 7px 7px 14px;
+    }
 
-  .btn.btn-lg {
-      font-size: 16px;
-      height: 45px;
-      border-radius: 12px;
-  }
+    .btn.btn-lg {
+        font-size: 16px;
+        height: 45px;
+        border-radius: 12px;
+    }
 
-  .without-icon,
-  html[dir="rtl"] .btn.without-icon {
-      padding: 10px 15px 10px 15px;
-  }
+    .without-icon,
+    html[dir="rtl"] .btn.without-icon {
+        padding: 10px 15px 10px 15px;
+    }
 
-  header .navbar .navbar-toggler {
-      padding: 8px;
-      height: 40px;
-      font-size: 22px;
-      width: 40px;
-  }
+    header .navbar .navbar-toggler {
+        padding: 8px;
+        height: 40px;
+        font-size: 22px;
+        width: 40px;
+    }
 
-  .thumbnail-btn,
-  html[dir="rtl"] .btn.thumbnail-btn {
-      padding: 10px;
-  }
+    .thumbnail-btn,
+    html[dir="rtl"] .btn.thumbnail-btn {
+        padding: 10px;
+    }
 
-  .right-form {
-      padding: 20px;
-  }
+    .right-form {
+        padding: 20px;
+    }
 
-  .SignUp-SignIn-card {
-      border-radius: 20px;
-  }
+    .SignUp-SignIn-card {
+        border-radius: 20px;
+    }
 
-  .subscription-plan-list li {
-      font-size: 14px;
-  }
+    .subscription-plan-list li {
+        font-size: 14px;
+    }
 
-  .subscription-plan-list li small {
-      font-size: 12px;
-  }
+    .subscription-plan-list li small {
+        font-size: 12px;
+    }
 
-  .form-group-card .input-group:first-child .form-control {
-      width: 100%;
-      background-color: transparent;
-  }
+    .form-group-card .input-group:first-child .form-control {
+        width: 100%;
+        background-color: transparent;
+    }
 
-  .form-group-card .input-group:first-child .btn {
-      height: auto;
-      margin-bottom: 10px;
-      padding: 0 10px;
-  }
+    .form-group-card .input-group:first-child .btn {
+        height: auto;
+        margin-bottom: 10px;
+        padding: 0 10px;
+    }
 
-  .successful-img img {
-      width: 150px;
-  }
+    .successful-img img {
+        width: 150px;
+    }
 
-  .result-card {
-      padding: 15px;
-  }
+    .result-card {
+        padding: 15px;
+    }
 
-  .modal-footer {
-      border-radius: 0 0 20px 20px;
-  }
+    .modal-footer {
+        border-radius: 0 0 20px 20px;
+    }
 
-  .modal-header {
-      padding: 20px 40px 15px 20px;
-  }
+    .modal-header {
+        padding: 20px 40px 15px 20px;
+    }
 
-  .submit-modal .modal-body {
-      padding: 20px;
-  }
+    .submit-modal .modal-body {
+        padding: 20px;
+    }
 
-  .modal-body {
-      padding: 15px 20px;
-  }
+    .modal-body {
+        padding: 15px 20px;
+    }
 
-  .modal-content {
-      border-radius: 20px;
-  }
+    .modal-content {
+        border-radius: 20px;
+    }
 
-  h1 {
-      font-size: 27px;
-  }
+    h1 {
+        font-size: 27px;
+    }
 
-  h2 {
-      font-size: 24px;
-  }
+    h2 {
+        font-size: 24px;
+    }
 
-  .HowItWorks-section {
-      padding: 30px 0;
-  }
+    .HowItWorks-section {
+        padding: 30px 0;
+    }
 
-  .text-lg {
-      font-size: 16px;
-  }
+    .text-lg {
+        font-size: 16px;
+    }
 
-  html[dir="rtl"] .modal .btn-close {
-      left: 5px;
-  }
+    html[dir="rtl"] .modal .btn-close {
+        left: 5px;
+    }
 
-  .contact-card {
-      padding: 20px;
-      border-radius: 20px;
-  }
+    .contact-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
 
-  .btn-icon {
-      padding: 5px;
-      font-size: 18px;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-  }
+    .btn-icon {
+        padding: 5px;
+        font-size: 18px;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+    }
 }

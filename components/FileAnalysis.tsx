@@ -108,7 +108,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       } else {
         clearInterval(typing);
       }
-    }, 0.1);
+    }, 0);
   };
 
   const handleShowAnalysis = (content:string) => {

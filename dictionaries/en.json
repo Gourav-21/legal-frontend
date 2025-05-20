@@ -6,6 +6,7 @@
     "about": "About Us",
     "contact": "Contact Us",
     "login": "Login",
+    "logout": "Logout",
     "upgrade": "Upgrade to Pro"
   },
   "languageSwitcher": {

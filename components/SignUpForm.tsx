@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; // Use next/navigation for App Router
+import useAuthStore from '../store/authStore'; // Import the auth store
 
 interface SignUpFormProps {
   signupDict: any; // Replace 'any' with a more specific type if available
@@ -20,6 +21,7 @@ export default function SignUpForm({ signupDict, lang }: SignUpFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuthStore(); // Use the auth store
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,7 +42,7 @@ export default function SignUpForm({ signupDict, lang }: SignUpFormProps) {
     try {
       // Assuming your backend API is running on the same origin or proxied
       // Adjust the URL if your backend is hosted elsewhere
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}auth/register`, { // Adjust this path if needed
+      const response = await fetch('/api/auth/register', { // Adjust this path if needed
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,10 +57,12 @@ export default function SignUpForm({ signupDict, lang }: SignUpFormProps) {
         throw new Error(data.detail || signupDict.defaultError || 'An error occurred during sign up');
       }
 
+      login(data.email); // Update auth store with user email
+
       // Signup successful, potentially redirect or show success message
       console.log('Signup successful:', data);
-      // Redirect to signin page after successful registration
-      router.push(`/${lang}/signin`);
+      // Redirect to home page after successful registration
+      router.push(`/${lang}/`);
 
     } catch (err: any) {
       setError(err.message);

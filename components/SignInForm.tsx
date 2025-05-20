@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Locale } from '../i18n-config'; // Adjust path if needed based on actual location
+import useAuthStore from '../store/authStore'; // Import the auth store
 
 interface SignInFormProps {
     lang: Locale;
@@ -18,6 +19,7 @@ export default function SignInForm({ lang, dictionary }: SignInFormProps) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const signinDict = dictionary.signin;
+    const { login } = useAuthStore(); // Use the auth store
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -30,7 +32,7 @@ export default function SignInForm({ lang, dictionary }: SignInFormProps) {
 
         try {
             // Adjust the URL '/api/login' if your backend API is hosted elsewhere
-            const response = await fetch('/api/login', { // Assuming API is proxied or on the same origin
+            const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -42,6 +44,9 @@ export default function SignInForm({ lang, dictionary }: SignInFormProps) {
                 const errorData = await response.json();
                 throw new Error(errorData.detail || signinDict.loginError);
             }
+
+            const userData = await response.json(); // Get user data from response
+            login(userData.email); // Update auth store with user email
 
             // Login successful, redirect or update UI
             // The API sets an HttpOnly cookie, so no token handling needed here directly

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { Locale } from "../i18n-config"; // Adjust path as needed
+import useAuthStore from '../store/authStore'; // Import the auth store
 
 interface NavbarProps {
   lang: Locale;
@@ -14,6 +15,11 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const collapseRef = useRef<HTMLDivElement>(null);
+  const { isLoggedIn, logout, checkAuth } = useAuthStore(); // Use the auth store
+
+  useEffect(() => {
+    checkAuth(); // Check auth status on component mount
+  }, [checkAuth]);
 
   useEffect(() => {
     let bsCollapse: any = null;
@@ -38,6 +44,19 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
       }
     };
   }, [isMenuOpen]);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', { method: 'POST', credentials: 'include', });
+      if (response.ok) {
+        logout(); // Update Zustand store
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -101,12 +120,21 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
               </button>
             </div>
           </div>
-          <Link
-            href={`/${lang}/signin`}
-            className={`btn ${lang === 'he' ? 'me-auto' : 'ms-auto'} btn-outline-dark without-icon ${lang === 'he' ? 'ms-2' : 'ms-2'}`}
-          >
-            {dictionary.navigation.login}
-          </Link>
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className={`btn ${lang === 'he' ? 'me-auto' : 'ms-auto'} btn-outline-dark without-icon ${lang === 'he' ? 'ms-2' : 'ms-2'}`}
+            >
+              {dictionary.navigation.logout}
+            </button>
+          ) : (
+            <Link
+              href={`/${lang}/signin`}
+              className={`btn ${lang === 'he' ? 'me-auto' : 'ms-auto'} btn-outline-dark without-icon ${lang === 'he' ? 'ms-2' : 'ms-2'}`}
+            >
+              {dictionary.navigation.login}
+            </Link>
+          )}
           <button
             className="navbar-toggler ms-2"
             type="button"

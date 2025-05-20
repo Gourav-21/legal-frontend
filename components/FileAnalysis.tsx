@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Locale } from "@/i18n-config";
 import FileUpload from './FileUpload';
 import ReactMarkdown from 'react-markdown';
+import useAuthStore from '../store/authStore'; // Import the auth store
 
 interface FileAnalysisProps {
   lang: Locale;
@@ -24,6 +25,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   const [attendanceFiles, setAttendanceFiles] = useState<UploadedFile[]>([]); // New state for attendance reports
   const [context, setContext] = useState<string>(''); // State for additional context input
   const router = useRouter();
+  const { isLoggedIn } = useAuthStore(); // Use the auth store
 
   // Analysis States
   const [isVisible, setIsVisible] = useState(false);
@@ -43,6 +45,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   };
 
   const handleProcessDocuments = async () => {
+    if (!isLoggedIn) {
+      alert('Please log in to process documents.'); // Or use a more sophisticated notification
+      return;
+    }
     if (payslipFiles.length === 0 && contractFiles.length === 0 && attendanceFiles.length === 0) {
       alert('Please upload at least one payslip, contract, or attendance file.'); // Or use a more sophisticated notification
       return;
@@ -72,9 +78,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     try {
       // Assuming your backend API is running on the same origin or configured for CORS
       // Adjust the URL '/api/process' if your backend is hosted elsewhere or has a different prefix
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/process`, {
+      const response = await fetch('/api/process', { // Changed to use the Next.js API route
         method: 'POST',
         body: formData,
+        credentials: 'include', // Include credentials for CORS
       });
 
       if (!response.ok) {
@@ -84,6 +91,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
       const result = await response.json();
       setProcessingResult(result);
+      console.log(result); // Log the response to the terminal
       return result
       // Optionally, trigger the analysis display or show a success message
       // handleShowAnalysis(); // You might want to show analysis based on the API result
@@ -130,6 +138,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   };
 
 const handleCreateReport = async (type:string) => {
+    if (!isLoggedIn) {
+      alert('Please log in to create a report.'); // Or use a more sophisticated notification
+      return;
+    }
     var returnResult = null
     if(processingResult == null) {
         returnResult = await handleProcessDocuments()
@@ -142,8 +154,9 @@ const handleCreateReport = async (type:string) => {
     console.log("returnResult",returnResult)
   
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/report`, {
+      const response = await fetch('/api/report', { // Changed to use the Next.js API route
         method: 'POST',
+        credentials: 'include', 
         headers: {
           'Content-Type': 'application/json',
         },

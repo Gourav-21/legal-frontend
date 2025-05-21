@@ -457,10 +457,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
                 <i className="bi bi-envelope"></i>
               </button>
             </div>
-
+            
             <button type="submit" className="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#summaryModal">
               <i className="bi bi-eye"></i>
-              Show ai Summary
+              {dictionary.fileAnalysis.showAiSummary}
             </button>
 
             <button type="submit" className="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#exampleModal">

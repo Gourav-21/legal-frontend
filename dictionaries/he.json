@@ -429,5 +429,8 @@
     "error": "שגיאה",
     "couldNotLoadSummary": "לא ניתן לטעון סיכום, אך הניתוח המלא זמין.",
     "noAnalysisAvailable": "אין ניתוח זמין לסיכום."
+  },
+  "fileAnalysis": {
+    "showAiSummary": "הצג סיכום AI"
   }
 }

@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Locale } from "@/i18n-config";
-import FileUpload from './FileUpload';
+import { useAnalysisStore } from '@/store/analysisStore'; // Add this import
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import useAuthStore from '../store/authStore'; // Import the auth store
+import FileUpload from './FileUpload';
 
 interface FileAnalysisProps {
   lang: Locale;
@@ -26,6 +27,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   const [context, setContext] = useState<string>(''); // State for additional context input
   const router = useRouter();
   const { isLoggedIn } = useAuthStore(); // Use the auth store
+  const { setLegalAnalysis } = useAnalysisStore(); // Add this line
 
   // Analysis States
   const [isVisible, setIsVisible] = useState(false);
@@ -99,7 +101,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     } catch (error: any) {
       console.error('Error processing documents:', error);
       setProcessingError(error.message || 'An unexpected error occurred.');
-    //   alert(`Error processing files: ${error.message || 'An unexpected error occurred.'}`); // Placeholder error message
+      //   alert(`Error processing files: ${error.message || 'An unexpected error occurred.'}`); // Placeholder error message
     } finally {
       setIsProcessing(false);
     }
@@ -119,44 +121,44 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     }, 0);
   };
 
-  const handleShowAnalysis = (content:string) => {
+  const handleShowAnalysis = (content: string) => {
     // if (!animationStartedRef.current) {
     //   animationStartedRef.current = true;
-        setTypedContent('');
-        setIsVisible(true);
+    setTypedContent('');
+    setIsVisible(true);
 
+    setTimeout(() => {
+      scrollToAnalysis();
       setTimeout(() => {
-        scrollToAnalysis();
-        setTimeout(() => {
         //   const content = document.getElementById('analysis-content')?.innerHTML || '';
-          typeContent(content);
-        }, 100);
+        typeContent(content);
       }, 100);
+    }, 100);
     // } else {
     //   scrollToAnalysis();
     // }
   };
 
-const handleCreateReport = async (type:string) => {
+  const handleCreateReport = async (type: string) => {
     if (!isLoggedIn) {
       alert('Please log in to create a report.'); // Or use a more sophisticated notification
       return;
     }
     var returnResult = null
-    if(processingResult == null) {
-        returnResult = await handleProcessDocuments()
+    if (processingResult == null) {
+      returnResult = await handleProcessDocuments()
     }
     setIsVisible(false)
     setIsProcessing(true);
     setProcessingError(null);
 
-    console.log("processingResult",processingResult)
-    console.log("returnResult",returnResult)
-  
+    console.log("processingResult", processingResult)
+    console.log("returnResult", returnResult)
+
     try {
       const response = await fetch('/api/report', { // Changed to use the Next.js API route
         method: 'POST',
-        credentials: 'include', 
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -168,24 +170,25 @@ const handleCreateReport = async (type:string) => {
           context: context
         })
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || 'Report creation failed');
       }
-  
+
       const result = await response.json();
       console.log(result); // Log the response to the termina
       // Handle successful report creation
+      setLegalAnalysis(result.legal_analysis); // Add this line
       handleShowAnalysis(result.legal_analysis);
     } catch (error: any) {
       console.error('Report creation error:', error);
       setProcessingError(error.message);
-    //   alert(`Error creating report: ${error.message}`);
+      //   alert(`Error creating report: ${error.message}`);
     } finally {
       setIsProcessing(false);
     }
-  };  
+  };
 
   return (
     <div>
@@ -254,9 +257,9 @@ const handleCreateReport = async (type:string) => {
                 {isProcessing ? 'Processing...' : (dictionary.hero.processButton || 'Process Documents')}
                 </>
             )} */}
-                <>
-                {isProcessing ? 'Processing...' : processingResult != null ? 'Processed' : (dictionary.hero.processButton || 'Process Documents')}
-                </>
+            <>
+              {isProcessing ? 'Processing...' : processingResult != null ? 'Processed' : (dictionary.hero.processButton || 'Process Documents')}
+            </>
             {!isProcessing && <span><i className="bi bi-arrow-right-short"></i></span>}
           </button>
         </div>
@@ -267,29 +270,29 @@ const handleCreateReport = async (type:string) => {
         {/* Example: Button 1 - Create a report */}
         {dictionary.hero.actionButtons.createReport && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          onClick={() => handleCreateReport('report')}
-          disabled={isProcessing}
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createReport.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('report')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createReport.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
 
         {/* Example: Button 2 - Create a company page */}
         {dictionary.hero.actionButtons.createCompanyPage && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          disabled
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createCompanyPage.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              disabled
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createCompanyPage.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
 
@@ -297,119 +300,119 @@ const handleCreateReport = async (type:string) => {
         {/* Example: Button 3 - Document history */}
         {dictionary.hero.actionButtons.documentHistory && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          onClick={() => router.push(`/reports`)}
-          disabled={isProcessing}
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.documentHistory.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => router.push(`/reports`)}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.documentHistory.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
 
         {/* Button 5 - Check profitability */}
         {dictionary.hero.actionButtons.checkProfitability && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          onClick={() => handleCreateReport('profitability')}
-          disabled={isProcessing}
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.checkProfitability.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('profitability')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.checkProfitability.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
 
         {/* Button 6 - Create warning letter */}
         {dictionary.hero.actionButtons.createWarningLetter && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          onClick={() => handleCreateReport('warning_letter')}
-          disabled={isProcessing}
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createWarningLetter.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('warning_letter')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createWarningLetter.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
 
         {/* Button 7 - Professional Opinion & Calculations */}
         {dictionary.hero.actionButtons.professionalOpinion && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          onClick={() => handleCreateReport('professional')}
-          disabled={isProcessing}
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.professionalOpinion.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('professional')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.professionalOpinion.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
 
         {/* Easy Explanation Button */}
         {dictionary.hero.actionButtons.easyExplanation && (
-        <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          onClick={() => handleCreateReport('easy')}
-          disabled={isProcessing}
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.easyExplanation.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
-        </div>
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('easy')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.easyExplanation.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
         )}
-        
+
         {/* Example: Button 4 - Preparing a claim */}
         {dictionary.hero.actionButtons.prepareClaim && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          onClick={() => handleCreateReport('claim')}
-          disabled={isProcessing}
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.prepareClaim.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('claim')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.prepareClaim.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
 
         {/* Button 10 - Final Claim Report */}
         {dictionary.hero.actionButtons.finalClaimReport && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          onClick={() => handleCreateReport('table')}
-          disabled={isProcessing}
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.finalClaimReport.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('table')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.finalClaimReport.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
 
         {/* Button 11 - Serial employer */}
         {dictionary.hero.actionButtons.identifySerialEmployer && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <button
-          type="button"
-          className="btn btn-outline-dark thumbnail-btn show-btn"
-          disabled
-        >
-          <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.identifySerialEmployer.replace(' ', '<br>') }} />
-          <span><i className="bi bi-arrow-right-short"></i></span>
-        </button>
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              disabled
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.identifySerialEmployer.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
           </div>
         )}
       </div>
@@ -422,14 +425,14 @@ const handleCreateReport = async (type:string) => {
       )}
 
       {/* Analysis Section */}
-     {isVisible && <div className="result-card mt-4" id="analysis-section" style={{ display: isVisible ? 'block' : 'none' }}>
+      {isVisible && <div className="result-card mt-4" id="analysis-section" style={{ display: isVisible ? 'block' : 'none' }}>
         <div id="typing-output" style={{ whiteSpace: 'pre-wrap' }}>
           <ReactMarkdown>{typedContent}</ReactMarkdown>
           <div className="d-sm-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center mt-4">
               <p className="mb-0 text-muted">{dictionary.hero.sharing.title} </p>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-dark btn-icon btn-sm ms-2"
                 onClick={() => {
                   const text = typedContent;
@@ -440,8 +443,8 @@ const handleCreateReport = async (type:string) => {
               >
                 <i className="bi bi-whatsapp"></i>
               </button>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 className="btn btn-dark btn-icon btn-sm ms-2"
                 onClick={() => {
                   const subject = 'Legal Analysis Report';
@@ -455,8 +458,13 @@ const handleCreateReport = async (type:string) => {
               </button>
             </div>
 
+            <button type="submit" className="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#summaryModal">
+              <i className="bi bi-eye"></i>
+              Show ai Summary
+            </button>
+
             <button type="submit" className="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            {dictionary.hero.sharing.findLawyer}
+              {dictionary.hero.sharing.findLawyer}
               <span><i className="bi bi-arrow-right-short"></i></span>
             </button>
           </div>

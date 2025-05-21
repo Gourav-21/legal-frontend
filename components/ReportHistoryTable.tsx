@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import ReactMarkdown from 'react-markdown';
-// @ts-ignore
-import html2pdf from 'html2pdf.js';
 
 interface ReportHistoryItem {
   id: string;
@@ -22,8 +20,15 @@ export default function ReportHistoryTable({ reportsDict }: ReportHistoryTablePr
   const [error, setError] = useState<string | null>(null);
   const [selectedReport, setSelectedReport] = useState<ReportHistoryItem | null>(null);
   const [triggerRowDownloadFor, setTriggerRowDownloadFor] = useState<ReportHistoryItem | null>(null); // New state for triggering download from row
+  const [html2pdf, setHtml2Pdf] = useState<any>(null); // State to hold the dynamically imported library
 
   useEffect(() => {
+    // Dynamically import html2pdf.js on the client side
+    // @ts-ignore
+    import('html2pdf.js').then(module => {
+      setHtml2Pdf(() => module.default);
+    });
+
     async function fetchReportHistory() {
       try {
         const response = await fetch("/api/history"); // Adjust if your API route is different
@@ -47,7 +52,7 @@ export default function ReportHistoryTable({ reportsDict }: ReportHistoryTablePr
   };
 
   const handleDownloadPdf = () => {
-    if (selectedReport) {
+    if (selectedReport && html2pdf) { // Check if html2pdf is loaded
       const element = document.getElementById('reportContentToDownload');
       if (element) {
         const opt = {

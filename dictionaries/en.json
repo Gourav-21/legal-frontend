@@ -247,7 +247,8 @@
       "status": "Status",
       "actions": "Actions",
       "viewButton": "View",
-      "downloadButton": "Download"
+      "downloadButton": "Download",
+      "noReports": "No reports available"
     },
     "downloadAll": {
       "button": "Download All Reports",

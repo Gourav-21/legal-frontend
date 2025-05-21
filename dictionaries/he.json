@@ -244,7 +244,8 @@
       "status": "סטָטוּס",
       "downloadButton": "הורדה",
       "actions": "קישור להורדה",
-      "viewButton": " נוֹף"
+      "viewButton": " נוֹף",
+      "noReports": "אין דוחות זמינים"
     },
     "downloadAll": {
       "button": "הורד את כל הדוחות",

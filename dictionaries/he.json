@@ -422,5 +422,12 @@
       "updateFailed": "שגיאה בעדכון חוק",
       "genericUpdate": "נכשל בעדכון חוק"
     }
+  },
+  "summaryModal": {
+    "title": "סיכום",
+    "loading": "טוען סיכום...",
+    "error": "שגיאה",
+    "couldNotLoadSummary": "לא ניתן לטעון סיכום, אך הניתוח המלא זמין.",
+    "noAnalysisAvailable": "אין ניתוח זמין לסיכום."
   }
 }

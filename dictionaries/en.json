@@ -425,5 +425,12 @@
       "updateFailed": "Error updating law",
       "genericUpdate": "Failed to update law"
     }
+  },
+  "summaryModal": {
+    "title": "Summary",
+    "loading": "Loading summary...",
+    "error": "Error",
+    "couldNotLoadSummary": "Could not load summary, but the full analysis is available.",
+    "noAnalysisAvailable": "No analysis available to summarize."
   }
 }

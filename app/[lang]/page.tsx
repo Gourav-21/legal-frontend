@@ -3,6 +3,7 @@ import { Locale } from "../../i18n-config"; // Import Locale type
 import { getDictionary } from "../../get-dictionary"; // Import dictionary loader
 import FileAnalysis from "@/components/FileAnalysis";
 import LawyerModal from "@/components/LawyerModal";
+import AiSummaryModal from "@/components/AiSummary";
 
 // Define props type to include lang
 interface HomeProps {
@@ -156,6 +157,7 @@ export default async function Home(props: HomeProps) {
             </div>
           </div>
         </section>
+        <AiSummaryModal />
 
         {/* Lawyer Modal */}
         <LawyerModal lang={lang} dictionary={dictionary} />

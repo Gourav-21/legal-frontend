@@ -1,10 +1,11 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import { Locale } from '@/i18n-config';
+import { useAnalysisStore } from '@/store/analysisStore';
+import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { useAnalysisStore } from '@/store/analysisStore'; 
 
-export default function AiSummaryModal() {
-  const { legalAnalysis } = useAnalysisStore(); 
+export default function AiSummaryModal({ lang, dictionary }: { lang: Locale, dictionary: any }) {
+  const { legalAnalysis } = useAnalysisStore();
   const [summaryContent, setSummaryContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +47,7 @@ export default function AiSummaryModal() {
       fetchSummary();
     } else if (modalElement) {
       const observer = new MutationObserver((mutationsList, observerInstance) => {
-        for(let mutation of mutationsList) {
+        for (let mutation of mutationsList) {
           if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
             const targetElement = mutation.target as HTMLElement;
             if (targetElement.classList.contains('show')) {
@@ -70,20 +71,20 @@ export default function AiSummaryModal() {
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="summaryModalLabel">
-                {'Summary'}
+                {dictionary.summaryModal.title}
               </h1>
               <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"><i className="bi bi-x"></i></button>
             </div>
             <div className="modal-body">
-              {isLoading && <p>Loading summary...</p>}
-              {error && <p>Error: {error}</p>}
+              {isLoading && <p>{dictionary.summaryModal.loading}</p>}
+              {error && <p>{dictionary.summaryModal.error}: {error}</p>}
               {summaryContent && !isLoading && !error && (
                 <ReactMarkdown>{summaryContent}</ReactMarkdown>
               )}
               {!summaryContent && !isLoading && !error && legalAnalysis && (
-                <p>Could not load summary, but the full analysis is available.</p>
+                <p>{dictionary.summaryModal.couldNotLoadSummary}</p>
               )}
-              {!legalAnalysis && !isLoading && <p>No analysis available to summarize.</p>}
+              {!legalAnalysis && !isLoading && <p>{dictionary.summaryModal.noAnalysisAvailable}</p>}
             </div>
             <div className="modal-footer">
             </div>

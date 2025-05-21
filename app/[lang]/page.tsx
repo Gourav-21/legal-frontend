@@ -157,7 +157,7 @@ export default async function Home(props: HomeProps) {
             </div>
           </div>
         </section>
-        <AiSummaryModal />
+        <AiSummaryModal lang={lang} dictionary={dictionary} />
 
         {/* Lawyer Modal */}
         <LawyerModal lang={lang} dictionary={dictionary} />

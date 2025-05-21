@@ -426,8 +426,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
       {/* Analysis Section */}
       {isVisible && <div className="result-card mt-4" id="analysis-section" style={{ display: isVisible ? 'block' : 'none' }}>
-        <div id="typing-output" style={{ whiteSpace: 'pre-wrap' }}>
-          <ReactMarkdown>{typedContent}</ReactMarkdown>
+        <div id="typing-output" >
+          <ReactMarkdown>{typedContent.replace(/<(ctrl|crrl)(99|100)(\/>|>)?/g, '')}</ReactMarkdown>
           <div className="d-sm-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center mt-4">
               <p className="mb-0 text-muted">{dictionary.hero.sharing.title} </p>

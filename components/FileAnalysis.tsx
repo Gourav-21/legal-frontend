@@ -27,15 +27,54 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   const [context, setContext] = useState<string>(''); // State for additional context input
   const router = useRouter();
   const { isLoggedIn } = useAuthStore(); // Use the auth store
-  const { setLegalAnalysis } = useAnalysisStore(); // Add this line
-
-  // Analysis States
+  const { setLegalAnalysis } = useAnalysisStore(); // Add this line  // Analysis States
   const [isVisible, setIsVisible] = useState(false);
   const [typedContent, setTypedContent] = useState('');
   const animationStartedRef = React.useRef(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processingResult, setProcessingResult] = useState<any>(null); // State to hold API response
+  const typingIntervalRef = React.useRef<NodeJS.Timeout | null>(null); // Track typing interval
+  const [isProcessing, setIsProcessing] = useState(false); // General processing state
+  const [processingResult, setProcessingResult] = useState<any>(null); // State to hold API response from document processing
   const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error
+    // Track file changes to reset processing result when files change
+  const [lastProcessedFiles, setLastProcessedFiles] = useState<{
+    payslip: string[];
+    contract: string[];
+    attendance: string[];
+  }>({
+    payslip: [],
+    contract: [],
+    attendance: []
+  });
+
+  // Effect to detect file changes and reset processing result
+  React.useEffect(() => {
+    const currentFiles = {
+      payslip: payslipFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
+      contract: contractFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
+      attendance: attendanceFiles.map(f => f.file.name + f.file.size + f.file.lastModified)
+    };
+
+    // Check if files have changed
+    const filesChanged = 
+      JSON.stringify(currentFiles.payslip) !== JSON.stringify(lastProcessedFiles.payslip) ||
+      JSON.stringify(currentFiles.contract) !== JSON.stringify(lastProcessedFiles.contract) ||
+      JSON.stringify(currentFiles.attendance) !== JSON.stringify(lastProcessedFiles.attendance);
+
+    if (filesChanged && processingResult !== null) {
+      console.log("Files changed, resetting processing result");
+      setProcessingResult(null);
+      setProcessingError(null);
+      setIsVisible(false); // Hide any previous analysis
+    }  }, [payslipFiles, contractFiles, attendanceFiles, processingResult, lastProcessedFiles]);
+
+  // Cleanup typing interval on unmount
+  React.useEffect(() => {
+    return () => {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+    };
+  }, []);
 
   // Analysis Handlers
   const scrollToAnalysis = () => {
@@ -48,17 +87,17 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
   const handleProcessDocuments = async () => {
     if (!isLoggedIn) {
-      alert('Please log in to process documents.'); // Or use a more sophisticated notification
-      return;
+      alert('Please log in to process documents.');
+      return null; // Return null to indicate failure/early exit
     }
     if (payslipFiles.length === 0 && contractFiles.length === 0 && attendanceFiles.length === 0) {
-      alert('Please upload at least one payslip, contract, or attendance file.'); // Or use a more sophisticated notification
-      return;
+      alert('Please upload at least one payslip, contract, or attendance file.');
+      return null; // Return null
     }
 
-    setIsProcessing(true);
-    setProcessingResult(null);
-    setProcessingError(null);
+    setIsProcessing(true); // Indicate processing of documents has started
+    setProcessingResult(null); // Reset previous results
+    setProcessingError(null); // Reset previous errors
 
     const formData = new FormData();
 
@@ -72,100 +111,128 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       formData.append('doc_types', 'contract');
     });
 
-    attendanceFiles.forEach(uploadedFile => { // Add attendance files to formData
+    attendanceFiles.forEach(uploadedFile => {
       formData.append('files', uploadedFile.file);
       formData.append('doc_types', 'attendance');
     });
 
     try {
-      // Assuming your backend API is running on the same origin or configured for CORS
-      // Adjust the URL '/api/process' if your backend is hosted elsewhere or has a different prefix
-      const response = await fetch('/api/process', { // Changed to use the Next.js API route
+      const response = await fetch('/api/process', {
         method: 'POST',
         body: formData,
-        credentials: 'include', // Include credentials for CORS
+        credentials: 'include',
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-      setProcessingResult(result);
-      console.log(result); // Log the response to the terminal
-      return result
-      // Optionally, trigger the analysis display or show a success message
-      // handleShowAnalysis(); // You might want to show analysis based on the API result
+      }      const result = await response.json();
+      setProcessingResult(result); // Store the successful result
+      
+      // Update the last processed files tracker
+      setLastProcessedFiles({
+        payslip: payslipFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
+        contract: contractFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
+        attendance: attendanceFiles.map(f => f.file.name + f.file.size + f.file.lastModified)
+      });
+      
+      console.log("Documents processed successfully:", result);
+      return result; // Return the result for immediate use if needed
 
     } catch (error: any) {
       console.error('Error processing documents:', error);
       setProcessingError(error.message || 'An unexpected error occurred.');
-      //   alert(`Error processing files: ${error.message || 'An unexpected error occurred.'}`); // Placeholder error message
-    } finally {
-      setIsProcessing(false);
+      return null; // Return null on error    } finally {
+      setIsProcessing(false); // Indicate processing of documents has finished
     }
   };
 
   const typeContent = (html: string) => {
+    // Clear any existing typing interval first
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+    
     setTypedContent('');
     let i = 0;
 
-    const typing = setInterval(() => {
+    typingIntervalRef.current = setInterval(() => {
       if (i < html.length) {
         setTypedContent(prev => prev + html.charAt(i));
         i++;
       } else {
-        clearInterval(typing);
-      }
-    }, 0);
+        clearInterval(typingIntervalRef.current!);
+        typingIntervalRef.current = null;
+      }    }, 0);
   };
 
   const handleShowAnalysis = (content: string) => {
-    // if (!animationStartedRef.current) {
-    //   animationStartedRef.current = true;
+    // Clear any existing typing animation first
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+    
     setTypedContent('');
     setIsVisible(true);
 
     setTimeout(() => {
       scrollToAnalysis();
       setTimeout(() => {
-        //   const content = document.getElementById('analysis-content')?.innerHTML || '';
         typeContent(content);
       }, 100);
     }, 100);
-    // } else {
-    //   scrollToAnalysis();
-    // }
   };
 
   const handleCreateReport = async (type: string) => {
     if (!isLoggedIn) {
-      alert('Please log in to create a report.'); // Or use a more sophisticated notification
+      alert('Please log in to create a report.');
       return;
     }
-    var returnResult = null
-    if (processingResult == null) {
-      returnResult = await handleProcessDocuments()
-    }
-    setIsVisible(false)
-    setIsProcessing(true);
-    setProcessingError(null);
 
-    console.log("processingResult", processingResult)
-    console.log("returnResult", returnResult)
+    let documentsData = processingResult; // Try to use existing processed data
+
+    // If documents haven't been processed yet (processingResult is null), process them now.
+    if (!documentsData) {
+      console.log("No existing processing result, calling handleProcessDocuments...");
+      // `handleProcessDocuments` will set its own `isProcessing` and `processingError` states.
+      // It will also update `processingResult` state upon success.
+      const newlyProcessedData = await handleProcessDocuments();
+      if (!newlyProcessedData) {
+        // If `handleProcessDocuments` failed or returned no data,
+        // an error message should have been set by it.
+        // We don't need to set `isProcessing` to false here for `handleCreateReport`'s
+        // own processing, as we are returning early.
+        console.error('Document processing failed or returned no data. Aborting report creation.');
+        return; // Abort report creation if document processing failed
+      }
+      documentsData = newlyProcessedData; // Use the freshly processed data
+    }
+
+    // At this point, `documentsData` should contain the necessary information.
+    // Now, proceed with the report creation specific logic.
+    setIsVisible(false); // Hide any previous analysis
+    setIsProcessing(true); // Set loading state for report creation
+    setProcessingError(null); // Clear previous errors before report creation
+
+    console.log("Data being used for report API:", documentsData);
 
     try {
-      const response = await fetch('/api/report', { // Changed to use the Next.js API route
+      // Safeguard: ensure documentsData is not null/undefined
+      if (!documentsData) {
+        throw new Error("No document data available to create report even after attempting processing.");
+      }
+      const response = await fetch('/api/report', {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          payslip_text: processingResult?.payslip_text ? processingResult.payslip_text : returnResult?.payslip_text,
-          contract_text: processingResult?.contract_text ? processingResult.contract_text : returnResult?.contract_text,
-          attendance_text: processingResult?.attendance_text ? processingResult.attendance_text : returnResult?.attendance_text,
+          payslip_text: documentsData.payslip_text,
+          contract_text: documentsData.contract_text,
+          attendance_text: documentsData.attendance_text,
           type: type,
           context: context
         })
@@ -176,17 +243,15 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         throw new Error(errorData.detail || 'Report creation failed');
       }
 
-      const result = await response.json();
-      console.log(result); // Log the response to the termina
-      // Handle successful report creation
-      setLegalAnalysis(result.legal_analysis); // Add this line
-      handleShowAnalysis(result.legal_analysis);
+      const reportResult = await response.json();
+      console.log("Report creation successful:", reportResult);
+      setLegalAnalysis(reportResult.legal_analysis);
+      handleShowAnalysis(reportResult.legal_analysis);
     } catch (error: any) {
       console.error('Report creation error:', error);
-      setProcessingError(error.message);
-      //   alert(`Error creating report: ${error.message}`);
+      setProcessingError(error.message || 'An unexpected error occurred during report creation.');
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false); // Clear loading state for report creation
     }
   };
 
@@ -244,21 +309,17 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             value={context}
             onChange={(e) => setContext(e.target.value)}
           />
-        </div>
-        <div className="col-3">
+        </div>        <div className="col-3">
           <button
             type="button"
             className="btn btn-success w-100 p-4"
             onClick={handleProcessDocuments}
             disabled={isProcessing || (payslipFiles.length === 0 && contractFiles.length === 0 && attendanceFiles.length === 0)}
           >
-            {/* {processingResult != null ? 'Processed' : (
-                <>
-                {isProcessing ? 'Processing...' : (dictionary.hero.processButton || 'Process Documents')}
-                </>
-            )} */}
             <>
-              {isProcessing ? 'Processing...' : processingResult != null ? 'Processed' : (dictionary.hero.processButton || 'Process Documents')}
+              {isProcessing && !processingResult ? 'Processing Docs...' : 
+               processingResult ? 'Docs Processed' : 
+               (dictionary.hero.processButton || 'Process Documents')}
             </>
             {!isProcessing && <span><i className="bi bi-arrow-right-short"></i></span>}
           </button>
@@ -274,7 +335,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
               onClick={() => handleCreateReport('report')}
-              disabled={isProcessing}
+              disabled={isProcessing} // General disable if any processing is happening
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createReport.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -288,7 +349,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              disabled
+              disabled // Kept disabled as per original
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createCompanyPage.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -408,7 +469,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              disabled
+              disabled // Kept disabled as per original
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.identifySerialEmployer.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>

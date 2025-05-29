@@ -23,16 +23,20 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // File Upload States
   const [payslipFiles, setPayslipFiles] = useState<UploadedFile[]>([]);
   const [contractFiles, setContractFiles] = useState<UploadedFile[]>([]);
-  const [attendanceFiles, setAttendanceFiles] = useState<UploadedFile[]>([]); // New state for attendance reports
+    const [attendanceFiles, setAttendanceFiles] = useState<UploadedFile[]>([]); // New state for attendance reports
   const [context, setContext] = useState<string>(''); // State for additional context input
   const router = useRouter();
   const { isLoggedIn } = useAuthStore(); // Use the auth store
-  const { setLegalAnalysis } = useAnalysisStore(); // Add this line  // Analysis States
+  const { setLegalAnalysis } = useAnalysisStore(); // Add this line
+  
+  // Analysis States
   const [isVisible, setIsVisible] = useState(false);
   const [typedContent, setTypedContent] = useState('');
   const animationStartedRef = React.useRef(false);
   const typingIntervalRef = React.useRef<NodeJS.Timeout | null>(null); // Track typing interval
-  const [isProcessing, setIsProcessing] = useState(false); // General processing state
+  
+  const [isProcessingDocuments, setIsProcessingDocuments] = useState(false); // Document processing state
+  const [isProcessingReport, setIsProcessingReport] = useState(false); // Report creation state
   const [processingResult, setProcessingResult] = useState<any>(null); // State to hold API response from document processing
   const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error
     // Track file changes to reset processing result when files change
@@ -45,6 +49,9 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     contract: [],
     attendance: []
   });
+
+  // Combined processing state for UI
+  const isProcessing = isProcessingDocuments || isProcessingReport;
 
   // Effect to detect file changes and reset processing result
   React.useEffect(() => {
@@ -84,7 +91,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
-
   const handleProcessDocuments = async () => {
     if (!isLoggedIn) {
       alert('Please log in to process documents.');
@@ -95,7 +101,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       return null; // Return null
     }
 
-    setIsProcessing(true); // Indicate processing of documents has started
+    setIsProcessingDocuments(true); // Indicate processing of documents has started
     setProcessingResult(null); // Reset previous results
     setProcessingError(null); // Reset previous errors
 
@@ -126,7 +132,9 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
-      }      const result = await response.json();
+      }
+
+      const result = await response.json();
       setProcessingResult(result); // Store the successful result
       
       // Update the last processed files tracker
@@ -142,8 +150,9 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     } catch (error: any) {
       console.error('Error processing documents:', error);
       setProcessingError(error.message || 'An unexpected error occurred.');
-      return null; // Return null on error    } finally {
-      setIsProcessing(false); // Indicate processing of documents has finished
+      return null; // Return null on error
+    } finally {
+      setIsProcessingDocuments(false); // Indicate processing of documents has finished
     }
   };
 
@@ -208,12 +217,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         return; // Abort report creation if document processing failed
       }
       documentsData = newlyProcessedData; // Use the freshly processed data
-    }
-
-    // At this point, `documentsData` should contain the necessary information.
+    }    // At this point, `documentsData` should contain the necessary information.
     // Now, proceed with the report creation specific logic.
     setIsVisible(false); // Hide any previous analysis
-    setIsProcessing(true); // Set loading state for report creation
+    setIsProcessingReport(true); // Set loading state for report creation
     setProcessingError(null); // Clear previous errors before report creation
 
     console.log("Data being used for report API:", documentsData);
@@ -249,9 +256,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       handleShowAnalysis(reportResult.legal_analysis);
     } catch (error: any) {
       console.error('Report creation error:', error);
-      setProcessingError(error.message || 'An unexpected error occurred during report creation.');
-    } finally {
-      setIsProcessing(false); // Clear loading state for report creation
+      setProcessingError(error.message || 'An unexpected error occurred during report creation.');    } finally {
+      setIsProcessingReport(false); // Clear loading state for report creation
     }
   };
 

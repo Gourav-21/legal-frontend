@@ -493,7 +493,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
       {/* Analysis Section */}
       {isVisible && <div className="result-card mt-4" id="analysis-section" style={{ display: isVisible ? 'block' : 'none' }}>
-        <div id="typing-output" >
+        <div id="typing-output" dir={"rtl"}>
           <ReactMarkdown>{typedContent.replace(/<(ctrl|crrl)(99|100)(\/>|>)?/g, '')}</ReactMarkdown>
           <div className="d-sm-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center mt-4">

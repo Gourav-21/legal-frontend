@@ -137,7 +137,7 @@ export default function SignInForm({ lang, dictionary }: SignInFormProps) {
                     <button type="button" className="btn btn-yellow w-100" disabled={loading}>
                         {signinDict.googleButton}
                         <span>
-                            <Image src="/img/google.png" alt={signinDict.googleImageAlt} width={20} height={20} />
+                            <Image src="/img/Google.png" alt={signinDict.googleImageAlt} width={20} height={20} />
                         </span>
                     </button>
                 </div>

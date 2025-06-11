@@ -173,7 +173,7 @@ export default function SignUpForm({ signupDict, lang }: SignUpFormProps) {
            <button type="button" className="btn btn-yellow w-100"> {/* Changed to type="button" */}
              {signupDict.googleButton}
              <span>
-               <Image src="/img/google.png" alt="Google" width={20} height={20} />
+               <Image src="/img/Google.png" alt="Google" width={20} height={20} />
              </span>
            </button>
          </div>

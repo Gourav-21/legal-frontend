@@ -5,6 +5,8 @@ import { useAnalysisStore } from '@/store/analysisStore'; // Add this import
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import MDEditor from '@uiw/react-md-editor';
+import '@uiw/react-md-editor/markdown-editor.css';
 import useAuthStore from '../store/authStore'; // Import the auth store
 import FileUpload from './FileUpload';
 
@@ -34,12 +36,23 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   const [typedContent, setTypedContent] = useState('');
   const animationStartedRef = React.useRef(false);
   const typingIntervalRef = React.useRef<NodeJS.Timeout | null>(null); // Track typing interval
-  
-  const [isProcessingDocuments, setIsProcessingDocuments] = useState(false); // Document processing state
+    const [isProcessingDocuments, setIsProcessingDocuments] = useState(false); // Document processing state
   const [isProcessingReport, setIsProcessingReport] = useState(false); // Report creation state
   const [processingResult, setProcessingResult] = useState<any>(null); // State to hold API response from document processing
-  const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error
-    // Track file changes to reset processing result when files change
+  const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error  // OCR Editor states
+  const [showOcrEditor, setShowOcrEditor] = useState(false);
+  const [ocrSaveSuccess, setOcrSaveSuccess] = useState(false);
+  const [editableOcrData, setEditableOcrData] = useState<{
+    payslip_text: string;
+    contract_text: string;
+    attendance_text: string;
+  }>({
+    payslip_text: '',
+    contract_text: '',
+    attendance_text: ''
+  });
+  
+  // Track file changes to reset processing result when files change
   const [lastProcessedFiles, setLastProcessedFiles] = useState<{
     payslip: string[];
     contract: string[];
@@ -65,13 +78,18 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     const filesChanged = 
       JSON.stringify(currentFiles.payslip) !== JSON.stringify(lastProcessedFiles.payslip) ||
       JSON.stringify(currentFiles.contract) !== JSON.stringify(lastProcessedFiles.contract) ||
-      JSON.stringify(currentFiles.attendance) !== JSON.stringify(lastProcessedFiles.attendance);
-
-    if (filesChanged && processingResult !== null) {
+      JSON.stringify(currentFiles.attendance) !== JSON.stringify(lastProcessedFiles.attendance);    if (filesChanged && processingResult !== null) {
       console.log("Files changed, resetting processing result");
       setProcessingResult(null);
       setProcessingError(null);
       setIsVisible(false); // Hide any previous analysis
+      setShowOcrEditor(false); // Hide OCR editor
+      setOcrSaveSuccess(false); // Hide success message
+      setEditableOcrData({ // Reset OCR editor data
+        payslip_text: '',
+        contract_text: '',
+        attendance_text: ''
+      });
     }  }, [payslipFiles, contractFiles, attendanceFiles, processingResult, lastProcessedFiles]);
 
   // Cleanup typing interval on unmount
@@ -127,9 +145,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         method: 'POST',
         body: formData,
         credentials: 'include',
-      });
-
-      if (!response.ok) {
+      });      if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
       }
@@ -153,6 +169,42 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       return null; // Return null on error
     } finally {
       setIsProcessingDocuments(false); // Indicate processing of documents has finished
+    }  };
+
+  // OCR Editor functions
+  const handleShowOcrEditor = () => {
+    if (processingResult) {
+      setEditableOcrData({
+        payslip_text: processingResult.payslip_text || '',
+        contract_text: processingResult.contract_text || '',
+        attendance_text: processingResult.attendance_text || ''
+      });
+      setShowOcrEditor(true);
+    }
+  };
+  const handleSaveOcrChanges = () => {
+    // Update the processing result with edited OCR data
+    setProcessingResult({
+      ...processingResult,
+      ...editableOcrData
+    });
+    setShowOcrEditor(false);
+    setOcrSaveSuccess(true);
+    console.log("OCR data updated:", editableOcrData);
+    
+    // Hide success message after 3 seconds
+    setTimeout(() => {
+      setOcrSaveSuccess(false);
+    }, 3000);
+  };  const handleCancelOcrEdit = () => {
+    setShowOcrEditor(false);
+    // Reset editable data to original processing result
+    if (processingResult) {
+      setEditableOcrData({
+        payslip_text: processingResult.payslip_text || '',
+        contract_text: processingResult.contract_text || '',
+        attendance_text: processingResult.attendance_text || ''
+      });
     }
   };
 
@@ -205,31 +257,33 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     // If documents haven't been processed yet (processingResult is null), process them now.
     if (!documentsData) {
       console.log("No existing processing result, calling handleProcessDocuments...");
-      // `handleProcessDocuments` will set its own `isProcessing` and `processingError` states.
-      // It will also update `processingResult` state upon success.
+      // handleProcessDocuments will set its own isProcessing and processingError states.
+      // It will also update processingResult state upon success.
       const newlyProcessedData = await handleProcessDocuments();
       if (!newlyProcessedData) {
-        // If `handleProcessDocuments` failed or returned no data,
+        // If handleProcessDocuments failed or returned no data,
         // an error message should have been set by it.
-        // We don't need to set `isProcessing` to false here for `handleCreateReport`'s
+        // We don't need to set isProcessing to false here for handleCreateReport's
         // own processing, as we are returning early.
         console.error('Document processing failed or returned no data. Aborting report creation.');
         return; // Abort report creation if document processing failed
       }
       documentsData = newlyProcessedData; // Use the freshly processed data
-    }    // At this point, `documentsData` should contain the necessary information.
+    }    // At this point, documentsData should contain the necessary information.
     // Now, proceed with the report creation specific logic.
     setIsVisible(false); // Hide any previous analysis
     setIsProcessingReport(true); // Set loading state for report creation
-    setProcessingError(null); // Clear previous errors before report creation
-
-    console.log("Data being used for report API:", documentsData);
+    setProcessingError(null); // Clear previous errors before report creation    console.log("Data being used for report API:", documentsData);
 
     try {
       // Safeguard: ensure documentsData is not null/undefined
       if (!documentsData) {
         throw new Error("No document data available to create report even after attempting processing.");
       }
+      
+      // Use the current processingResult state which may contain edited OCR data
+      const finalData = processingResult || documentsData;
+      
       const response = await fetch('/api/report', {
         method: 'POST',
         credentials: 'include',
@@ -237,9 +291,9 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          payslip_text: documentsData.payslip_text,
-          contract_text: documentsData.contract_text,
-          attendance_text: documentsData.attendance_text,
+          payslip_text: finalData.payslip_text,
+          contract_text: finalData.contract_text,
+          attendance_text: finalData.attendance_text,
           type: type,
           context: context
         })
@@ -329,8 +383,38 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             </>
             {!isProcessing && <span><i className="bi bi-arrow-right-short"></i></span>}
           </button>
+        </div>      </div>      {/* View/Edit OCR Results Button */}
+      {processingResult && (
+        <div className="row mt-3" data-aos="fade-up" data-aos-duration="1500">
+          <div className="col-12">            <div className="alert alert-info d-flex align-items-center" role="alert">
+              <i className="bi bi-info-circle me-2"></i>
+              <small>Documents processed successfully! You can now review and edit the extracted text with live markdown preview before creating reports.</small>
+            </div>
+            <button
+              type="button"
+              className="btn btn-outline-info w-100 py-3"
+              onClick={handleShowOcrEditor}
+              disabled={isProcessing}
+            >
+              <i className="bi bi-pencil-square me-2"></i>
+              <strong>Edit OCR Results with Live Preview</strong>
+              <br />
+              <small className="text-muted">Professional markdown editor with tables, formatting, and real-time preview</small>
+            </button>
+          </div>
+        </div>      )}
+
+      {/* OCR Save Success Message */}
+      {ocrSaveSuccess && (
+        <div className="row mt-2" data-aos="fade-up" data-aos-duration="500">
+          <div className="col-12">
+            <div className="alert alert-success d-flex align-items-center" role="alert">
+              <i className="bi bi-check-circle-fill me-2"></i>
+              <span>OCR text successfully updated! Your changes will be used in future reports.</span>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Action Buttons - Rendered individually for unique functionality */}
       <div className="row">
@@ -370,7 +454,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => router.push(`/reports`)}
+              onClick={() => router.push('/reports')}
               disabled={isProcessing}
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.documentHistory.replace(' ', '<br>') }} />
@@ -500,8 +584,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               <p className="mb-0 text-muted">{dictionary.hero.sharing.title} </p>
               <button
                 type="button"
-                className="btn btn-dark btn-icon btn-sm ms-2"
-                onClick={() => {
+                className="btn btn-dark btn-icon btn-sm ms-2"                onClick={() => {
                   const text = typedContent;
                   const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
                   window.open(url, '_blank');
@@ -512,8 +595,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               </button>
               <button
                 type="button"
-                className="btn btn-dark btn-icon btn-sm ms-2"
-                onClick={() => {
+                className="btn btn-dark btn-icon btn-sm ms-2"                onClick={() => {
                   const subject = 'Legal Analysis Report';
                   const body = typedContent;
                   const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -534,11 +616,133 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               {dictionary.hero.sharing.findLawyer}
               <span><i className="bi bi-arrow-right-short"></i></span>
             </button>
+          </div>        </div>
+      </div>}
+
+      {/* OCR Editor Modal */}
+      {showOcrEditor && (
+        <div className="modal show d-block" style={{backgroundColor: 'rgba(0,0,0,0.5)'}} tabIndex={-1}>
+          <div className="modal-dialog modal-xl">
+            <div className="modal-content">              <div className="modal-header">
+                <div>
+                  <h5 className="modal-title">Edit OCR Results</h5>
+                  <small className="text-muted">
+                    Edit the extracted text from your documents using the markdown editor with live preview. Changes will be used when creating reports.
+                  </small>
+                </div>
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={handleCancelOcrEdit}
+                ></button>
+              </div><div className="modal-body">
+                <div className="row">
+                  {/* Payslip Text Editor */}                  {editableOcrData.payslip_text && (
+                    <div className="col-12 mb-4">
+                      <label className="form-label fw-bold text-primary">
+                        <i className="bi bi-file-earmark-text me-2"></i>
+                        Payslip Text:
+                      </label>
+                      <div data-color-mode="light">                        <MDEditor
+                          value={editableOcrData.payslip_text}
+                          onChange={(value) => setEditableOcrData({
+                            ...editableOcrData,
+                            payslip_text: value || ''
+                          })}
+                          height={400}
+                          preview="live"
+                          hideToolbar
+                          visibleDragbar={false}
+                          data-color-mode="light"
+                        />
+                      </div>
+                      <small className="text-muted">{editableOcrData.payslip_text.length} characters</small>
+                    </div>
+                  )}
+                    {/* Contract Text Editor */}
+                  {editableOcrData.contract_text && (
+                    <div className="col-12 mb-4">
+                      <label className="form-label fw-bold text-success">
+                        <i className="bi bi-file-earmark-contract me-2"></i>
+                        Contract Text:
+                      </label>
+                      <div data-color-mode="light">                        <MDEditor
+                          value={editableOcrData.contract_text}
+                          onChange={(value) => setEditableOcrData({
+                            ...editableOcrData,
+                            contract_text: value || ''
+                          })}
+                          height={400}
+                          preview="live"
+                          hideToolbar
+                          visibleDragbar={false}
+                          data-color-mode="light"
+                        />
+                      </div>
+                      <small className="text-muted">{editableOcrData.contract_text.length} characters</small>
+                    </div>
+                  )}
+                    {/* Attendance Text Editor */}
+                  {editableOcrData.attendance_text && (
+                    <div className="col-12 mb-4">
+                      <label className="form-label fw-bold text-warning">
+                        <i className="bi bi-calendar-check me-2"></i>
+                        Attendance Text:
+                      </label>
+                      <div data-color-mode="light">                        <MDEditor
+                          value={editableOcrData.attendance_text}
+                          onChange={(value) => setEditableOcrData({
+                            ...editableOcrData,
+                            attendance_text: value || ''
+                          })}
+                          height={400}
+                          preview="live"
+                          hideToolbar
+                          visibleDragbar={false}
+                          data-color-mode="light"
+                        />
+                      </div>
+                      <small className="text-muted">{editableOcrData.attendance_text.length} characters</small>
+                    </div>
+                  )}
+                  
+                  {!editableOcrData.payslip_text && !editableOcrData.contract_text && !editableOcrData.attendance_text && (
+                    <div className="col-12">
+                      <p className="text-muted">No OCR text available to edit.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="modal-footer d-flex justify-content-between">
+                <div className="text-start">
+                  <small className="text-muted">
+                    <strong>Markdown Editor:</strong> Live preview shows rendered content. Tables and HTML tags are supported.
+                  </small>
+                </div>
+                <div>
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary me-2" 
+                    onClick={handleCancelOcrEdit}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn btn-primary" 
+                    onClick={handleSaveOcrChanges}
+                  >
+                    <i className="bi bi-check-lg me-2"></i>
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>}
+      )}
     </div>
   );
 };
 
-export default FileAnalysis;
+export default FileAnalysis;

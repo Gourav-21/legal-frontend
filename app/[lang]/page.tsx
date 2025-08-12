@@ -2,8 +2,10 @@ import Image from "next/image";
 import { Locale } from "../../i18n-config"; // Import Locale type
 import { getDictionary } from "../../get-dictionary"; // Import dictionary loader
 import FileAnalysis from "@/components/FileAnalysis";
+import OcrEditorModal from "@/components/OcrEditorModal";
 import LawyerModal from "@/components/LawyerModal";
 import AiSummaryModal from "@/components/AiSummary";
+import QuestionModal from "@/components/QuestionModal";
 
 // Define props type to include lang
 interface HomeProps {
@@ -21,7 +23,6 @@ export default async function Home(props: HomeProps) {
   const dictionary = await getDictionary(lang); // Fetch dictionary
   return (
     <div>
-
       <main>
         <section className="hero-section">
           <div className="container">
@@ -44,7 +45,6 @@ export default async function Home(props: HomeProps) {
               <Image className="coin2 bounce-1" src="/img/coin.svg" alt="coin" width={50} height={50} />
               <h3 className="mb-1">{dictionary.hero.uploadTitle}</h3>
               <p className="mb-3">{dictionary.hero.uploadSubtitle}</p>
-              
               {/* Combined File Upload and Analysis Component */}
               <FileAnalysis lang={lang} dictionary={dictionary} />
             </div>
@@ -159,8 +159,11 @@ export default async function Home(props: HomeProps) {
         </section>
         <AiSummaryModal lang={lang} dictionary={dictionary} />
 
-        {/* Lawyer Modal */}
         <LawyerModal lang={lang} dictionary={dictionary} />
+ 
+        <QuestionModal lang={lang} dictionary={dictionary} />
+
+        <OcrEditorModal />
       </main>
     </div>
   );

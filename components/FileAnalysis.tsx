@@ -2,18 +2,18 @@
 
 import { Locale } from "@/i18n-config";
 import { useAnalysisStore } from '@/store/analysisStore'; // Add this import
+import { useProcessingResultStore } from "@/store/processingResultStore";
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { MDXEditor, headingsPlugin, listsPlugin, quotePlugin, thematicBreakPlugin, markdownShortcutPlugin, linkPlugin, linkDialogPlugin, imagePlugin, tablePlugin, codeBlockPlugin, codeMirrorPlugin, diffSourcePlugin, frontmatterPlugin, directivesPlugin, toolbarPlugin, UndoRedo, BoldItalicUnderlineToggles, CodeToggle, CreateLink, InsertImage, InsertTable, InsertThematicBreak, ListsToggle, Separator } from '@mdxeditor/editor';
-import '@mdxeditor/editor/style.css';
 import useAuthStore from '../store/authStore'; // Import the auth store
+import { useOcrEditorStore } from '../store/ocrEditorStore';
+import { convertHtmlTablesToMarkdown, convertHtmlToMarkdown, hasHtmlTables } from '../utils/htmlToMarkdown';
 import FileUpload from './FileUpload';
-import { convertHtmlToMarkdown, convertHtmlTablesToMarkdown, hasHtmlTables } from '../utils/htmlToMarkdown';
 
 interface FileAnalysisProps {
   lang: Locale;
-  dictionary: any;
+  dictionary: Record<string, any>;
 }
 
 interface UploadedFile {
@@ -23,7 +23,110 @@ interface UploadedFile {
 }
 
 const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
+  // Typing animation for analysis display
+  const typeContent = (html: string) => {
+    // Clear any existing typing interval first
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+
+    setTypedContent('');
+    let i = 0;
+
+    typingIntervalRef.current = setInterval(() => {
+      if (i < html.length) {
+        setTypedContent(prev => prev + html.charAt(i));
+        i++;
+      } else {
+        clearInterval(typingIntervalRef.current!);
+        typingIntervalRef.current = null;
+      }
+    }, 0);
+  };
+
+  // Show analysis with typing animation
+  const handleShowAnalysis = (content: string) => {
+    // Clear any existing typing animation first
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+
+    setTypedContent('');
+    setIsVisible(true);
+
+    setTimeout(() => {
+      const analysisSection = document.getElementById('analysis-section');
+      if (analysisSection) {
+        const y = analysisSection.getBoundingClientRect().top + window.pageYOffset - 30;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+      setTimeout(() => {
+        typeContent(content);
+      }, 100);
+    }, 100);
+  };
   // File Upload States
+  // Export to Excel handler
+  const handleExportToExcel = async () => {
+    if (!isLoggedIn) {
+      alert('Please log in to export to Excel.');
+      return;
+    }
+
+    let documentsData = processingResult;
+
+    // If documents haven't been processed yet, process them now
+    if (!documentsData) {
+      console.log("No existing processing result, calling handleProcessDocuments...");
+      const newlyProcessedData = await handleProcessDocuments();
+      if (!newlyProcessedData) {
+        console.error('Document processing failed. Cannot export to Excel.');
+        return;
+      }
+      documentsData = newlyProcessedData;
+    }
+
+    try {
+      // Use the current processingResult state which may contain edited OCR data
+      const finalData = processingResult || documentsData;
+
+      const response = await fetch('/api/export_excel', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          processed_result: finalData
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Excel export failed');
+      }
+
+      // Handle the file download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'employee_data.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      console.log('Excel export successful');
+    } catch (error: unknown) {
+      console.error('Excel export error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred during Excel export.';
+      alert(`Export failed: ${errorMessage}`);
+    }
+  };
+
   const [payslipFiles, setPayslipFiles] = useState<UploadedFile[]>([]);
   const [contractFiles, setContractFiles] = useState<UploadedFile[]>([]);
   const [attendanceFiles, setAttendanceFiles] = useState<UploadedFile[]>([]); // New state for attendance reports
@@ -35,23 +138,14 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // Analysis States
   const [isVisible, setIsVisible] = useState(false);
   const [typedContent, setTypedContent] = useState('');
-  const animationStartedRef = React.useRef(false);
   const typingIntervalRef = React.useRef<NodeJS.Timeout | null>(null); // Track typing interval
   const [isProcessingDocuments, setIsProcessingDocuments] = useState(false); // Document processing state
   const [isProcessingReport, setIsProcessingReport] = useState(false); // Report creation state
-  const [processingResult, setProcessingResult] = useState<any>(null); // State to hold API response from document processing
-  const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error  // OCR Editor states
-  const [showOcrEditor, setShowOcrEditor] = useState(false);
-  const [ocrSaveSuccess, setOcrSaveSuccess] = useState(false);
-  const [editableOcrData, setEditableOcrData] = useState<{
-    payslip_text: string;
-    contract_text: string;
-    attendance_text: string;
-  }>({
-    payslip_text: '',
-    contract_text: '',
-    attendance_text: ''
-  });
+  // Use global Zustand store for processingResult
+  const { processingResult, setProcessingResult } = useProcessingResultStore();
+  const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error
+  const [ocrSaveSuccess, setOcrSaveSuccess] = useState(false); // State for OCR save success message
+  const { setShowOcrEditor, setEditableOcrData, setOnSaveCallback, resetOcrData } = useOcrEditorStore();
 
   // Track file changes to reset processing result when files change
   const [lastProcessedFiles, setLastProcessedFiles] = useState<{
@@ -66,6 +160,28 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
   // Combined processing state for UI
   const isProcessing = isProcessingDocuments || isProcessingReport;
+
+  // Set up OCR editor save callback
+  React.useEffect(() => {
+    console.log('Setting up OCR save callback in FileAnalysis');
+    setOnSaveCallback((editedData) => {
+      console.log('OCR save callback triggered with data:', editedData);
+      // Update the processing result with edited OCR data
+      if (!processingResult) {
+        setProcessingResult(null);
+      } else {
+        setProcessingResult({
+          ...processingResult,
+          payslip_text: editedData.payslip_text || '',
+          contract_text: editedData.contract_text || '',
+          attendance_text: editedData.attendance_text || ''
+        });
+      }
+      // Show success message
+      setOcrSaveSuccess(true);
+      setTimeout(() => setOcrSaveSuccess(false), 3000); // Hide after 3 seconds
+    });
+  }, [setOnSaveCallback]);
 
   // Effect to detect file changes and reset processing result
   React.useEffect(() => {
@@ -85,14 +201,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         setProcessingError(null);
         setIsVisible(false); // Hide any previous analysis
         setShowOcrEditor(false); // Hide OCR editor
+        resetOcrData(); // Reset OCR editor data
         setOcrSaveSuccess(false); // Hide success message
-        setEditableOcrData({ // Reset OCR editor data
-          payslip_text: '',
-          contract_text: '',
-          attendance_text: ''
-        });
       }
-  }, [payslipFiles, contractFiles, attendanceFiles, processingResult, lastProcessedFiles]);
+  }, [payslipFiles, contractFiles, attendanceFiles, processingResult, lastProcessedFiles, setShowOcrEditor, resetOcrData]);
 
   // Cleanup typing interval on unmount
   React.useEffect(() => {
@@ -104,13 +216,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   }, []);
 
   // Analysis Handlers
-  const scrollToAnalysis = () => {
-    const analysisSection = document.getElementById('analysis-section');
-    if (analysisSection) {
-      const y = analysisSection.getBoundingClientRect().top + window.pageYOffset - 30;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  };
   const handleProcessDocuments = async () => {
     if (!isLoggedIn) {
       alert('Please log in to process documents.');
@@ -166,9 +271,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       console.log("Documents processed successfully:", result);
       return result; // Return the result for immediate use if needed
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error processing documents:', error);
-      setProcessingError(error.message || 'An unexpected error occurred.');
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+      setProcessingError(errorMessage);
       return null; // Return null on error
     } finally {
       setIsProcessingDocuments(false); // Indicate processing of documents has finished
@@ -196,103 +302,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       });
       setShowOcrEditor(true);
     }
-  };
-  const handleSaveOcrChanges = () => {
-    // Update the processing result with edited OCR data
-    setProcessingResult({
-      ...processingResult,
-      ...editableOcrData
-    });
-    setShowOcrEditor(false);
-    setOcrSaveSuccess(true);
-    console.log("OCR data updated:", editableOcrData);
-
-    // Hide success message after 3 seconds
-    setTimeout(() => {
-      setOcrSaveSuccess(false);
-    }, 3000);
-  };
-
-  const handleCancelOcrEdit = () => {
-    setShowOcrEditor(false);
-    // Reset editable data to original processing result
-    if (processingResult) {
-      setEditableOcrData({
-        payslip_text: processingResult.payslip_text || '',
-        contract_text: processingResult.contract_text || '',
-        attendance_text: processingResult.attendance_text || ''
-      });
-    }
-  };
-
-  // Automatic HTML to Markdown conversion function
-  const handleAutoConvertHtmlToMarkdown = (value: string, field: 'payslip_text' | 'contract_text' | 'attendance_text') => {
-    // Check if the content contains HTML tables or other HTML elements
-    if (hasHtmlTables(value) || /<[^>]+>/g.test(value)) {
-      console.log(`🔄 Auto-converting HTML to Markdown for ${field}:`, value.substring(0, 100) + '...');
-      
-      // Convert HTML to markdown automatically
-      const convertedValue = hasHtmlTables(value)
-        ? convertHtmlTablesToMarkdown(value)
-        : convertHtmlToMarkdown(value);
-
-      console.log(`✅ Converted to Markdown:`, convertedValue.substring(0, 100) + '...');
-
-      // Update the state with converted markdown
-      setEditableOcrData(prev => ({
-        ...prev,
-        [field]: convertedValue
-      }));
-
-      return convertedValue;
-    }
-
-    // If no HTML detected, update normally
-    setEditableOcrData(prev => ({
-      ...prev,
-      [field]: value || ''
-    }));
-
-    return value || '';
-  };
-
-  const typeContent = (html: string) => {
-    // Clear any existing typing interval first
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current);
-      typingIntervalRef.current = null;
-    }
-
-    setTypedContent('');
-    let i = 0;
-
-    typingIntervalRef.current = setInterval(() => {
-      if (i < html.length) {
-        setTypedContent(prev => prev + html.charAt(i));
-        i++;
-      } else {
-        clearInterval(typingIntervalRef.current!);
-        typingIntervalRef.current = null;
-      }
-    }, 0);
-  };
-
-  const handleShowAnalysis = (content: string) => {
-    // Clear any existing typing animation first
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current);
-      typingIntervalRef.current = null;
-    }
-
-    setTypedContent('');
-    setIsVisible(true);
-
-    setTimeout(() => {
-      scrollToAnalysis();
-      setTimeout(() => {
-        typeContent(content);
-      }, 100);
-    }, 100);
   };
 
   const handleCreateReport = async (type: string) => {
@@ -331,7 +340,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       }
 
       // Use the current processingResult state which may contain edited OCR data
+      // processingResult takes precedence as it may contain user edits from OCR editor
       const finalData = processingResult || documentsData;
+      console.log("Final data being sent to report API (may include OCR edits):", finalData);
+      console.log("Current processingResult state:", processingResult);
 
       const response = await fetch('/api/report', {
         method: 'POST',
@@ -357,9 +369,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       console.log("Report creation successful:", reportResult);
       setLegalAnalysis(reportResult.legal_analysis);
       handleShowAnalysis(reportResult.legal_analysis);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Report creation error:', error);
-      setProcessingError(error.message || 'An unexpected error occurred during report creation.');
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred during report creation.';
+      setProcessingError(errorMessage);
     } finally {
       setIsProcessingReport(false); // Clear loading state for report creation
     }
@@ -456,11 +469,11 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
       {/* OCR Save Success Message */}
       {ocrSaveSuccess && (
-        <div className="row mt-2" data-aos="fade-up" data-aos-duration="500">
+        <div className="row mt-3" data-aos="fade-up" data-aos-duration="1500">
           <div className="col-12">
             <div className="alert alert-success d-flex align-items-center" role="alert">
-              <i className="bi bi-check-circle-fill me-2"></i>
-              <span>OCR text successfully updated! Your changes will be used in future reports.</span>
+              <i className="bi bi-check-circle me-2"></i>
+              <span>OCR text changes saved successfully! Updated data will be used for report generation.</span>
             </div>
           </div>
         </div>
@@ -474,7 +487,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             <button
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
-              onClick={() => handleCreateReport('report')}
+              onClick={() => handleCreateReport('combined')}
               disabled={isProcessing} // General disable if any processing is happening
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.createReport.replace(' ', '<br>') }} />
@@ -484,7 +497,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         )}
 
         {/* Example: Button 2 - Create a company page */}
-        {dictionary.hero.actionButtons.createCompanyPage && (
+        {/* {dictionary.hero.actionButtons.createCompanyPage && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
             <button
               type="button"
@@ -495,7 +508,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               <span><i className="bi bi-arrow-right-short"></i></span>
             </button>
           </div>
-        )}
+        )} */}
 
         {/* Add other buttons similarly, accessing them by index from dictionary.hero.actionButtons */}
         {/* Example: Button 3 - Document history */}
@@ -603,8 +616,68 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           </div>
         )}
 
+        {/* Employer Report Button */}
+        {dictionary.hero.actionButtons.employerReport && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('report')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.employerReport.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* List of Violations Button */}
+        {dictionary.hero.actionButtons.violationsList && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('violations_list')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.violationsList.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Table of Violations Button */}
+        {dictionary.hero.actionButtons.violationsTable && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-dark thumbnail-btn show-btn"
+              onClick={() => handleCreateReport('violation_count_table')}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.violationsTable.replace(' ', '<br>') }} />
+              <span><i className="bi bi-arrow-right-short"></i></span>
+            </button>
+          </div>
+        )}
+
+        {/* Export to Excel Button */}
+        {dictionary.hero.actionButtons.exportToExcel && (
+          <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
+            <button
+              type="button"
+              className="btn btn-outline-success thumbnail-btn show-btn"
+              onClick={handleExportToExcel}
+              disabled={isProcessing}
+            >
+              <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.exportToExcel.replace(' ', '<br>') }} />
+              <span className="text-success"><i className="bi bi-file-earmark-excel"></i></span>
+            </button>
+          </div>
+        )}
+
         {/* Button 11 - Serial employer */}
-        {dictionary.hero.actionButtons.identifySerialEmployer && (
+        {/* {dictionary.hero.actionButtons.identifySerialEmployer && (
           <div className="col-6 col-md-3 mt-4" data-aos="fade-up" data-aos-duration="1500">
             <button
               type="button"
@@ -615,7 +688,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               <span><i className="bi bi-arrow-right-short"></i></span>
             </button>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Processing Status Messages */}
@@ -662,6 +735,11 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               {dictionary.fileAnalysis.showAiSummary}
             </button>
 
+            <button type="submit" className="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#questionModal">
+              <i className="bi bi-question-circle"></i>
+              {dictionary.fileAnalysis.askQuestion}
+            </button>
+
             <button type="submit" className="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#exampleModal">
               {dictionary.hero.sharing.findLawyer}
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -669,209 +747,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           </div>        </div>
       </div>}
 
-      {/* OCR Editor Modal */}
-      {showOcrEditor && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }} tabIndex={-1}>
-          <div className="modal-dialog modal-xl">
-            <div className="modal-content">              <div className="modal-header">
-              <div>
-                <h5 className="modal-title">Edit OCR Results</h5>
-                <small className="text-muted">
-                  Edit the extracted text from your documents using the markdown editor with live preview. Changes will be used when creating reports.
-                </small>
-              </div>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={handleCancelOcrEdit}
-              ></button>
-            </div><div className="modal-body">
-                <div className="row">
-                  {/* Payslip Text Editor */}                  {editableOcrData.payslip_text && (
-                    <div className="col-12 mb-4">
-                      <label className="form-label fw-bold text-primary">
-                        <i className="bi bi-file-earmark-text me-2"></i>
-                        Payslip Text:
-                      </label>
-                      <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
-                        <MDXEditor
-                          markdown={editableOcrData.payslip_text}
-                          onChange={(value) => handleAutoConvertHtmlToMarkdown(value || '', 'payslip_text')}
-                          plugins={[
-                            headingsPlugin(),
-                            listsPlugin(),
-                            quotePlugin(),
-                            thematicBreakPlugin(),
-                            markdownShortcutPlugin(),
-                            linkPlugin(),
-                            linkDialogPlugin(),
-                            imagePlugin(),
-                            tablePlugin(),
-                            codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-                            codeMirrorPlugin({ codeBlockLanguages: { txt: 'Text', js: 'JavaScript', css: 'CSS' } }),
-                            diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: '' }),
-                            frontmatterPlugin(),
-                            directivesPlugin(),
-                            toolbarPlugin({
-                              toolbarContents: () => (
-                                <>
-                                  <UndoRedo />
-                                  <Separator />
-                                  <BoldItalicUnderlineToggles />
-                                  <CodeToggle />
-                                  <Separator />
-                                  <ListsToggle />
-                                  <Separator />
-                                  <CreateLink />
-                                  <InsertImage />
-                                  <Separator />
-                                  <InsertTable />
-                                  <InsertThematicBreak />
-                                </>
-                              )
-                            })
-                          ]}
-                        />
-                      </div>
-                      <small className="text-muted">{editableOcrData.payslip_text.length} characters</small>
-                    </div>
-                  )}
-                  {/* Contract Text Editor */}
-                  {editableOcrData.contract_text && (
-                    <div className="col-12 mb-4">
-                      <label className="form-label fw-bold text-success">
-                        <i className="bi bi-file-earmark-contract me-2"></i>
-                        Contract Text:
-                      </label>
-                      <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
-                        <MDXEditor
-                          markdown={editableOcrData.contract_text}
-                          onChange={(value) => handleAutoConvertHtmlToMarkdown(value || '', 'contract_text')}
-                          plugins={[
-                            headingsPlugin(),
-                            listsPlugin(),
-                            quotePlugin(),
-                            thematicBreakPlugin(),
-                            markdownShortcutPlugin(),
-                            linkPlugin(),
-                            linkDialogPlugin(),
-                            imagePlugin(),
-                            tablePlugin(),
-                            codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-                            codeMirrorPlugin({ codeBlockLanguages: { txt: 'Text', js: 'JavaScript', css: 'CSS' } }),
-                            diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: '' }),
-                            frontmatterPlugin(),
-                            directivesPlugin(),
-                            toolbarPlugin({
-                              toolbarContents: () => (
-                                <>
-                                  <UndoRedo />
-                                  <Separator />
-                                  <BoldItalicUnderlineToggles />
-                                  <CodeToggle />
-                                  <Separator />
-                                  <ListsToggle />
-                                  <Separator />
-                                  <CreateLink />
-                                  <InsertImage />
-                                  <Separator />
-                                  <InsertTable />
-                                  <InsertThematicBreak />
-                                </>
-                              )
-                            })
-                          ]}
-                        />
-                      </div>
-                      <small className="text-muted">{editableOcrData.contract_text.length} characters</small>
-                    </div>
-                  )}
-                  {/* Attendance Text Editor */}
-                  {editableOcrData.attendance_text && (
-                    <div className="col-12 mb-4">
-                      <label className="form-label fw-bold text-warning">
-                        <i className="bi bi-calendar-check me-2"></i>
-                        Attendance Text:
-                      </label>
-                      <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
-                        <MDXEditor
-                          markdown={editableOcrData.attendance_text}
-                          onChange={(value) => handleAutoConvertHtmlToMarkdown(value || '', 'attendance_text')}
-                          plugins={[
-                            headingsPlugin(),
-                            listsPlugin(),
-                            quotePlugin(),
-                            thematicBreakPlugin(),
-                            markdownShortcutPlugin(),
-                            linkPlugin(),
-                            linkDialogPlugin(),
-                            imagePlugin(),
-                            tablePlugin(),
-                            codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-                            codeMirrorPlugin({ codeBlockLanguages: { txt: 'Text', js: 'JavaScript', css: 'CSS' } }),
-                            diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: '' }),
-                            frontmatterPlugin(),
-                            directivesPlugin(),
-                            toolbarPlugin({
-                              toolbarContents: () => (
-                                <>
-                                  <UndoRedo />
-                                  <Separator />
-                                  <BoldItalicUnderlineToggles />
-                                  <CodeToggle />
-                                  <Separator />
-                                  <ListsToggle />
-                                  <Separator />
-                                  <CreateLink />
-                                  <InsertImage />
-                                  <Separator />
-                                  <InsertTable />
-                                  <InsertThematicBreak />
-                                </>
-                              )
-                            })
-                          ]}
-                        />
-                      </div>
-                      <small className="text-muted">{editableOcrData.attendance_text.length} characters</small>
-                    </div>
-                  )}
-
-                  {!editableOcrData.payslip_text && !editableOcrData.contract_text && !editableOcrData.attendance_text && (
-                    <div className="col-12">
-                      <p className="text-muted">No OCR text available to edit.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="modal-footer d-flex justify-content-between">
-                <div className="text-start">
-                  <small className="text-muted">
-                    <strong>Markdown Editor:</strong> Live preview shows rendered content. HTML tables are automatically converted to markdown format when pasted.
-                  </small>
-                </div>
-                <div>
-                  <button
-                    type="button"
-                    className="btn btn-secondary me-2"
-                    onClick={handleCancelOcrEdit}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleSaveOcrChanges}
-                  >
-                    <i className="bi bi-check-lg me-2"></i>
-                    Save Changes
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

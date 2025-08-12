@@ -37,6 +37,10 @@
       "finalClaimReport": "Final Claim Report & Tables",
       "identifySerialEmployer": "Serial employer identification",
       "easyExplanation": "Easy Explanation"
+    ,"employerReport": "Employer Report"
+    ,"violationsList": "List of Violations"
+    ,"violationsTable": "Table of Violations"
+    ,"exportToExcel": "Export to Excel"
     },
     "sharing": {
       "title": "Send Reports via:",
@@ -434,6 +438,15 @@
     "noAnalysisAvailable": "No analysis available to summarize."
   },
   "fileAnalysis": {
-    "showAiSummary": "Show AI Summary"
+    "showAiSummary": "Show AI Summary",
+    "askQuestion": "Ask Question"
+  },
+  "questionModal": {
+    "title": "Ask a Question",
+    "placeholder": "Type your question about the analysis...",
+    "submitButton": "Submit Question",
+    "loading": "Processing your question...",
+    "error": "Error processing question",
+    "noAnalysisError": "Please process documents first before asking questions."
   }
 }

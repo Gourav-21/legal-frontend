@@ -37,6 +37,10 @@
       "finalClaimReport": "דוח תביעה סופי וטבלאות",
       "identifySerialEmployer": "זיהוי מעסיק סדרתי",
       "easyExplanation": "הסבר פשוט"
+    ,"employerReport": "דו\"ח מעסיק"
+    ,"violationsList": "רשימת הפרות"
+    ,"violationsTable": "טבלת הפרות"
+    ,"exportToExcel": "ייצוא לאקסל"
     },
     "sharing": {
       "title": "שלח דוחות באמצעות:",
@@ -431,6 +435,15 @@
     "noAnalysisAvailable": "אין ניתוח זמין לסיכום."
   },
   "fileAnalysis": {
-    "showAiSummary": "הצג סיכום AI"
+    "showAiSummary": "הצג סיכום AI",
+    "askQuestion": "שאל שאלה"
+  },
+  "questionModal": {
+    "title": "שאל שאלה",
+    "placeholder": "הקלד את השאלה שלך על הניתוח...",
+    "submitButton": "שלח שאלה",
+    "loading": "מעבד את השאלה שלך...",
+    "error": "שגיאה בעיבוד השאלה",
+    "noAnalysisError": "אנא עבד מסמכים תחילה לפני שאילת שאלות."
   }
 }

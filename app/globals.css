@@ -1,4 +1,41 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
+/* Custom markdown table styles for FileAnalysis */
+.markdown-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  direction: rtl;
+  margin: 1em 0;
+  font-size: 1rem;
+}
+.markdown-table th, .markdown-table td {
+  border: 1px solid #d3d3d3;
+  padding: 8px 12px;
+  text-align: right;
+  background: #f9f6e7;
+}
+.markdown-table th {
+  background: #f3eac2;
+  font-weight: bold;
+}
+.markdown-table tr:nth-child(even) td {
+  background: #f7f3e6;
+}
+.markdown-table tr:hover td {
+  background: #f0e6c8;
+}
+
+/* Custom heading styles for markdown output */
+.markdown-table h1, .markdown-table h2, .markdown-table h3 {
+  color: #b89c3a;
+  font-weight: bold;
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+  text-align: right;
+  direction: rtl;
+  background: none;
+  font-family: inherit;
+}
 
 /* ------Common-Css------------- */
 * {

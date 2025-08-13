@@ -6,6 +6,7 @@ import { useProcessingResultStore } from "@/store/processingResultStore";
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import useAuthStore from '../store/authStore'; // Import the auth store
 import { useOcrEditorStore } from '../store/ocrEditorStore';
 import { convertHtmlTablesToMarkdown, convertHtmlToMarkdown, hasHtmlTables } from '../utils/htmlToMarkdown';
@@ -701,7 +702,16 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       {/* Analysis Section */}
       {isVisible && <div className="result-card mt-4" id="analysis-section" style={{ display: isVisible ? 'block' : 'none' }}>
         <div id="typing-output" dir={"rtl"}>
-          <ReactMarkdown>{typedContent.replace(/<(ctrl|crrl)(99|100)(\/>|>)?/g, '')}</ReactMarkdown>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              table: ({node, ...props}) => (
+                <table className="markdown-table" {...props} />
+              )
+            }}
+          >
+            {typedContent}
+          </ReactMarkdown>
           <div className="d-sm-flex align-items-center justify-content-between">
             <div className="d-flex align-items-center mt-4">
               <p className="mb-0 text-muted">{dictionary.hero.sharing.title} </p>

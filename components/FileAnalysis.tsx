@@ -745,7 +745,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               {dictionary.fileAnalysis.showAiSummary}
             </button>
 
-            <button type="submit" className="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#questionModal">
+            <button type="submit" className="btn btn-primary mt-4" data-bs-toggle="modal" data-bs-target="#questionModal">
               <i className="bi bi-question-circle"></i>
               {dictionary.fileAnalysis.askQuestion}
             </button>

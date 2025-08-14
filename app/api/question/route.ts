@@ -18,13 +18,13 @@ export async function POST(request: NextRequest) {
     // Format the request body to match the backend QnA API structure
     const qnaRequestBody = {
       report: body.report,
-      questions: [body.question]
+      question: body.question
     };
 
     // Proxy the request to the backend QnA endpoint
     return await proxyToBackend(request, '/api/qna', {
       method: 'POST',
-      body: JSON.stringify(qnaRequestBody),
+      body: qnaRequestBody,
     });
   } catch (error) {
     console.error('Question API error:', error);

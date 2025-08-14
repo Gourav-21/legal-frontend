@@ -43,7 +43,6 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ lang, dictionary }) => {
                 })
             });
 
-
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.detail || 'Question processing failed');
@@ -78,53 +77,42 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ lang, dictionary }) => {
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={handleReset}></button>
                     </div>
                     <div className="modal-body">
-                        {/* Question Input */}
+                        {/* Question Input and Submit Button Side by Side, Same Height, No Clear Button */}
                         <div className="mb-3">
                             <label htmlFor="questionInput" className="form-label">
                                 {dictionary.questionModal.title}
                             </label>
-                            <textarea
-                                id="questionInput"
-                                className="form-control"
-                                rows={3}
-                                placeholder={dictionary.questionModal.placeholder}
-                                value={question}
-                                onChange={(e) => setQuestion(e.target.value)}
-                                disabled={isLoading}
-                            />
-                        </div>
-
-                        {/* Submit Button */}
-                        <div className="mb-3">
-                            <button
-                                type="button"
-                                className="btn btn-primary me-2"
-                                onClick={handleSubmitQuestion}
-                                disabled={isLoading || !question.trim()}
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                        {dictionary.questionModal.loading}
-                                    </>
-                                ) : (
-                                    <>
-                                        <i className="bi bi-send me-2"></i>
-                                        {dictionary.questionModal.submitButton}
-                                    </>
-                                )}
-                            </button>
-                            {(question || answer || error) && (
+                            <div className="d-flex align-items-stretch gap-2">
+                                <textarea
+                                    id="questionInput"
+                                    className="form-control"
+                                    rows={3}
+                                    style={{ resize: 'vertical', flex: 1, height: '48px', minHeight: '48px', maxHeight: '120px' }}
+                                    placeholder={dictionary.questionModal.placeholder}
+                                    value={question}
+                                    onChange={(e) => setQuestion(e.target.value)}
+                                    disabled={isLoading}
+                                />
                                 <button
                                     type="button"
-                                    className="btn btn-outline-secondary"
-                                    onClick={handleReset}
-                                    disabled={isLoading}
+                                    className="btn btn-primary d-flex align-items-center justify-content-center"
+                                    style={{ height: '48px', minWidth: '120px' }}
+                                    onClick={handleSubmitQuestion}
+                                    disabled={isLoading || !question.trim()}
                                 >
-                                    <i className="bi bi-arrow-clockwise me-2"></i>
-                                    Clear
+                                    {isLoading ? (
+                                        <>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            {dictionary.questionModal.loading}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="bi bi-send me-2"></i>
+                                            {dictionary.questionModal.submitButton}
+                                        </>
+                                    )}
                                 </button>
-                            )}
+                            </div>
                         </div>
 
                         {/* Error Display */}

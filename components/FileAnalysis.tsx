@@ -72,9 +72,11 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // Export to Excel handler
   const handleExportToExcel = async () => {
     if (!isLoggedIn) {
-      alert('Please log in to export to Excel.');
+      setProcessingError('Please log in to export to Excel.');
       return;
     }
+    setIsProcessingDocuments(true);
+    setProcessingError(null)
 
     let documentsData = processingResult;
 
@@ -84,6 +86,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       const newlyProcessedData = await handleProcessDocuments();
       if (!newlyProcessedData) {
         console.error('Document processing failed. Cannot export to Excel.');
+        setProcessingError('Document processing failed. Cannot export to Excel.');
+        setIsProcessingDocuments(false);
         return;
       }
       documentsData = newlyProcessedData;
@@ -106,6 +110,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
       if (!response.ok) {
         const errorData = await response.json();
+        setIsProcessingDocuments(false);
+        setProcessingError(errorData.detail || 'Excel export failed');
         throw new Error(errorData.detail || 'Excel export failed');
       }
 
@@ -119,12 +125,14 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+  setIsProcessingDocuments(false);
 
-      console.log('Excel export successful');
+  console.log('Excel export successful');
     } catch (error: unknown) {
       console.error('Excel export error:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred during Excel export.';
-      alert(`Export failed: ${errorMessage}`);
+      setIsProcessingDocuments(false);
+      setProcessingError(`Export failed: ${errorMessage}`);
     }
   };
 

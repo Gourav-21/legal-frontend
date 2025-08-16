@@ -263,6 +263,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         credentials: 'include',
       }); if (!response.ok) {
         const errorData = await response.json();
+        console.log( `HTTP error! status: ${response.status}`)
         throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
       }
 
@@ -283,7 +284,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     } catch (error: unknown) {
       console.error('Error processing documents:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
-      setProcessingError(errorMessage);
+      setProcessingError("Document processing failed");
       return null; // Return null on error
     } finally {
       setIsProcessingDocuments(false); // Indicate processing of documents has finished

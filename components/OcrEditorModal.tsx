@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { useOcrEditorStore } from '../store/ocrEditorStore';
-import { MDXEditor, headingsPlugin, listsPlugin, quotePlugin, thematicBreakPlugin, markdownShortcutPlugin, linkPlugin, linkDialogPlugin, imagePlugin, tablePlugin, codeBlockPlugin, codeMirrorPlugin, diffSourcePlugin, frontmatterPlugin, directivesPlugin, toolbarPlugin, UndoRedo, BoldItalicUnderlineToggles, CodeToggle, CreateLink, InsertImage, InsertTable, InsertThematicBreak, ListsToggle, Separator } from '@mdxeditor/editor';
+import { MDXEditor, headingsPlugin, listsPlugin, markdownShortcutPlugin, tablePlugin, toolbarPlugin, UndoRedo, BoldItalicUnderlineToggles, InsertTable, ListsToggle, Separator } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 
 // Custom styles to fix z-index issues with MDXEditor in modals
@@ -25,8 +25,51 @@ const modalEditorStyles = `
   }
 `;
 
+// Optimized plugins configuration - shared across all editors for better performance
+const editorPlugins = [
+  headingsPlugin(),
+  listsPlugin(),
+  markdownShortcutPlugin(),
+  tablePlugin(),
+  toolbarPlugin({
+    toolbarContents: () => (
+      <>
+        <UndoRedo />
+        <Separator />
+        <BoldItalicUnderlineToggles />
+        <Separator />
+        <ListsToggle />
+        <Separator />
+        <InsertTable />
+      </>
+    )
+  })
+];
+
 const OcrEditorModal: React.FC = () => {
   const { showOcrEditor, editableOcrData, onSaveCallback, setShowOcrEditor, setEditableOcrData, resetOcrData } = useOcrEditorStore();
+  const [fixingField, setFixingField] = React.useState<string | null>(null);
+  const [originalContent, setOriginalContent] = React.useState<{
+    payslip_text?: string;
+    contract_text?: string;
+    attendance_text?: string;
+  }>({});
+  const [canUndo, setCanUndo] = React.useState<{
+    payslip_text: boolean;
+    contract_text: boolean;
+    attendance_text: boolean;
+  }>({
+    payslip_text: false,
+    contract_text: false,
+    attendance_text: false
+  });
+
+  // Force re-render keys for MDXEditor when content changes programmatically
+  const [editorKeys, setEditorKeys] = React.useState({
+    payslip_text: 0,
+    contract_text: 0,
+    attendance_text: 0
+  });
 
   // Save handler (can be extended to trigger global effects)
   const handleSave = () => {
@@ -46,6 +89,74 @@ const OcrEditorModal: React.FC = () => {
   // Markdown change handler
   const handleChange = (value: string, field: 'payslip_text' | 'contract_text' | 'attendance_text') => {
     setEditableOcrData({ [field]: value || '' });
+  };
+
+  // AI Fix handler
+  const handleAiFix = async (field: 'payslip_text' | 'contract_text' | 'attendance_text') => {
+    const currentContent = editableOcrData[field];
+    if (!currentContent) return;
+
+    // Store original content for undo functionality
+    setOriginalContent(prev => ({
+      ...prev,
+      [field]: currentContent
+    }));
+
+    setFixingField(field);
+    try {
+      const response = await fetch('/api/fix_ocr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ocr_content: currentContent
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fix OCR content');
+      }
+
+      const result = await response.json();
+      setEditableOcrData({ [field]: result.fixed_content });
+
+      // Force MDXEditor to re-render with new content
+      setEditorKeys(prev => ({
+        ...prev,
+        [field]: prev[field] + 1
+      }));
+
+      // Enable undo for this field
+      setCanUndo(prev => ({
+        ...prev,
+        [field]: true
+      }));
+    } catch (error) {
+      console.error('Error fixing OCR content:', error);
+      alert('Failed to fix OCR content. Please try again.');
+    } finally {
+      setFixingField(null);
+    }
+  };
+
+  // Undo AI Fix handler
+  const handleUndoAiFix = (field: 'payslip_text' | 'contract_text' | 'attendance_text') => {
+    const originalText = originalContent[field];
+    if (originalText) {
+      setEditableOcrData({ [field]: originalText });
+
+      // Force MDXEditor to re-render with original content
+      setEditorKeys(prev => ({
+        ...prev,
+        [field]: prev[field] + 1
+      }));
+
+      setCanUndo(prev => ({
+        ...prev,
+        [field]: false
+      }));
+    }
   };
 
   if (!showOcrEditor) return null;
@@ -73,48 +184,49 @@ const OcrEditorModal: React.FC = () => {
                 {/* Payslip Text Editor */}
                 {editableOcrData.payslip_text && (
                   <div className="col-12 mb-4">
-                    <label className="form-label fw-bold text-primary">
-                      <i className="bi bi-file-earmark-text me-2"></i>
-                      Payslip Text:
-                    </label>
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <label className="form-label fw-bold text-primary mb-0">
+                        <i className="bi bi-file-earmark-text me-2"></i>
+                        Payslip Text:
+                      </label>
+                      <div className="d-flex gap-2">
+                        {canUndo.payslip_text && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary btn-sm"
+                            onClick={() => handleUndoAiFix('payslip_text')}
+                            disabled={fixingField === 'payslip_text'}
+                          >
+                            <i className="bi bi-arrow-counterclockwise me-1"></i>
+                            Undo
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="btn btn-outline-primary btn-sm"
+                          onClick={() => handleAiFix('payslip_text')}
+                          disabled={fixingField === 'payslip_text'}
+                        >
+                          {fixingField === 'payslip_text' ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                              Fixing...
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-magic me-1"></i>
+                              AI Fix
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                     <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                       <MDXEditor
+                        key={`payslip-${editorKeys.payslip_text}`}
                         markdown={editableOcrData.payslip_text}
                         onChange={(value) => handleChange(value || '', 'payslip_text')}
-                        plugins={[
-                          headingsPlugin(),
-                          listsPlugin(),
-                          quotePlugin(),
-                          thematicBreakPlugin(),
-                          markdownShortcutPlugin(),
-                          linkPlugin(),
-                          linkDialogPlugin(),
-                          imagePlugin(),
-                          tablePlugin(),
-                          codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-                          codeMirrorPlugin({ codeBlockLanguages: { txt: 'Text', js: 'JavaScript', css: 'CSS' } }),
-                          diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: '' }),
-                          frontmatterPlugin(),
-                          directivesPlugin(),
-                          toolbarPlugin({
-                            toolbarContents: () => (
-                              <>
-                                <UndoRedo />
-                                <Separator />
-                                <BoldItalicUnderlineToggles />
-                                <CodeToggle />
-                                <Separator />
-                                <ListsToggle />
-                                <Separator />
-                                <CreateLink />
-                                <InsertImage />
-                                <Separator />
-                                <InsertTable />
-                                <InsertThematicBreak />
-                              </>
-                            )
-                          })
-                        ]}
+                        plugins={editorPlugins}
                       />
                     </div>
                     <small className="text-muted">{editableOcrData.payslip_text.length} characters</small>
@@ -123,48 +235,49 @@ const OcrEditorModal: React.FC = () => {
                 {/* Contract Text Editor */}
                 {editableOcrData.contract_text && (
                   <div className="col-12 mb-4">
-                    <label className="form-label fw-bold text-success">
-                      <i className="bi bi-file-earmark-contract me-2"></i>
-                      Contract Text:
-                    </label>
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <label className="form-label fw-bold text-success mb-0">
+                        <i className="bi bi-file-earmark-contract me-2"></i>
+                        Contract Text:
+                      </label>
+                      <div className="d-flex gap-2">
+                        {canUndo.contract_text && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary btn-sm"
+                            onClick={() => handleUndoAiFix('contract_text')}
+                            disabled={fixingField === 'contract_text'}
+                          >
+                            <i className="bi bi-arrow-counterclockwise me-1"></i>
+                            Undo
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="btn btn-outline-success btn-sm"
+                          onClick={() => handleAiFix('contract_text')}
+                          disabled={fixingField === 'contract_text'}
+                        >
+                          {fixingField === 'contract_text' ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                              Fixing...
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-magic me-1"></i>
+                              AI Fix
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                     <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                       <MDXEditor
+                        key={`contract-${editorKeys.contract_text}`}
                         markdown={editableOcrData.contract_text}
                         onChange={(value) => handleChange(value || '', 'contract_text')}
-                        plugins={[
-                          headingsPlugin(),
-                          listsPlugin(),
-                          quotePlugin(),
-                          thematicBreakPlugin(),
-                          markdownShortcutPlugin(),
-                          linkPlugin(),
-                          linkDialogPlugin(),
-                          imagePlugin(),
-                          tablePlugin(),
-                          codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-                          codeMirrorPlugin({ codeBlockLanguages: { txt: 'Text', js: 'JavaScript', css: 'CSS' } }),
-                          diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: '' }),
-                          frontmatterPlugin(),
-                          directivesPlugin(),
-                          toolbarPlugin({
-                            toolbarContents: () => (
-                              <>
-                                <UndoRedo />
-                                <Separator />
-                                <BoldItalicUnderlineToggles />
-                                <CodeToggle />
-                                <Separator />
-                                <ListsToggle />
-                                <Separator />
-                                <CreateLink />
-                                <InsertImage />
-                                <Separator />
-                                <InsertTable />
-                                <InsertThematicBreak />
-                              </>
-                            )
-                          })
-                        ]}
+                        plugins={editorPlugins}
                       />
                     </div>
                     <small className="text-muted">{editableOcrData.contract_text.length} characters</small>
@@ -173,48 +286,49 @@ const OcrEditorModal: React.FC = () => {
                 {/* Attendance Text Editor */}
                 {editableOcrData.attendance_text && (
                   <div className="col-12 mb-4">
-                    <label className="form-label fw-bold text-warning">
-                      <i className="bi bi-calendar-check me-2"></i>
-                      Attendance Text:
-                    </label>
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <label className="form-label fw-bold text-warning mb-0">
+                        <i className="bi bi-calendar-check me-2"></i>
+                        Attendance Text:
+                      </label>
+                      <div className="d-flex gap-2">
+                        {canUndo.attendance_text && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary btn-sm"
+                            onClick={() => handleUndoAiFix('attendance_text')}
+                            disabled={fixingField === 'attendance_text'}
+                          >
+                            <i className="bi bi-arrow-counterclockwise me-1"></i>
+                            Undo
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="btn btn-outline-warning btn-sm"
+                          onClick={() => handleAiFix('attendance_text')}
+                          disabled={fixingField === 'attendance_text'}
+                        >
+                          {fixingField === 'attendance_text' ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                              Fixing...
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-magic me-1"></i>
+                              AI Fix
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                     <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
                       <MDXEditor
+                        key={`attendance-${editorKeys.attendance_text}`}
                         markdown={editableOcrData.attendance_text}
                         onChange={(value) => handleChange(value || '', 'attendance_text')}
-                        plugins={[
-                          headingsPlugin(),
-                          listsPlugin(),
-                          quotePlugin(),
-                          thematicBreakPlugin(),
-                          markdownShortcutPlugin(),
-                          linkPlugin(),
-                          linkDialogPlugin(),
-                          imagePlugin(),
-                          tablePlugin(),
-                          codeBlockPlugin({ defaultCodeBlockLanguage: 'txt' }),
-                          codeMirrorPlugin({ codeBlockLanguages: { txt: 'Text', js: 'JavaScript', css: 'CSS' } }),
-                          diffSourcePlugin({ viewMode: 'rich-text', diffMarkdown: '' }),
-                          frontmatterPlugin(),
-                          directivesPlugin(),
-                          toolbarPlugin({
-                            toolbarContents: () => (
-                              <>
-                                <UndoRedo />
-                                <Separator />
-                                <BoldItalicUnderlineToggles />
-                                <CodeToggle />
-                                <Separator />
-                                <ListsToggle />
-                                <Separator />
-                                <CreateLink />
-                                <InsertImage />
-                                <Separator />
-                                <InsertTable />
-                                <InsertThematicBreak />
-                              </>
-                            )
-                          })
-                        ]}
+                        plugins={editorPlugins}
                       />
                     </div>
                     <small className="text-muted">{editableOcrData.attendance_text.length} characters</small>

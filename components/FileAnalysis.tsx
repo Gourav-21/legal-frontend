@@ -153,7 +153,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // Use global Zustand store for processingResult
   const { processingResult, setProcessingResult } = useProcessingResultStore();
   const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error
-  const [ocrSaveSuccess, setOcrSaveSuccess] = useState(false); // State for OCR save success message
   const { setShowOcrEditor, setEditableOcrData, setOnSaveCallback, resetOcrData } = useOcrEditorStore();
 
   // Track file changes to reset processing result when files change
@@ -176,9 +175,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     setOnSaveCallback((editedData) => {
       console.log('OCR save callback triggered with data:', editedData);
       // Update the processing result with edited OCR data
-      if (!processingResult) {
-        setProcessingResult(null);
-      } else {
+      if (processingResult) {
         setProcessingResult({
           ...processingResult,
           payslip_text: editedData.payslip_text || '',
@@ -186,11 +183,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           attendance_text: editedData.attendance_text || ''
         });
       }
-      // Show success message
-      setOcrSaveSuccess(true);
-      setTimeout(() => setOcrSaveSuccess(false), 3000); // Hide after 3 seconds
     });
-  }, [setOnSaveCallback]);
+  }, [setOnSaveCallback, processingResult]);
+
+  console.log(processingResult)
 
   // Effect to detect file changes and reset processing result
   React.useEffect(() => {
@@ -211,7 +207,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         setIsVisible(false); // Hide any previous analysis
         setShowOcrEditor(false); // Hide OCR editor
         resetOcrData(); // Reset OCR editor data
-        setOcrSaveSuccess(false); // Hide success message
       }
   }, [payslipFiles, contractFiles, attendanceFiles, processingResult, lastProcessedFiles, setShowOcrEditor, resetOcrData]);
 
@@ -490,17 +485,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           </div>
         </div>)}
 
-      {/* OCR Save Success Message */}
-      {ocrSaveSuccess && (
-        <div className="row mt-3" data-aos="fade-up" data-aos-duration="1500">
-          <div className="col-12">
-            <div className="alert alert-success d-flex align-items-center" role="alert">
-              <i className="bi bi-check-circle me-2"></i>
-              <span>OCR text changes saved successfully! Updated data will be used for report generation.</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Action Buttons - Rendered individually for unique functionality */}
       <div className="row">

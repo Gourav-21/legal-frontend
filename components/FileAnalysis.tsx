@@ -225,6 +225,12 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     return allFiles.every(file => file.progress === 100);
   };
 
+  // Helper to calculate total file size in bytes
+  const getTotalUploadedFileSize = () => {
+    const allFiles = [...payslipFiles, ...contractFiles, ...attendanceFiles];
+    return allFiles.reduce((acc, fileObj) => acc + (fileObj.file.size || 0), 0);
+  };
+
   // Analysis Handlers
   const handleProcessDocuments = async () => {
     if (!isLoggedIn) {
@@ -234,6 +240,14 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     if (payslipFiles.length === 0 && contractFiles.length === 0 && attendanceFiles.length === 0) {
       alert('Please upload at least one payslip, contract, or attendance file.');
       return null; // Return null
+    }
+
+    // Check total file size limit (100MB)
+    const totalSizeBytes = getTotalUploadedFileSize();
+    const maxSizeBytes = 100 * 1024 * 1024; // 100MB
+    if (totalSizeBytes > maxSizeBytes) {
+      alert('Total file size exceeds 100MB. Please upload smaller files or fewer files.');
+      return null;
     }
 
     // Check if all files are fully compressed before processing

@@ -315,6 +315,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // OCR Editor functions
   const handleShowOcrEditor = () => {
     if (processingResult) {
+      console.log("Processing result available, showing OCR editor");
+      console.log("Processing result data:", processingResult);
       // Automatically convert any HTML content when opening the editor
       const payslipText = processingResult.payslip_text || '';
       const contractText = processingResult.contract_text || '';

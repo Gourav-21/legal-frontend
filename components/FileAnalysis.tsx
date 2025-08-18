@@ -305,7 +305,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     } catch (error: unknown) {
       console.error('Error processing documents:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
-      setProcessingError("Document processing failed");
+      setProcessingError(errorMessage);
       return null; // Return null on error
     } finally {
       setIsProcessingDocuments(false); // Indicate processing of documents has finished

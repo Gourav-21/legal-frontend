@@ -12,7 +12,7 @@
     "@fontsource/manrope": "^5.2.5",
     "@fontsource/space-grotesk": "^5.2.6",
     "@formatjs/intl-localematcher": "^0.6.1",
-    "@mdxeditor/editor": "^3.40.1",
+    "@mdxeditor/editor": "^3.42.0",
     "aos": "^2.3.4",
     "bootstrap": "^5.3.5",
     "bootstrap-icons": "^1.11.3",

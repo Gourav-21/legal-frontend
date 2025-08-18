@@ -323,14 +323,14 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       const attendanceText = processingResult.attendance_text || '';
 
       setEditableOcrData({
-        payslip_text: hasHtmlTables(payslipText) || /<[^>]+>/g.test(payslipText)
-          ? (hasHtmlTables(payslipText) ? convertHtmlTablesToMarkdown(payslipText) : convertHtmlToMarkdown(payslipText))
+        payslip_text: hasHtmlTables(payslipText)
+          ? convertHtmlTablesToMarkdown(payslipText)
           : payslipText,
-        contract_text: hasHtmlTables(contractText) || /<[^>]+>/g.test(contractText)
-          ? (hasHtmlTables(contractText) ? convertHtmlTablesToMarkdown(contractText) : convertHtmlToMarkdown(contractText))
+        contract_text: hasHtmlTables(contractText)
+          ? convertHtmlTablesToMarkdown(contractText)
           : contractText,
-        attendance_text: hasHtmlTables(attendanceText) || /<[^>]+>/g.test(attendanceText)
-          ? (hasHtmlTables(attendanceText) ? convertHtmlTablesToMarkdown(attendanceText) : convertHtmlToMarkdown(attendanceText))
+        attendance_text: hasHtmlTables(attendanceText)
+          ? convertHtmlTablesToMarkdown(attendanceText)
           : attendanceText
       });
       setShowOcrEditor(true);

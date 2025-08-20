@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import remarkGfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
 import { Locale } from "@/i18n-config";
 import { useAnalysisStore } from '@/store/analysisStore';
@@ -128,7 +129,16 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ lang, dictionary }) => {
                             <div className="mt-3">
                                 <h6 className="fw-bold">Answer:</h6>
                                 <div className="border rounded p-3 bg-light">
-                                    <ReactMarkdown>{answer}</ReactMarkdown>
+                                    <ReactMarkdown
+                                        remarkPlugins={[remarkGfm]}
+                                        components={{
+                                            table: ({ node, ...props }) => (
+                                                <table className="markdown-table" {...props} />
+                                            )
+                                        }}
+                                    >
+                                        {answer}
+                                    </ReactMarkdown>
                                 </div>
                             </div>
                         )}

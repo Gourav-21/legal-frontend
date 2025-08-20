@@ -96,9 +96,18 @@ export default function SignInForm({ lang, dictionary }: SignInFormProps) {
                     />
                     <label htmlFor="floatingPassword">{signinDict.passwordLabel}</label>
                 </div>
-                <div className="row">
+
+                <button
+                    type="submit"
+                    className="btn btn-lg btn-primary without-icon w-100 mb-4"
+                    disabled={loading}
+                >
+                    {loading ? 'Signing In...' : signinDict.signInButton}
+                </button>
+
+                <div className="row mb-4">
                     <div className="col-6">
-                        <div className={`${lang === 'he' ? '' : 'form-check'} mb-4`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                        {/* <div className={`${lang === 'he' ? '' : 'form-check'} mb-4`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
                             <input
                                 className={`form-check-input ${lang === 'he' ? 'mx-2' : ''}`}
                                 type="checkbox"
@@ -109,7 +118,7 @@ export default function SignInForm({ lang, dictionary }: SignInFormProps) {
                             <label className="form-check-label" htmlFor="flexCheckDefault">
                                 {signinDict.rememberMe}
                             </label>
-                        </div>
+                        </div> */}
                     </div>
                     <div className={`col-6 ${lang === 'he' ? 'text-start' : 'text-end'}`}>
                         <Link href="#" className="link-primary fw-600">
@@ -118,13 +127,7 @@ export default function SignInForm({ lang, dictionary }: SignInFormProps) {
                     </div>
                 </div>
 
-                <button
-                    type="submit"
-                    className="btn btn-lg btn-primary without-icon w-100 mb-4"
-                    disabled={loading}
-                >
-                    {loading ? 'Signing In...' : signinDict.signInButton}
-                </button>
+
             </form>
 
             {/* Social login and sign up link remain outside the main form */}

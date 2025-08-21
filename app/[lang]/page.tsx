@@ -163,7 +163,7 @@ export default async function Home(props: HomeProps) {
  
         <QuestionModal lang={lang} dictionary={dictionary} />
 
-        <OcrEditorModal />
+        <OcrEditorModal lang={lang} dictionary={dictionary} />
       </main>
     </div>
   );

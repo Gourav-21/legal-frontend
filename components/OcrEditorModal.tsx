@@ -3,6 +3,12 @@ import React from 'react';
 import { useOcrEditorStore } from '../store/ocrEditorStore';
 import { MDXEditor, headingsPlugin, listsPlugin, markdownShortcutPlugin, tablePlugin, toolbarPlugin, UndoRedo, BoldItalicUnderlineToggles, InsertTable, ListsToggle, Separator } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
+import { Locale } from '@/i18n-config';
+
+interface OcrEditorModalProps {
+  lang: Locale;
+  dictionary: Record<string, any>;
+}
 
 // Custom styles to fix z-index issues with MDXEditor in modals
 const modalEditorStyles = `
@@ -46,7 +52,7 @@ const editorPlugins = [
   })
 ];
 
-const OcrEditorModal: React.FC = () => {
+const OcrEditorModal: React.FC<OcrEditorModalProps> = ({ dictionary }) => {
   const { showOcrEditor, editableOcrData, onSaveCallback, setShowOcrEditor, setEditableOcrData, resetOcrData } = useOcrEditorStore();
   const [fixingField, setFixingField] = React.useState<string | null>(null);
   const [originalContent, setOriginalContent] = React.useState<{
@@ -168,9 +174,9 @@ const OcrEditorModal: React.FC = () => {
           <div className="modal-content">
             <div className="modal-header">
               <div>
-                <h5 className="modal-title">Edit OCR Results</h5>
+                <h5 className="modal-title">{dictionary.ocrEditorModal.title}</h5>
                 <small className="text-muted">
-                  Edit the extracted text from your documents using the markdown editor with live preview. Changes will be used when creating reports.
+                  {dictionary.ocrEditorModal.subtitle}
                 </small>
               </div>
               <button
@@ -187,7 +193,7 @@ const OcrEditorModal: React.FC = () => {
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <label className="form-label fw-bold text-primary mb-0">
                         <i className="bi bi-file-earmark-text me-2"></i>
-                        Payslip Text:
+                        {dictionary.ocrEditorModal.payslipText}
                       </label>
                       <div className="d-flex gap-2">
                         {canUndo.payslip_text && (
@@ -198,7 +204,7 @@ const OcrEditorModal: React.FC = () => {
                             disabled={fixingField === 'payslip_text'}
                           >
                             <i className="bi bi-arrow-counterclockwise me-1"></i>
-                            Undo
+                            {dictionary.ocrEditorModal.undoButton}
                           </button>
                         )}
                         <button
@@ -210,12 +216,12 @@ const OcrEditorModal: React.FC = () => {
                           {fixingField === 'payslip_text' ? (
                             <>
                               <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                              Fixing...
+                              {dictionary.ocrEditorModal.fixingButton}
                             </>
                           ) : (
                             <>
                               <i className="bi bi-magic me-1"></i>
-                              AI Fix
+                              {dictionary.ocrEditorModal.aiFixButton}
                             </>
                           )}
                         </button>
@@ -229,7 +235,7 @@ const OcrEditorModal: React.FC = () => {
                         plugins={editorPlugins}
                       />
                     </div>
-                    <small className="text-muted">{editableOcrData.payslip_text.length} characters</small>
+                    <small className="text-muted">{editableOcrData.payslip_text.length} {dictionary.ocrEditorModal.charactersCount}</small>
                   </div>
                 )}
                 {/* Contract Text Editor */}
@@ -238,7 +244,7 @@ const OcrEditorModal: React.FC = () => {
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <label className="form-label fw-bold text-success mb-0">
                         <i className="bi bi-file-earmark-contract me-2"></i>
-                        Contract Text:
+                        {dictionary.ocrEditorModal.contractText}
                       </label>
                       <div className="d-flex gap-2">
                         {canUndo.contract_text && (
@@ -249,7 +255,7 @@ const OcrEditorModal: React.FC = () => {
                             disabled={fixingField === 'contract_text'}
                           >
                             <i className="bi bi-arrow-counterclockwise me-1"></i>
-                            Undo
+                            {dictionary.ocrEditorModal.undoButton}
                           </button>
                         )}
                         <button
@@ -261,12 +267,12 @@ const OcrEditorModal: React.FC = () => {
                           {fixingField === 'contract_text' ? (
                             <>
                               <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                              Fixing...
+                              {dictionary.ocrEditorModal.fixingButton}
                             </>
                           ) : (
                             <>
                               <i className="bi bi-magic me-1"></i>
-                              AI Fix
+                              {dictionary.ocrEditorModal.aiFixButton}
                             </>
                           )}
                         </button>
@@ -280,7 +286,7 @@ const OcrEditorModal: React.FC = () => {
                         plugins={editorPlugins}
                       />
                     </div>
-                    <small className="text-muted">{editableOcrData.contract_text.length} characters</small>
+                    <small className="text-muted">{editableOcrData.contract_text.length} {dictionary.ocrEditorModal.charactersCount}</small>
                   </div>
                 )}
                 {/* Attendance Text Editor */}
@@ -289,7 +295,7 @@ const OcrEditorModal: React.FC = () => {
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <label className="form-label fw-bold text-warning mb-0">
                         <i className="bi bi-calendar-check me-2"></i>
-                        Attendance Text:
+                        {dictionary.ocrEditorModal.attendanceText}
                       </label>
                       <div className="d-flex gap-2">
                         {canUndo.attendance_text && (
@@ -300,7 +306,7 @@ const OcrEditorModal: React.FC = () => {
                             disabled={fixingField === 'attendance_text'}
                           >
                             <i className="bi bi-arrow-counterclockwise me-1"></i>
-                            Undo
+                            {dictionary.ocrEditorModal.undoButton}
                           </button>
                         )}
                         <button
@@ -312,12 +318,12 @@ const OcrEditorModal: React.FC = () => {
                           {fixingField === 'attendance_text' ? (
                             <>
                               <span className="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-                              Fixing...
+                              {dictionary.ocrEditorModal.fixingButton}
                             </>
                           ) : (
                             <>
                               <i className="bi bi-magic me-1"></i>
-                              AI Fix
+                              {dictionary.ocrEditorModal.aiFixButton}
                             </>
                           )}
                         </button>
@@ -331,13 +337,13 @@ const OcrEditorModal: React.FC = () => {
                         plugins={editorPlugins}
                       />
                     </div>
-                    <small className="text-muted">{editableOcrData.attendance_text.length} characters</small>
+                    <small className="text-muted">{editableOcrData.attendance_text.length} {dictionary.ocrEditorModal.charactersCount}</small>
                   </div>
                 )}
 
                 {!editableOcrData.payslip_text && !editableOcrData.contract_text && !editableOcrData.attendance_text && (
                   <div className="col-12">
-                    <p className="text-muted">No OCR text available to edit.</p>
+                    <p className="text-muted">{dictionary.ocrEditorModal.noOcrText}</p>
                   </div>
                 )}
               </div>
@@ -352,7 +358,7 @@ const OcrEditorModal: React.FC = () => {
                     onClick={handleCancel}
                     style={{ minWidth: '100px' }}
                   >
-                    Cancel
+                    {dictionary.ocrEditorModal.cancelButton}
                   </button>
                   <div className="flex-grow-1"></div>
                   <button
@@ -362,7 +368,7 @@ const OcrEditorModal: React.FC = () => {
                     style={{ minWidth: '120px' }}
                   >
                     <i className="bi bi-check-lg me-2"></i>
-                    Save Changes
+                    {dictionary.ocrEditorModal.saveChangesButton}
                   </button>
                 </div>
               </div>

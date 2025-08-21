@@ -72,7 +72,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // Export to Excel handler
   const handleExportToExcel = async () => {
     if (!isLoggedIn) {
-      setProcessingError('Please log in to export to Excel.');
+      setProcessingError(dictionary.fileAnalysis.loginRequiredExport);
       return;
     }
     setIsProcessingDocuments(true);
@@ -234,11 +234,11 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // Analysis Handlers
   const handleProcessDocuments = async () => {
     if (!isLoggedIn) {
-      alert('Please log in to process documents.');
+      alert(dictionary.fileAnalysis.loginRequired);
       return null; // Return null to indicate failure/early exit
     }
     if (payslipFiles.length === 0 && contractFiles.length === 0 && attendanceFiles.length === 0) {
-      alert('Please upload at least one payslip, contract, or attendance file.');
+      alert(dictionary.fileAnalysis.uploadRequired);
       return null; // Return null
     }
 
@@ -246,13 +246,13 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     const totalSizeBytes = getTotalUploadedFileSize();
     const maxSizeBytes = 100 * 1024 * 1024; // 100MB
     if (totalSizeBytes > maxSizeBytes) {
-      alert('Total file size exceeds 100MB. Please upload smaller files or fewer files.');
+      alert(dictionary.fileAnalysis.fileSizeExceeded);
       return null;
     }
 
     // Check if all files are fully compressed before processing
     if (!areAllFilesCompressed()) {
-      alert('Please wait until all files are completely compressed before processing documents.');
+      alert(dictionary.fileAnalysis.waitForCompression);
       return null;
     }
 
@@ -339,7 +339,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
   const handleCreateReport = async (type: string) => {
     if (!isLoggedIn) {
-      alert('Please log in to create a report.');
+      alert(dictionary.fileAnalysis.loginRequiredReport);
       return;
     }
 
@@ -461,7 +461,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           <input
             type="text"
             className="form-control"
-            placeholder="Enter additional context for document analysis..."
+            placeholder={dictionary.fileAnalysis.contextPlaceholder}
             value={context}
             onChange={(e) => setContext(e.target.value)}
           />
@@ -473,10 +473,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             disabled={isProcessing || (payslipFiles.length === 0 && contractFiles.length === 0 && attendanceFiles.length === 0) || !areAllFilesCompressed()}
           >
             <>
-              {!areAllFilesCompressed() && (payslipFiles.length > 0 || contractFiles.length > 0 || attendanceFiles.length > 0) ? 'Compressing Files...' :
-                isProcessing && !processingResult ? 'Processing Docs...' :
-                  processingResult ? 'Docs Processed' :
-                    (dictionary.hero.processButton || 'Process Documents')}
+              {!areAllFilesCompressed() && (payslipFiles.length > 0 || contractFiles.length > 0 || attendanceFiles.length > 0) ? dictionary.fileAnalysis.compressingFiles :
+                isProcessing && !processingResult ? dictionary.fileAnalysis.processingDocs :
+                  processingResult ? dictionary.fileAnalysis.docsProcessed :
+                    (dictionary.hero.processButton || dictionary.fileAnalysis.processButton)}
             </>
             {!isProcessing && areAllFilesCompressed() && <span><i className="bi bi-arrow-right-short"></i></span>}
           </button>
@@ -485,7 +485,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         <div className="row mt-3" data-aos="fade-up" data-aos-duration="1500">
           <div className="col-12">            <div className="alert alert-info d-flex align-items-center" role="alert">
             <i className="bi bi-info-circle me-2"></i>
-            <small>Documents processed successfully! You can now review and edit the extracted text with live markdown preview before creating reports.</small>
+            <small>{dictionary.fileAnalysis.docsProcessedAlert}</small>
           </div>
             <button
               type="button"
@@ -494,9 +494,9 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               disabled={isProcessing || !areAllFilesCompressed()}
             >
               <i className="bi bi-pencil-square me-2"></i>
-              <strong>Edit OCR Results with Live Preview</strong>
+              <strong>{dictionary.fileAnalysis.editOcrResults}</strong>
               <br />
-              <small className="text-muted">Professional markdown editor with tables, formatting, and real-time preview</small>
+              <small className="text-muted">{dictionary.fileAnalysis.editOcrSubtext}</small>
             </button>
           </div>
         </div>)}

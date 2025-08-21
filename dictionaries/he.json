@@ -436,7 +436,21 @@
   },
   "fileAnalysis": {
     "showAiSummary": "הצג סיכום AI",
-    "askQuestion": "שאל שאלה"
+    "askQuestion": "שאל שאלה",
+    "processButton": "עבד מסמכים",
+    "contextPlaceholder": "הזן הקשר נוסף לניתוח מסמכים...",
+    "compressingFiles": "דוחס קבצים...",
+    "processingDocs": "מעבד מסמכים...",
+    "docsProcessed": "מסמכים עובדו",
+    "editOcrResults": "ערוך תוצאות OCR עם תצוגה מקדימה חיה",
+    "editOcrSubtext": "עורך מארקדאון מקצועי עם טבלאות, עיצוב ותצוגה מקדימה בזמן אמת",
+    "docsProcessedAlert": "המסמכים עובדו בהצלחה! כעת תוכל לסקור ולערוך את הטקסט שחולץ עם תצוגה מקדימה של מארקדאון לפני יצירת דוחות.",
+    "loginRequired": "אנא התחבר כדי לעבד מסמכים.",
+    "uploadRequired": "אנא העלה לפחות קובץ תלוש שכר, חוזה או נוכחות אחד.",
+    "fileSizeExceeded": "גודל הקובץ הכולל חורג מ-100MB. אנא העלה קבצים קטנים יותר או פחות קבצים.",
+    "waitForCompression": "אנא המתן עד שכל הקבצים יידחסו לחלוטין לפני עיבוד המסמכים.",
+    "loginRequiredExport": "אנא התחבר כדי לייצא לאקסל.",
+    "loginRequiredReport": "אנא התחבר כדי ליצור דוח."
   },
   "questionModal": {
     "title": "שאל שאלה",
@@ -445,5 +459,19 @@
     "loading": "מעבד את השאלה שלך...",
     "error": "שגיאה בעיבוד השאלה",
     "noAnalysisError": "אנא עבד מסמכים תחילה לפני שאילת שאלות."
+  },
+  "ocrEditorModal": {
+    "title": "עריכת תוצאות OCR",
+    "subtitle": "ערוך את הטקסט שחולץ מהמסמכים שלך באמצעות עורך המארקדאון עם תצוגה מקדימה חיה. השינויים ישמשו ביצירת דוחות.",
+    "payslipText": "טקסט תלוש שכר:",
+    "contractText": "טקסט חוזה:",
+    "attendanceText": "טקסט נוכחות:",
+    "undoButton": "בטל",
+    "aiFixButton": "תיקון AI",
+    "fixingButton": "מתקן...",
+    "charactersCount": "תווים",
+    "noOcrText": "אין טקסט OCR זמין לעריכה.",
+    "cancelButton": "בטל",
+    "saveChangesButton": "שמור שינויים"
   }
 }

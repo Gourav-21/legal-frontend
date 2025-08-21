@@ -439,7 +439,21 @@
   },
   "fileAnalysis": {
     "showAiSummary": "Show AI Summary",
-    "askQuestion": "Ask Question"
+    "askQuestion": "Ask Question",
+    "processButton": "Process Documents",
+    "contextPlaceholder": "Enter additional context for document analysis...",
+    "compressingFiles": "Compressing Files...",
+    "processingDocs": "Processing Docs...",
+    "docsProcessed": "Docs Processed",
+    "editOcrResults": "Edit OCR Results with Live Preview",
+    "editOcrSubtext": "Professional markdown editor with tables, formatting, and real-time preview",
+    "docsProcessedAlert": "Documents processed successfully! You can now review and edit the extracted text with live markdown preview before creating reports.",
+    "loginRequired": "Please log in to process documents.",
+    "uploadRequired": "Please upload at least one payslip, contract, or attendance file.",
+    "fileSizeExceeded": "Total file size exceeds 100MB. Please upload smaller files or fewer files.",
+    "waitForCompression": "Please wait until all files are completely compressed before processing documents.",
+    "loginRequiredExport": "Please log in to export to Excel.",
+    "loginRequiredReport": "Please log in to create a report."
   },
   "questionModal": {
     "title": "Ask a Question",
@@ -448,5 +462,19 @@
     "loading": "Processing your question...",
     "error": "Error processing question",
     "noAnalysisError": "Please process documents first before asking questions."
+  },
+  "ocrEditorModal": {
+    "title": "Edit OCR Results",
+    "subtitle": "Edit the extracted text from your documents using the markdown editor with live preview. Changes will be used when creating reports.",
+    "payslipText": "Payslip Text:",
+    "contractText": "Contract Text:",
+    "attendanceText": "Attendance Text:",
+    "undoButton": "Undo",
+    "aiFixButton": "AI Fix",
+    "fixingButton": "Fixing...",
+    "charactersCount": "characters",
+    "noOcrText": "No OCR text available to edit.",
+    "cancelButton": "Cancel",
+    "saveChangesButton": "Save Changes"
   }
 }

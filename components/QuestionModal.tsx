@@ -11,8 +11,8 @@ interface QuestionModalProps {
     dictionary: Record<string, any>;
 }
 
-const QuestionModal: React.FC<QuestionModalProps> = ({ lang, dictionary }) => {
-  const { legalAnalysis } = useAnalysisStore();
+const QuestionModal: React.FC<QuestionModalProps> = ({ dictionary }) => {
+    const { legalAnalysis } = useAnalysisStore();
     const [question, setQuestion] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [answer, setAnswer] = useState('');

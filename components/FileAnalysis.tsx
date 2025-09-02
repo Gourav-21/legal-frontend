@@ -581,7 +581,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
               onClick={() => handleCreateReport('profitability')}
-              disabled={isProcessing || !areAllFilesCompressed()}
+              // disabled={isProcessing || !areAllFilesCompressed()}
+              disabled
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.checkProfitability.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -611,7 +612,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               type="button"
               className="btn btn-outline-dark thumbnail-btn show-btn"
               onClick={() => handleCreateReport('professional')}
-              disabled={isProcessing || !areAllFilesCompressed()}
+              // disabled={isProcessing || !areAllFilesCompressed()}
+              disabled
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.professionalOpinion.replace(' ', '<br>') }} />
               <span><i className="bi bi-arrow-right-short"></i></span>
@@ -716,7 +718,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               type="button"
               className="btn btn-outline-success thumbnail-btn show-btn"
               onClick={handleExportToExcel}
-              disabled={isProcessing || !areAllFilesCompressed()}
+              // disabled={isProcessing || !areAllFilesCompressed()}
+              disabled
             >
               <div dangerouslySetInnerHTML={{ __html: dictionary.hero.actionButtons.exportToExcel.replace(' ', '<br>') }} />
               <span className="text-success"><i className="bi bi-file-earmark-excel"></i></span>

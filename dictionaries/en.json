@@ -476,5 +476,69 @@
     "noOcrText": "No OCR text available to edit.",
     "cancelButton": "Cancel",
     "saveChangesButton": "Save Changes"
+  },
+  "admin2": {
+    "title": "Admin Dashboard",
+    "subtitle": "Manage labor law rules and system settings",
+    "rulesTitle": "Labor Law Rules Management",
+    "rulesSubtitle": "Create, update, and delete labor law rules",
+    "createButton": "Create New Rule",
+    "loading": "Loading...",
+    "loadingRules": "Loading rules...",
+    "noRules": "No labor law rules found. Create your first rule using the button above.",
+    "confirmDelete": "Are you sure you want to delete this rule?",
+    "tableHeaders": {
+      "name": "Name",
+      "lawReference": "Law Reference",
+      "effectivePeriod": "Effective Period",
+      "checks": "Checks",
+      "actions": "Actions"
+    },
+    "ruleDetails": {
+      "title": "Rule Details",
+      "basicInfo": "Basic Information",
+      "id": "ID",
+      "name": "Name",
+      "lawReference": "Law Reference",
+      "description": "Description",
+      "effectivePeriod": "Effective Period",
+      "created": "Created",
+      "updated": "Last Updated",
+      "checks": "Checks",
+      "violation": "Violation",
+      "condition": "Condition",
+      "underpaidAmount": "Underpaid Amount",
+      "penaltyCalculation": "Penalty Calculation"
+    },
+    "ruleForm": {
+      "editTitle": "Edit Rule",
+      "createTitle": "Create New Rule",
+      "cancel": "Cancel",
+      "ruleName": "Rule Name",
+      "lawReference": "Law Reference",
+      "description": "Description",
+      "effectiveFrom": "Effective From",
+      "effectiveTo": "Effective To (Optional)",
+      "checks": "Checks",
+      "addCheck": "Add Check",
+      "checkNumber": "Check #",
+      "violationMessage": "Violation Message",
+      "condition": "Condition",
+      "underpaidAmount": "Underpaid Amount",
+      "penaltyCalculation": "Penalty Calculation",
+      "addLine": "Add Line",
+      "update": "Update Rule",
+      "create": "Create Rule"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "lawReferenceRequired": "Law reference is required",
+      "effectiveFromRequired": "Effective from date is required",
+      "checksRequired": "At least one check is required",
+      "conditionRequired": "Condition is required",
+      "underpaidAmountRequired": "Underpaid amount formula is required",
+      "penaltiesRequired": "At least one penalty calculation is required",
+      "penaltyRequired": "Penalty calculation is required"
+    }
   }
 }

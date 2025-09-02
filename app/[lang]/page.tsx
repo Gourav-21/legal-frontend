@@ -6,6 +6,7 @@ import OcrEditorModal from "@/components/OcrEditorModal";
 import LawyerModal from "@/components/LawyerModal";
 import AiSummaryModal from "@/components/AiSummary";
 import QuestionModal from "@/components/QuestionModal";
+import ManualEntryModal from "@/components/ManualEntryModal";
 
 // Define props type to include lang
 interface HomeProps {
@@ -162,6 +163,8 @@ export default async function Home(props: HomeProps) {
         <LawyerModal lang={lang} dictionary={dictionary} />
  
         <QuestionModal lang={lang} dictionary={dictionary} />
+
+        <ManualEntryModal />
 
         <OcrEditorModal lang={lang} dictionary={dictionary} />
       </main>

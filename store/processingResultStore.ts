@@ -1,9 +1,9 @@
 import { create } from "zustand";
 
 type ProcessingResult = {
-    payslip_text: string;
-    contract_text: string;
-    attendance_text: string;
+    payslip_text: string | any[];
+    contract_text: string | object;
+    attendance_text: string | any[];
 } | null;
 
 interface ProcessingResultState {

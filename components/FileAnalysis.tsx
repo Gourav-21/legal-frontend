@@ -3,6 +3,7 @@
 import { Locale } from "@/i18n-config";
 import { useAnalysisStore } from '@/store/analysisStore'; // Add this import
 import { useProcessingResultStore } from "@/store/processingResultStore";
+import { useManualEntryStore } from '@/store/manualEntryStore';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -48,13 +49,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
   // Show analysis with typing animation
   const handleShowAnalysis = (content: string) => {
-    // Clear any existing typing animation first
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current);
-      typingIntervalRef.current = null;
-    }
-
-    setTypedContent('');
+    // Immediately show analysis content, no typing animation
+    setTypedContent(content);
     setIsVisible(true);
 
     setTimeout(() => {
@@ -63,9 +59,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         const y = analysisSection.getBoundingClientRect().top + window.pageYOffset - 30;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
-      setTimeout(() => {
-        typeContent(content);
-      }, 100);
     }, 100);
   };
   // File Upload States
@@ -139,10 +132,11 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   const [payslipFiles, setPayslipFiles] = useState<UploadedFile[]>([]);
   const [contractFiles, setContractFiles] = useState<UploadedFile[]>([]);
   const [attendanceFiles, setAttendanceFiles] = useState<UploadedFile[]>([]); // New state for attendance reports
-  const [context, setContext] = useState<string>(''); // State for additional context input
+
   const router = useRouter();
   const { isLoggedIn } = useAuthStore(); // Use the auth store
   const { setLegalAnalysis } = useAnalysisStore(); // Add this line
+  const { setShowManualEntryModal, setManualEntryData } = useManualEntryStore();
 
   // Analysis States
   const [isVisible, setIsVisible] = useState(false);
@@ -256,86 +250,86 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       return null;
     }
 
-    setIsProcessingDocuments(true); // Indicate processing of documents has started
-    setProcessingResult(null); // Reset previous results
-    setProcessingError(null); // Reset previous errors
+    // setIsProcessingDocuments(true); // Indicate processing of documents has started
+    // setProcessingResult(null); // Reset previous results
+    // setProcessingError(null); // Reset previous errors
 
-    const formData = new FormData();
+    // const formData = new FormData();
 
-    payslipFiles.forEach(uploadedFile => {
-      formData.append('files', uploadedFile.file);
-      formData.append('doc_types', 'payslip');
-    });
+    // payslipFiles.forEach(uploadedFile => {
+    //   formData.append('files', uploadedFile.file);
+    //   formData.append('doc_types', 'payslip');
+    // });
 
-    contractFiles.forEach(uploadedFile => {
-      formData.append('files', uploadedFile.file);
-      formData.append('doc_types', 'contract');
-    });
+    // contractFiles.forEach(uploadedFile => {
+    //   formData.append('files', uploadedFile.file);
+    //   formData.append('doc_types', 'contract');
+    // });
 
-    attendanceFiles.forEach(uploadedFile => {
-      formData.append('files', uploadedFile.file);
-      formData.append('doc_types', 'attendance');
-    });
+    // attendanceFiles.forEach(uploadedFile => {
+    //   formData.append('files', uploadedFile.file);
+    //   formData.append('doc_types', 'attendance');
+    // });
 
-    try {
-      const response = await fetch('/api/process', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      }); if (!response.ok) {
-        const errorData = await response.json();
-        console.log(`HTTP error! status: ${response.status}`)
-        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
-      }
+    // try {
+    //   const response = await fetch('/api/process', {
+    //     method: 'POST',
+    //     body: formData,
+    //     credentials: 'include',
+    //   }); if (!response.ok) {
+    //     const errorData = await response.json();
+    //     console.log(`HTTP error! status: ${response.status}`)
+    //     throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+    //   }
 
-      const result = await response.json();
-      console.log(result)
-      setProcessingResult(result); // Store the successful result
+    //   const result = await response.json();
+    //   console.log(result)
+    //   setProcessingResult(result); // Store the successful result
 
-      // Update the last processed files tracker
-      setLastProcessedFiles({
-        payslip: payslipFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
-        contract: contractFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
-        attendance: attendanceFiles.map(f => f.file.name + f.file.size + f.file.lastModified)
-      });
+    //   // Update the last processed files tracker
+    //   setLastProcessedFiles({
+    //     payslip: payslipFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
+    //     contract: contractFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
+    //     attendance: attendanceFiles.map(f => f.file.name + f.file.size + f.file.lastModified)
+    //   });
 
-      console.log("Documents processed successfully:", result);
-      return result; // Return the result for immediate use if needed
+    //   console.log("Documents processed successfully:", result);
+    //   return result; // Return the result for immediate use if needed
 
-    } catch (error: unknown) {
-      console.error('Error processing documents:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
-      setProcessingError(errorMessage);
-      return null; // Return null on error
-    } finally {
-      setIsProcessingDocuments(false); // Indicate processing of documents has finished
-    }
+    // } catch (error: unknown) {
+    //   console.error('Error processing documents:', error);
+    //   const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+    //   setProcessingError(errorMessage);
+    //   return null; // Return null on error
+    // } finally {
+    //   setIsProcessingDocuments(false); // Indicate processing of documents has finished
+    // }
   };
 
   // OCR Editor functions
-  const handleShowOcrEditor = () => {
-    if (processingResult) {
-      console.log("Processing result available, showing OCR editor");
-      console.log("Processing result data:", processingResult);
-      // Automatically convert any HTML content when opening the editor
-      const payslipText = processingResult.payslip_text || '';
-      const contractText = processingResult.contract_text || '';
-      const attendanceText = processingResult.attendance_text || '';
+  // const handleShowOcrEditor = () => {
+  //   if (processingResult) {
+  //     console.log("Processing result available, showing OCR editor");
+  //     console.log("Processing result data:", processingResult);
+  //     // Automatically convert any HTML content when opening the editor
+  //     const payslipText = processingResult.payslip_text || '';
+  //     const contractText = processingResult.contract_text || '';
+  //     const attendanceText = processingResult.attendance_text || '';
 
-      setEditableOcrData({
-        payslip_text: hasHtmlTables(payslipText)
-          ? convertHtmlTablesToMarkdown(payslipText)
-          : payslipText,
-        contract_text: hasHtmlTables(contractText)
-          ? convertHtmlTablesToMarkdown(contractText)
-          : contractText,
-        attendance_text: hasHtmlTables(attendanceText)
-          ? convertHtmlTablesToMarkdown(attendanceText)
-          : attendanceText
-      });
-      setShowOcrEditor(true);
-    }
-  };
+  //     setEditableOcrData({
+  //       payslip_text: hasHtmlTables(payslipText)
+  //         ? convertHtmlTablesToMarkdown(payslipText)
+  //         : payslipText,
+  //       contract_text: hasHtmlTables(contractText)
+  //         ? convertHtmlTablesToMarkdown(contractText)
+  //         : contractText,
+  //       attendance_text: hasHtmlTables(attendanceText)
+  //         ? convertHtmlTablesToMarkdown(attendanceText)
+  //         : attendanceText
+  //     });
+  //     setShowOcrEditor(true);
+  //   }
+  // };
 
   const handleCreateReport = async (type: string) => {
     if (!isLoggedIn) {
@@ -388,8 +382,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           payslip_text: finalData.payslip_text,
           contract_text: finalData.contract_text,
           attendance_text: finalData.attendance_text,
-          type: type,
-          context: context
+          type: type
         })
       });
 
@@ -410,6 +403,32 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       setIsProcessingReport(false); // Clear loading state for report creation
     }
   };
+
+  // Listen for manual entry data from the store
+  const { manualEntryData } = useManualEntryStore();
+
+  React.useEffect(() => {
+    if (manualEntryData) {
+      // Add employee ID to each payslip entry
+      const payslipsWithEmployeeId = manualEntryData.payslips.map((payslip: any) => ({
+        ...payslip,
+        employee_id: manualEntryData.employee_id, // Add employee ID from manual entry data
+      }));
+
+      // Directly use the lists/dicts from manual entry for backend compatibility
+      const manualProcessingResult = {
+        payslip_text: payslipsWithEmployeeId, // List of dicts with employee ID
+        contract_text: manualEntryData.contract, // Dict
+        attendance_text: manualEntryData.attendance, // List of dicts
+      };
+
+      setProcessingResult(manualProcessingResult);
+      console.log("Manual entry data processed (with employee ID):", manualProcessingResult);
+
+      // Clear the manual entry data after processing
+      setManualEntryData(null);
+    }
+  }, [manualEntryData, setProcessingResult, setManualEntryData]);
 
   return (
     <div>
@@ -455,17 +474,21 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         </div>
       </div>
 
-      {/* Process Documents Button */}
+      {/* Process Documents and Manual Entry Buttons */}
       <div className="row mt-4" data-aos="fade-up" data-aos-duration="1500">
-        <div className="col-9">
-          <input
-            type="text"
-            className="form-control"
-            placeholder={dictionary.fileAnalysis.contextPlaceholder}
-            value={context}
-            onChange={(e) => setContext(e.target.value)}
-          />
-        </div>        <div className="col-3">
+        <div className="col-6">
+          <button
+            type="button"
+            className="btn btn-outline-primary w-100 p-4"
+            onClick={() => setShowManualEntryModal(true)}
+            disabled={isProcessing}
+          >
+            <i className="bi bi-pencil-square me-2"></i>
+            Manual Entry
+            <span><i className="bi bi-arrow-right-short"></i></span>
+          </button>
+        </div>
+        <div className="col-6">
           <button
             type="button"
             className="btn btn-success w-100 p-4"
@@ -480,8 +503,10 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             </>
             {!isProcessing && areAllFilesCompressed() && <span><i className="bi bi-arrow-right-short"></i></span>}
           </button>
-        </div>      </div>      {/* View/Edit OCR Results Button */}
-      {processingResult && (
+        </div>
+
+      </div>      {/* View/Edit OCR Results Button */}
+      {/* {processingResult && (
         <div className="row mt-3" data-aos="fade-up" data-aos-duration="1500">
           <div className="col-12">            <div className="alert alert-info d-flex align-items-center" role="alert">
             <i className="bi bi-info-circle me-2"></i>
@@ -499,7 +524,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
               <small className="text-muted">{dictionary.fileAnalysis.editOcrSubtext}</small>
             </button>
           </div>
-        </div>)}
+        </div>)} */}
 
 
       {/* Action Buttons - Rendered individually for unique functionality */}

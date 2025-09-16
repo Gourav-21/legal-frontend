@@ -1,44 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useManualEntryStore } from '@/store/manualEntryStore';
+import { useProcessingResultStore } from '@/store/processingResultStore';
 
 interface PayslipData {
   month: string;
-  base_salary: number;
-  overtime_hours: number;
-  overtime_pay: number;
-  overtime_rate: number;
-  total_salary: number;
-  hours_worked: number;
-  hourly_rate: number;
-  sick_days_taken: number;
-  vacation_days_taken: number;
+  [key: string]: any;
 }
 
 interface AttendanceData {
   month: string;
-  days_worked: number;
-  regular_hours: number;
-  overtime_hours: number;
-  total_hours: number;
-  sick_days: number;
-  vacation_days: number;
+  [key: string]: any;
 }
 
 interface ContractData {
-  minimum_wage_monthly: number;
-  minimum_wage_hourly: number;
-  hourly_rate: number;
-  overtime_rate_125: number;
-  overtime_rate_150: number;
-  overtime_rate_175: number;
-  overtime_rate_200: number;
-  standard_hours_per_month: number;
-  standard_hours_per_day: number;
-  max_overtime_daily: number;
-  vacation_days_per_year: number;
-  sick_days_per_year: number;
+  [key: string]: any;
 }
 
 interface ManualEntryData {
@@ -48,56 +25,115 @@ interface ManualEntryData {
   contract: ContractData;
 }
 
-const ManualEntryModal: React.FC = () => {
-  const { showManualEntryModal, setShowManualEntryModal, setManualEntryData } = useManualEntryStore();
+interface ManualEntryModalProps {
+  dictionary: any;
+  lang: string;
+}
+
+const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang }) => {
+  const { showManualEntryModal, setShowManualEntryModal, dynamicParams, setDynamicParams } = useManualEntryStore();
+  const { processingResult, setProcessingResult } = useProcessingResultStore();
   const [activeTab, setActiveTab] = useState('payslips');
   const [selectedPayslipIndex, setSelectedPayslipIndex] = useState(0);
   const [selectedAttendanceIndex, setSelectedAttendanceIndex] = useState(0);
 
-  const [formData, setFormData] = useState<ManualEntryData>({
-    employee_id: 'EMP_001',
-    payslips: [{
-      month: '2024-07',
-      base_salary: 4800,
-      overtime_hours: 12,
-      overtime_pay: 456,
-      overtime_rate: 38,
-      total_salary: 5256,
-      hours_worked: 172,
-      hourly_rate: 30,
-      sick_days_taken: 0,
-      vacation_days_taken: 0
-    }],
-    attendance: [{
-      month: '2024-07',
-      days_worked: 22,
-      regular_hours: 160,
-      overtime_hours: 12,
-      total_hours: 172,
-      sick_days: 0,
-      vacation_days: 0
-    }],
-    contract: {
-      minimum_wage_monthly: 5572,
-      minimum_wage_hourly: 32.7,
-      hourly_rate: 32.7,
-      overtime_rate_125: 1.25,
-      overtime_rate_150: 1.50,
-      overtime_rate_175: 1.75,
-      overtime_rate_200: 2.00,
-      standard_hours_per_month: 186,
-      standard_hours_per_day: 8,
-      max_overtime_daily: 3,
-      vacation_days_per_year: 14,
-      sick_days_per_year: 18
+  // Populate form data from the current processingResult when modal opens
+  useEffect(() => {
+    if (showManualEntryModal && processingResult) {
+      const initial = processingResult;
+      const newFormData: ManualEntryData = {
+        employee_id: '',
+        payslips: [],
+        attendance: [],
+        contract: {}
+      };
+
+      const convertApiData = (obj: any): any => {
+        const result: any = {};
+        for (const key in obj) {
+          if (obj[key] === null) {
+            result[key] = '';
+          } else if (typeof obj[key] === 'string') {
+            const cleaned = obj[key].replace(/,/g, '');
+            const numValue = parseFloat(cleaned);
+            if (!isNaN(numValue) && cleaned === numValue.toString()) {
+              result[key] = numValue;
+            } else {
+              result[key] = obj[key];
+            }
+          } else {
+            result[key] = obj[key];
+          }
+        }
+        return result;
+      };
+
+      if ((initial as any).payslip_data && (initial as any).payslip_data.length > 0) {
+        newFormData.employee_id = (initial as any).payslip_data[0].employee_id || '';
+        newFormData.payslips = (initial as any).payslip_data.map((p: any) => ({
+          ...convertApiData(p),
+          month: p.month || ''
+        }));
+      }
+
+      if ((initial as any).attendance_data && (initial as any).attendance_data.length > 0) {
+        if (!newFormData.employee_id) newFormData.employee_id = (initial as any).attendance_data[0].employee_id || '';
+        newFormData.attendance = (initial as any).attendance_data.map((a: any) => ({
+          ...convertApiData(a),
+          month: a.month || ''
+        }));
+      }
+
+      if ((initial as any).contract_data) {
+        if (!newFormData.employee_id) newFormData.employee_id = (initial as any).contract_data.employee_id || '';
+        newFormData.contract = convertApiData((initial as any).contract_data);
+      }
+
+      setFormData(newFormData);
     }
+  }, [showManualEntryModal, processingResult]);
+
+  // Fetch dynamic params when modal opens
+  useEffect(() => {
+    if (showManualEntryModal && !dynamicParams) {
+      const fetchDynamicParams = async () => {
+        try {
+          const response = await fetch('/api/dynamic-params');
+          if (response.ok) {
+            const data = await response.json();
+            setDynamicParams(data);
+          } else {
+            console.error('Failed to fetch dynamic params');
+            // Set empty params to allow basic functionality
+            setDynamicParams({ payslip: [], attendance: [], contract: [] });
+          }
+        } catch (err) {
+          console.error('Error fetching dynamic params:', err);
+          // Set empty params to allow basic functionality
+          setDynamicParams({ payslip: [], attendance: [], contract: [] });
+        }
+      };
+      fetchDynamicParams();
+    }
+  }, [showManualEntryModal, dynamicParams, setDynamicParams]);
+
+  // Get current month in YYYY-MM format
+  const currentMonth = new Date().toISOString().slice(0, 7);
+
+  const [formData, setFormData] = useState<ManualEntryData>({
+    employee_id: '',
+    payslips: [{
+      month: currentMonth,
+    }],
+    attendance: [],
+    contract: {}
   });
 
   const handleEmployeeIdChange = (value: string) => {
     setFormData(prev => ({ ...prev, employee_id: value }));
   };
 
-  const handlePayslipChange = (index: number, field: keyof PayslipData, value: string | number) => {
+  const handlePayslipChange = (index: number, field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       payslips: prev.payslips.map((payslip, i) =>
@@ -115,7 +151,7 @@ const ManualEntryModal: React.FC = () => {
     }));
   };
 
-  const handleContractChange = (field: keyof ContractData, value: number) => {
+  const handleContractChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       contract: { ...prev.contract, [field]: value }
@@ -124,16 +160,7 @@ const ManualEntryModal: React.FC = () => {
 
   const addPayslip = () => {
     const newPayslip: PayslipData = {
-      month: '2024-08',
-      base_salary: 4800,
-      overtime_hours: 0,
-      overtime_pay: 0,
-      overtime_rate: 38,
-      total_salary: 4800,
-      hours_worked: 160,
-      hourly_rate: 30,
-      sick_days_taken: 0,
-      vacation_days_taken: 0
+      month: currentMonth,
     };
     setFormData(prev => ({
       ...prev,
@@ -154,13 +181,7 @@ const ManualEntryModal: React.FC = () => {
 
   const addAttendance = () => {
     const newAttendance: AttendanceData = {
-      month: '2024-08',
-      days_worked: 22,
-      regular_hours: 160,
-      overtime_hours: 0,
-      total_hours: 160,
-      sick_days: 0,
-      vacation_days: 0
+      month: currentMonth,
     };
     setFormData(prev => ({
       ...prev,
@@ -170,7 +191,7 @@ const ManualEntryModal: React.FC = () => {
   };
 
   const removeAttendance = (index: number) => {
-    if (formData.attendance.length > 1) {
+    if (formData.attendance.length > 0) {
       setFormData(prev => ({
         ...prev,
         attendance: prev.attendance.filter((_, i) => i !== index)
@@ -181,8 +202,32 @@ const ManualEntryModal: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setManualEntryData(formData);
+    // Also update processingResult with the manual entry data
+    setProcessingResult({
+      payslip_data: formData.payslips,
+      contract_data: formData.contract,
+      attendance_data: formData.attendance
+    });
     setShowManualEntryModal(false);
+  };
+
+  const getParamNames = (section: string) => {
+    if (!dynamicParams || !dynamicParams[section]) return [];
+    return dynamicParams[section]
+      .filter((p: any) => !['employee_id', 'month'].includes(p.param))
+      .map((p: any) => p.param);
+  };
+
+  const getParamLabel = (section: string, param: string) => {
+    if (!dynamicParams || !dynamicParams[section]) return param;
+    const paramObj = dynamicParams[section].find((p: any) => p.param === param);
+    if (!paramObj) return param;
+
+    // Use Hebrew label if language is Hebrew and it exists, otherwise use English
+    if (lang === 'he' && paramObj.label_he) {
+      return paramObj.label_he;
+    }
+    return paramObj.label_en || param;
   };
 
   const handleClose = () => {
@@ -198,7 +243,7 @@ const ManualEntryModal: React.FC = () => {
           <div className="modal-header">
             <h5 className="modal-title">
               <i className="bi bi-pencil-square me-2"></i>
-              Manual Entry
+              {dictionary.manualEntryModal.title}
             </h5>
             <button type="button" className="btn-close" onClick={handleClose}></button>
           </div>
@@ -206,7 +251,7 @@ const ManualEntryModal: React.FC = () => {
             {/* Employee ID Always Visible */}
             <div className="row mb-4">
               <div className="col-12">
-                <label className="form-label">Employee ID</label>
+                <label className="form-label">{dictionary.manualEntryModal.employeeId}</label>
                 <input
                   type="text"
                   className="form-control form-control-sm"
@@ -225,7 +270,7 @@ const ManualEntryModal: React.FC = () => {
                   type="button"
                 >
                   <i className="bi bi-currency-dollar me-1"></i>
-                  Payslips ({formData.payslips.length})
+                  {dictionary.manualEntryModal.payslips} ({formData.payslips.length})
                 </button>
               </li>
               <li className="nav-item" role="presentation">
@@ -235,7 +280,7 @@ const ManualEntryModal: React.FC = () => {
                   type="button"
                 >
                   <i className="bi bi-clock me-1"></i>
-                  Attendance ({formData.attendance.length})
+                  {dictionary.manualEntryModal.attendance} ({formData.attendance.length})
                 </button>
               </li>
               <li className="nav-item" role="presentation">
@@ -245,7 +290,7 @@ const ManualEntryModal: React.FC = () => {
                   type="button"
                 >
                   <i className="bi bi-file-text me-1"></i>
-                  Contract
+                  {dictionary.manualEntryModal.contract}
                 </button>
               </li>
             </ul>
@@ -274,7 +319,7 @@ const ManualEntryModal: React.FC = () => {
                         className="btn btn-success btn-sm me-2"
                         onClick={addPayslip}
                       >
-                        <i className="bi bi-plus"></i> Add
+                        <i className="bi bi-plus"></i> {dictionary.manualEntryModal.add}
                       </button>
                       {formData.payslips.length > 1 && (
                         <button
@@ -291,7 +336,7 @@ const ManualEntryModal: React.FC = () => {
                   {formData.payslips[selectedPayslipIndex] && (
                     <div className="row g-3">
                       <div className="col-md-6">
-                        <label className="form-label">Month</label>
+                        <label className="form-label">{dictionary.manualEntryModal.month}</label>
                         <input
                           type="month"
                           className="form-control form-control-sm"
@@ -299,89 +344,25 @@ const ManualEntryModal: React.FC = () => {
                           onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'month', e.target.value)}
                         />
                       </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Base Salary (₪)</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.payslips[selectedPayslipIndex].base_salary}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'base_salary', parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Overtime Hours</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.payslips[selectedPayslipIndex].overtime_hours}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'overtime_hours', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Overtime Pay (₪)</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.payslips[selectedPayslipIndex].overtime_pay}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'overtime_pay', parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Overtime Rate (₪/hr)</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          step="0.1"
-                          value={formData.payslips[selectedPayslipIndex].overtime_rate}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'overtime_rate', parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Total Salary (₪)</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.payslips[selectedPayslipIndex].total_salary}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'total_salary', parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Hours Worked</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.payslips[selectedPayslipIndex].hours_worked}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'hours_worked', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Hourly Rate (₪)</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          step="0.1"
-                          value={formData.payslips[selectedPayslipIndex].hourly_rate}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'hourly_rate', parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Sick Days Taken</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.payslips[selectedPayslipIndex].sick_days_taken}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'sick_days_taken', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Vacation Days Taken</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.payslips[selectedPayslipIndex].vacation_days_taken}
-                          onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'vacation_days_taken', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
+                      {getParamNames('payslip').map((param: string) => (
+                        <div key={param} className="col-md-6">
+                          <label className="form-label">{getParamLabel('payslip', param)}</label>
+                          <input
+                            type="number"
+                            className="form-control form-control-sm"
+                            step="0.01"
+                            value={formData.payslips[selectedPayslipIndex][param] ?? ''}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              handlePayslipChange(
+                                selectedPayslipIndex,
+                                param,
+                                v === '' ? '' : parseFloat(v)
+                              );
+                            }}
+                          />
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -409,9 +390,9 @@ const ManualEntryModal: React.FC = () => {
                         className="btn btn-success btn-sm me-2"
                         onClick={addAttendance}
                       >
-                        <i className="bi bi-plus"></i> Add
+                        <i className="bi bi-plus"></i> {dictionary.manualEntryModal.add}
                       </button>
-                      {formData.attendance.length > 1 && (
+                      {formData.attendance.length > 0 && (
                         <button
                           type="button"
                           className="btn btn-danger btn-sm"
@@ -426,7 +407,7 @@ const ManualEntryModal: React.FC = () => {
                   {formData.attendance[selectedAttendanceIndex] && (
                     <div className="row g-3">
                       <div className="col-md-6">
-                        <label className="form-label">Month</label>
+                        <label className="form-label">{dictionary.manualEntryModal.month}</label>
                         <input
                           type="month"
                           className="form-control form-control-sm"
@@ -434,60 +415,25 @@ const ManualEntryModal: React.FC = () => {
                           onChange={(e) => handleAttendanceChange(selectedAttendanceIndex, 'month', e.target.value)}
                         />
                       </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Days Worked</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.attendance[selectedAttendanceIndex].days_worked}
-                          onChange={(e) => handleAttendanceChange(selectedAttendanceIndex, 'days_worked', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Regular Hours</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.attendance[selectedAttendanceIndex].regular_hours}
-                          onChange={(e) => handleAttendanceChange(selectedAttendanceIndex, 'regular_hours', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Overtime Hours</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.attendance[selectedAttendanceIndex].overtime_hours}
-                          onChange={(e) => handleAttendanceChange(selectedAttendanceIndex, 'overtime_hours', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <label className="form-label">Total Hours</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.attendance[selectedAttendanceIndex].total_hours}
-                          onChange={(e) => handleAttendanceChange(selectedAttendanceIndex, 'total_hours', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Sick Days</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.attendance[selectedAttendanceIndex].sick_days}
-                          onChange={(e) => handleAttendanceChange(selectedAttendanceIndex, 'sick_days', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label">Vacation Days</label>
-                        <input
-                          type="number"
-                          className="form-control form-control-sm"
-                          value={formData.attendance[selectedAttendanceIndex].vacation_days}
-                          onChange={(e) => handleAttendanceChange(selectedAttendanceIndex, 'vacation_days', parseInt(e.target.value) || 0)}
-                        />
-                      </div>
+                      {getParamNames('attendance').map((param: string) => (
+                        <div key={param} className="col-md-6">
+                          <label className="form-label">{getParamLabel('attendance', param)}</label>
+                          <input
+                            type="number"
+                            className="form-control form-control-sm"
+                            step="0.01"
+                            value={formData.attendance[selectedAttendanceIndex][param] ?? ''}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              handleAttendanceChange(
+                                selectedAttendanceIndex,
+                                param as keyof typeof formData.attendance[number],
+                                v === '' ? '' : parseFloat(v)
+                              );
+                            }}
+                          />
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -497,124 +443,21 @@ const ManualEntryModal: React.FC = () => {
               {activeTab === 'contract' && (
                 <div className="tab-pane fade show active">
                   <div className="row g-3">
-                    <div className="col-md-6">
-                      <label className="form-label">Minimum Wage Monthly (₪)</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        value={formData.contract.minimum_wage_monthly}
-                        onChange={(e) => handleContractChange('minimum_wage_monthly', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Minimum Wage Hourly (₪)</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        step="0.1"
-                        value={formData.contract.minimum_wage_hourly}
-                        onChange={(e) => handleContractChange('minimum_wage_hourly', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Hourly Rate (₪)</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        step="0.1"
-                        value={formData.contract.hourly_rate}
-                        onChange={(e) => handleContractChange('hourly_rate', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Standard Hours/Month</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        value={formData.contract.standard_hours_per_month}
-                        onChange={(e) => handleContractChange('standard_hours_per_month', parseInt(e.target.value) || 0)}
-                      />
-                    </div>
-
-                    <div className="col-12"><hr /><h6>Overtime Rates</h6></div>
-                    <div className="col-md-3">
-                      <label className="form-label">125% Rate</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        step="0.01"
-                        value={formData.contract.overtime_rate_125}
-                        onChange={(e) => handleContractChange('overtime_rate_125', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-3">
-                      <label className="form-label">150% Rate</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        step="0.01"
-                        value={formData.contract.overtime_rate_150}
-                        onChange={(e) => handleContractChange('overtime_rate_150', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-3">
-                      <label className="form-label">175% Rate</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        step="0.01"
-                        value={formData.contract.overtime_rate_175}
-                        onChange={(e) => handleContractChange('overtime_rate_175', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-3">
-                      <label className="form-label">200% Rate</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        step="0.01"
-                        value={formData.contract.overtime_rate_200}
-                        onChange={(e) => handleContractChange('overtime_rate_200', parseFloat(e.target.value) || 0)}
-                      />
-                    </div>
-
-                    <div className="col-12"><hr /><h6>Work Standards & Benefits</h6></div>
-                    <div className="col-md-4">
-                      <label className="form-label">Hours/Day</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        value={formData.contract.standard_hours_per_day}
-                        onChange={(e) => handleContractChange('standard_hours_per_day', parseInt(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-4">
-                      <label className="form-label">Max Overtime/Day</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        value={formData.contract.max_overtime_daily}
-                        onChange={(e) => handleContractChange('max_overtime_daily', parseInt(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-4">
-                      <label className="form-label">Vacation Days/Year</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        value={formData.contract.vacation_days_per_year}
-                        onChange={(e) => handleContractChange('vacation_days_per_year', parseInt(e.target.value) || 0)}
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Sick Days/Year</label>
-                      <input
-                        type="number"
-                        className="form-control form-control-sm"
-                        value={formData.contract.sick_days_per_year}
-                        onChange={(e) => handleContractChange('sick_days_per_year', parseInt(e.target.value) || 0)}
-                      />
-                    </div>
+                    {getParamNames('contract').map((param: string) => (
+                      <div key={param} className="col-md-6">
+                        <label className="form-label">{getParamLabel('contract', param)}</label>
+                        <input
+                          type="number"
+                          className="form-control form-control-sm"
+                          step="0.01"
+                          value={formData.contract[param] ?? ''}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            handleContractChange(param, v === '' ? '' : parseFloat(v));
+                          }}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -622,11 +465,11 @@ const ManualEntryModal: React.FC = () => {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={handleClose}>
-              Cancel
+              {dictionary.manualEntryModal.cancel}
             </button>
             <button type="button" className="btn btn-primary" onClick={handleSubmit}>
               <i className="bi bi-check-lg me-1"></i>
-              Submit Entry
+              {dictionary.manualEntryModal.submitEntry}
             </button>
           </div>
         </div>

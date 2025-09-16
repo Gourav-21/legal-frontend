@@ -4,10 +4,11 @@ import { proxyToBackend } from '../../utils/proxyToBackend';
 // PUT /api/laws/[id] - Update a law by ID
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const body = await request.json();
-  return proxyToBackend(request, `/api/laws/${params.id}`, { 
+  return proxyToBackend(request, `/api/laws/${id}`, { 
     method: 'PUT', 
     body: body 
   });
@@ -16,9 +17,10 @@ export async function PUT(
 // DELETE /api/laws/[id] - Delete a law by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return proxyToBackend(request, `/api/laws/${params.id}`, { 
+  const { id } = await params;
+  return proxyToBackend(request, `/api/laws/${id}`, { 
     method: 'DELETE' 
   });
 }
@@ -26,9 +28,10 @@ export async function DELETE(
 // GET /api/laws/[id] - Get a specific law by ID (optional)
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return proxyToBackend(request, `/api/laws/${params.id}`, { 
+  const { id } = await params;
+  return proxyToBackend(request, `/api/laws/${id}`, { 
     method: 'GET' 
   });
 }

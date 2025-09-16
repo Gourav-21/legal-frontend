@@ -164,7 +164,7 @@ export default async function Home(props: HomeProps) {
  
         <QuestionModal lang={lang} dictionary={dictionary} />
 
-        <ManualEntryModal />
+        <ManualEntryModal dictionary={dictionary} lang={lang} />
 
         <OcrEditorModal lang={lang} dictionary={dictionary} />
       </main>

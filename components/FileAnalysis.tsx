@@ -2,15 +2,13 @@
 
 import { Locale } from "@/i18n-config";
 import { useAnalysisStore } from '@/store/analysisStore'; // Add this import
-import { useProcessingResultStore } from "@/store/processingResultStore";
 import { useManualEntryStore } from '@/store/manualEntryStore';
+import { useProcessingResultStore } from "@/store/processingResultStore";
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import useAuthStore from '../store/authStore'; // Import the auth store
-import { useOcrEditorStore } from '../store/ocrEditorStore';
-import { convertHtmlTablesToMarkdown, convertHtmlToMarkdown, hasHtmlTables } from '../utils/htmlToMarkdown';
 import FileUpload from './FileUpload';
 
 interface FileAnalysisProps {
@@ -136,7 +134,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   const router = useRouter();
   const { isLoggedIn } = useAuthStore(); // Use the auth store
   const { setLegalAnalysis } = useAnalysisStore(); // Add this line
-  const { setShowManualEntryModal, setManualEntryData } = useManualEntryStore();
+  const { setShowManualEntryModal } = useManualEntryStore();
 
   // Analysis States
   const [isVisible, setIsVisible] = useState(false);
@@ -147,7 +145,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
   // Use global Zustand store for processingResult
   const { processingResult, setProcessingResult } = useProcessingResultStore();
   const [processingError, setProcessingError] = useState<string | null>(null); // State to hold API error
-  const { setShowOcrEditor, setEditableOcrData, setOnSaveCallback, resetOcrData } = useOcrEditorStore();
 
   // Track file changes to reset processing result when files change
   const [lastProcessedFiles, setLastProcessedFiles] = useState<{
@@ -162,23 +159,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
   // Combined processing state for UI
   const isProcessing = isProcessingDocuments || isProcessingReport;
-
-  // Set up OCR editor save callback
-  React.useEffect(() => {
-    console.log('Setting up OCR save callback in FileAnalysis');
-    setOnSaveCallback((editedData) => {
-      console.log('OCR save callback triggered with data:', editedData);
-      // Update the processing result with edited OCR data
-      if (processingResult) {
-        setProcessingResult({
-          ...processingResult,
-          payslip_text: editedData.payslip_text || '',
-          contract_text: editedData.contract_text || '',
-          attendance_text: editedData.attendance_text || ''
-        });
-      }
-    });
-  }, [setOnSaveCallback, processingResult]);
 
   console.log(processingResult)
 
@@ -199,10 +179,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
         setProcessingResult(null);
         setProcessingError(null);
         setIsVisible(false); // Hide any previous analysis
-        setShowOcrEditor(false); // Hide OCR editor
-        resetOcrData(); // Reset OCR editor data
       }
-  }, [payslipFiles, contractFiles, attendanceFiles, processingResult, lastProcessedFiles, setShowOcrEditor, resetOcrData]);
+  }, [payslipFiles, contractFiles, attendanceFiles, processingResult, lastProcessedFiles]);
 
   // Cleanup typing interval on unmount
   React.useEffect(() => {
@@ -250,86 +228,64 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       return null;
     }
 
-    // setIsProcessingDocuments(true); // Indicate processing of documents has started
-    // setProcessingResult(null); // Reset previous results
-    // setProcessingError(null); // Reset previous errors
+    setIsProcessingDocuments(true); // Indicate processing of documents has started
+    setProcessingResult(null); // Reset previous results
+    setProcessingError(null); // Reset previous errors
 
-    // const formData = new FormData();
+    const formData = new FormData();
 
-    // payslipFiles.forEach(uploadedFile => {
-    //   formData.append('files', uploadedFile.file);
-    //   formData.append('doc_types', 'payslip');
-    // });
+    payslipFiles.forEach(uploadedFile => {
+      formData.append('files', uploadedFile.file);
+      formData.append('doc_types', 'payslip');
+    });
 
-    // contractFiles.forEach(uploadedFile => {
-    //   formData.append('files', uploadedFile.file);
-    //   formData.append('doc_types', 'contract');
-    // });
+    contractFiles.forEach(uploadedFile => {
+      formData.append('files', uploadedFile.file);
+      formData.append('doc_types', 'contract');
+    });
 
-    // attendanceFiles.forEach(uploadedFile => {
-    //   formData.append('files', uploadedFile.file);
-    //   formData.append('doc_types', 'attendance');
-    // });
+    attendanceFiles.forEach(uploadedFile => {
+      formData.append('files', uploadedFile.file);
+      formData.append('doc_types', 'attendance');
+    });
 
-    // try {
-    //   const response = await fetch('/api/process', {
-    //     method: 'POST',
-    //     body: formData,
-    //     credentials: 'include',
-    //   }); if (!response.ok) {
-    //     const errorData = await response.json();
-    //     console.log(`HTTP error! status: ${response.status}`)
-    //     throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
-    //   }
+    try {
+      const response = await fetch('/api/process', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      }); if (!response.ok) {
+        const errorData = await response.json();
+        console.log(`HTTP error! status: ${response.status}`)
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
 
-    //   const result = await response.json();
-    //   console.log(result)
-    //   setProcessingResult(result); // Store the successful result
+      const result = await response.json();
+      console.log(result)
+  setProcessingResult(result); // Store the successful result
+  // Automatically open manual entry modal which will read from processingResult
+  setShowManualEntryModal(true);
 
-    //   // Update the last processed files tracker
-    //   setLastProcessedFiles({
-    //     payslip: payslipFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
-    //     contract: contractFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
-    //     attendance: attendanceFiles.map(f => f.file.name + f.file.size + f.file.lastModified)
-    //   });
+      // Update the last processed files tracker
+      setLastProcessedFiles({
+        payslip: payslipFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
+        contract: contractFiles.map(f => f.file.name + f.file.size + f.file.lastModified),
+        attendance: attendanceFiles.map(f => f.file.name + f.file.size + f.file.lastModified)
+      });
 
-    //   console.log("Documents processed successfully:", result);
-    //   return result; // Return the result for immediate use if needed
+      console.log("Documents processed successfully:", result);
+      return result; // Return the result for immediate use if needed
 
-    // } catch (error: unknown) {
-    //   console.error('Error processing documents:', error);
-    //   const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
-    //   setProcessingError(errorMessage);
-    //   return null; // Return null on error
-    // } finally {
-    //   setIsProcessingDocuments(false); // Indicate processing of documents has finished
-    // }
+    } catch (error: unknown) {
+      console.error('Error processing documents:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
+      setProcessingError(errorMessage);
+      return null; // Return null on error
+    } finally {
+      setIsProcessingDocuments(false); // Indicate processing of documents has finished
+    }
   };
 
-  // OCR Editor functions
-  // const handleShowOcrEditor = () => {
-  //   if (processingResult) {
-  //     console.log("Processing result available, showing OCR editor");
-  //     console.log("Processing result data:", processingResult);
-  //     // Automatically convert any HTML content when opening the editor
-  //     const payslipText = processingResult.payslip_text || '';
-  //     const contractText = processingResult.contract_text || '';
-  //     const attendanceText = processingResult.attendance_text || '';
-
-  //     setEditableOcrData({
-  //       payslip_text: hasHtmlTables(payslipText)
-  //         ? convertHtmlTablesToMarkdown(payslipText)
-  //         : payslipText,
-  //       contract_text: hasHtmlTables(contractText)
-  //         ? convertHtmlTablesToMarkdown(contractText)
-  //         : contractText,
-  //       attendance_text: hasHtmlTables(attendanceText)
-  //         ? convertHtmlTablesToMarkdown(attendanceText)
-  //         : attendanceText
-  //     });
-  //     setShowOcrEditor(true);
-  //   }
-  // };
 
   const handleCreateReport = async (type: string) => {
     if (!isLoggedIn) {
@@ -379,9 +335,9 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          payslip_text: finalData.payslip_text,
-          contract_text: finalData.contract_text,
-          attendance_text: finalData.attendance_text,
+          payslip_text: finalData.payslip_data,
+          contract_text: finalData.contract_data,
+          attendance_text: finalData.attendance_data,
           type: type
         })
       });
@@ -404,31 +360,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
     }
   };
 
-  // Listen for manual entry data from the store
-  const { manualEntryData } = useManualEntryStore();
-
-  React.useEffect(() => {
-    if (manualEntryData) {
-      // Add employee ID to each payslip entry
-      const payslipsWithEmployeeId = manualEntryData.payslips.map((payslip: any) => ({
-        ...payslip,
-        employee_id: manualEntryData.employee_id, // Add employee ID from manual entry data
-      }));
-
-      // Directly use the lists/dicts from manual entry for backend compatibility
-      const manualProcessingResult = {
-        payslip_text: payslipsWithEmployeeId, // List of dicts with employee ID
-        contract_text: manualEntryData.contract, // Dict
-        attendance_text: manualEntryData.attendance, // List of dicts
-      };
-
-      setProcessingResult(manualProcessingResult);
-      console.log("Manual entry data processed (with employee ID):", manualProcessingResult);
-
-      // Clear the manual entry data after processing
-      setManualEntryData(null);
-    }
-  }, [manualEntryData, setProcessingResult, setManualEntryData]);
+  // Manual entry modal now writes directly to `processingResult`.
+  // Processing result is preserved until files change (see file-change effect above).
 
   return (
     <div>
@@ -480,7 +413,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           <button
             type="button"
             className="btn btn-outline-primary w-100 p-4"
-            onClick={() => setShowManualEntryModal(true)}
+              onClick={() => setShowManualEntryModal(true)}
             disabled={isProcessing}
           >
             <i className="bi bi-pencil-square me-2"></i>

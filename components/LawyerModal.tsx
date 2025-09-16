@@ -16,7 +16,7 @@ const LawyerModal: React.FC<LawyerModalProps> = ({ lang, dictionary }) => {
             <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"><i className="bi bi-x"></i></button>
           </div>
           <div className="modal-body p-3 p-sm-4">
-            {dictionary.lawyerModal.lawyers.map((lawyer, index) => (
+            {dictionary.lawyerModal.lawyers.map((lawyer: any, index: number) => (
               <div key={index} className={`lawyer-card${index < dictionary.lawyerModal.lawyers.length - 1 ? ' mb-3' : ''}`}>
                 <Image src={`/img/lawyer-pic${index + 1}.jpg`} className="lawyer-profile me-3" alt={lawyer.name} width={120} height={120} />
                 <div className="lawyer-info">
@@ -32,7 +32,7 @@ const LawyerModal: React.FC<LawyerModalProps> = ({ lang, dictionary }) => {
                     <div className="col-lg-6">
                       <h6>{lawyer.specialtiesTitle}</h6>
                       <ul className="text-sm">
-                        {lawyer.specialties.map((specialty, specialtyIndex) => (
+                        {lawyer.specialties.map((specialty: any, specialtyIndex: number) => (
                           <li key={specialtyIndex}>{specialty}</li>
                         ))}
                       </ul>

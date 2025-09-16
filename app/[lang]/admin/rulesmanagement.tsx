@@ -39,6 +39,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   const [rules, setRules] = useState<Rule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
 
   // For rule details view
   const [selectedRule, setSelectedRule] = useState<Rule | null>(null);
@@ -333,7 +334,14 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   const fetchRules = async () => {
     try {
       setLoading(true);
+      setIsUnauthorized(false);
       const response = await fetch('/api/labor-law-rules');
+
+      if (response.status === 401) {
+        setIsUnauthorized(true);
+        setError('You need to log in to access this page.');
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(`Error fetching rules: ${response.statusText}`);
@@ -1418,6 +1426,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             rules={rules}
             loading={loading}
             error={error}
+            isUnauthorized={isUnauthorized}
             selectedRule={selectedRule}
             showRuleForm={showRuleForm}
             isEditing={isEditing}

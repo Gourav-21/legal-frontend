@@ -25,6 +25,7 @@ interface ManageRulesTabProps {
   rules: Rule[];
   loading: boolean;
   error: string | null;
+  isUnauthorized: boolean;
   selectedRule: Rule | null;
   showRuleForm: boolean;
   isEditing: boolean;
@@ -92,6 +93,7 @@ export default function ManageRulesTab({
   rules,
   loading,
   error,
+  isUnauthorized,
   selectedRule,
   showRuleForm,
   isEditing,
@@ -187,6 +189,38 @@ export default function ManageRulesTab({
               <span className="visually-hidden">Loading...</span>
             </div>
             <p className="mt-3" style={{ color: '#0C756F', fontFamily: 'Manrope, sans-serif', fontSize: '1rem', fontWeight: '500' }}>{dictionary.admin.rulesManagement.loading}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (isUnauthorized) {
+      return (
+        <div className="alert mx-3" style={{ backgroundColor: '#fefce8', color: '#d97706', border: '1px solid #fcd34d', borderRadius: '12px', boxShadow: '0 4px 12px rgba(217, 119, 6, 0.1)' }} role="alert">
+          <div className="d-flex align-items-center">
+            <i className="bi bi-shield-lock-fill fs-4 me-3"></i>
+            <div className="flex-grow-1">
+              <h6 className="mb-2" style={{ color: '#d97706', fontFamily: 'Space Grotesk, sans-serif', fontWeight: '600' }}>{dictionary.admin.rulesManagement.messages.authenticationRequired}</h6>
+              <p className="mb-3" style={{ fontSize: '0.9rem' }}>{dictionary.admin.rulesManagement.messages.loginRequiredMessage}</p>
+              <a
+                href={`/${lang}/signin`}
+                className="btn"
+                style={{
+                  backgroundColor: '#FDCF6F',
+                  color: '#0F0F14',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontFamily: 'Space Grotesk, sans-serif',
+                  fontWeight: '600',
+                  textDecoration: 'none',
+                  display: 'inline-block',
+                  padding: '8px 16px'
+                }}
+              >
+                <i className="bi bi-box-arrow-in-right me-2"></i>
+                {dictionary.admin.rulesManagement.messages.goToLogin}
+              </a>
+            </div>
           </div>
         </div>
       );

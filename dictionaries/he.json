@@ -278,6 +278,11 @@
     "noAccount": "אין לך חשבון Paynalyze?",
     "signUpLink": "הירשם"
   },
+  "auth": {
+    "authenticationRequired": "נדרש אימות",
+    "loginRequiredMessage": "אתה צריך להתחבר כדי לגשת לפאנל הניהול ולנהל כללי חוק עבודה.",
+    "goToLogin": "עבור להתחברות"
+  },
   "signup": {
     "leftBannerTitle": "שכר חכם יותר,<br> דיוק משפטי.",
     "rightFormTitle": "צור את חשבון <span class=\"text-primary\">Paynalyze</span> שלך.<br> התחל בחינם.",
@@ -562,7 +567,10 @@
         "errorAddingRule": "שגיאה בהוספת חוק:",
         "failedToAddRule": "נכשל בהוספת חוק",
         "addAtLeastOneRuleCheck": "אנא הוסף לפחות בדיקת חוק אחת לפני הבדיקה",
-        "addAtLeastOneCheckToTest": "הוסף לפחות בדיקה אחת כדי לבדוק את החוק"
+        "addAtLeastOneCheckToTest": "הוסף לפחות בדיקה אחת כדי לבדוק את החוק",
+        "authenticationRequired": "נדרש אימות",
+        "loginRequiredMessage": "אתה צריך להיכנס כדי לגשת לפאנל הניהול ולנהל חוקי עבודה.",
+        "goToLogin": "עבור לכניסה"
       },
       "expandedRow": {
         "basicInformation": "מידע בסיסי",

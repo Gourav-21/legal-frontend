@@ -361,7 +361,7 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
               {activeTab === 'payslips' && (
                 <div className="tab-pane fade show active">
                   <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div className="btn-group btn-group-sm" role="group">
+                    <div className={`btn-group btn-group-sm ${lang === 'he' ? 'flex-row-reverse' : ''}`} role="group" style={{display: 'flex', flexWrap: 'wrap'}}>
                       {formData.payslips.map((payslip, index) => (
                         <button
                           key={index}
@@ -374,22 +374,24 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                       ))}
                     </div>
                     <div>
-                      <button
-                        type="button"
-                        className="btn btn-success btn-sm me-2"
-                        onClick={addPayslip}
-                      >
-                        <i className="bi bi-plus"></i> {dictionary.manualEntryModal.add}
-                      </button>
-                      {formData.payslips.length > 1 && (
+                      <div className={`btn-group btn-group-sm ${lang === 'he' ? 'flex-row-reverse' : ''}`} role="group" style={{display: 'flex'}}>
                         <button
                           type="button"
-                          className="btn btn-danger btn-sm"
-                          onClick={() => removePayslip(selectedPayslipIndex)}
+                          className="btn btn-success"
+                          onClick={addPayslip}
                         >
-                          <i className="bi bi-trash"></i>
+                          <i className="bi bi-plus"></i> {dictionary.manualEntryModal.add}
                         </button>
-                      )}
+                        {formData.payslips.length > 1 && (
+                          <button
+                            type="button"
+                            className="btn btn-danger"
+                            onClick={() => removePayslip(selectedPayslipIndex)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -433,7 +435,7 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
               {activeTab === 'attendance' && (
                 <div className="tab-pane fade show active">
                   <div className="d-flex justify-content-between align-items-center mb-3">
-                    <div className="btn-group btn-group-sm" role="group">
+                    <div className={`btn-group btn-group-sm ${lang === 'he' ? 'flex-row-reverse' : ''}`} role="group" style={{display: 'flex', flexWrap: 'wrap'}}>
                       {formData.attendance.map((attendance, index) => (
                         <button
                           key={index}
@@ -446,22 +448,24 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                       ))}
                     </div>
                     <div>
-                      <button
-                        type="button"
-                        className="btn btn-success btn-sm me-2"
-                        onClick={addAttendance}
-                      >
-                        <i className="bi bi-plus"></i> {dictionary.manualEntryModal.add}
-                      </button>
-                      {formData.attendance.length > 0 && (
+                      <div className={`btn-group btn-group-sm ${lang === 'he' ? 'flex-row-reverse' : ''}`} role="group" style={{display: 'flex'}}>
                         <button
                           type="button"
-                          className="btn btn-danger btn-sm"
-                          onClick={() => removeAttendance(selectedAttendanceIndex)}
+                          className="btn btn-success"
+                          onClick={addAttendance}
                         >
-                          <i className="bi bi-trash"></i>
+                          <i className="bi bi-plus"></i> {dictionary.manualEntryModal.add}
                         </button>
-                      )}
+                        {formData.attendance.length > 0 && (
+                          <button
+                            type="button"
+                            className="btn btn-danger"
+                            onClick={() => removeAttendance(selectedAttendanceIndex)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
 

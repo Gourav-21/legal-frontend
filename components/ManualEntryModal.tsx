@@ -222,7 +222,7 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
 
     // 3. Only contract, no payslip
     const hasContract = Object.keys(formData.contract).length > 0;
-    const hasPayslip = formData.payslips.length > 2 && formData.payslips.some(p => p.month);
+    const hasPayslip = formData.payslips.length > 0 && formData.payslips.some(p => p.month);
     if (hasContract && !hasPayslip) {
       console.log('Contract provided without payslip data'); // Debug log
       return (

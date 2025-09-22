@@ -33,7 +33,7 @@ export default function LaborLawHelp({ dictionary }: LaborLawHelpProps) {
         onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         onClick={() => setIsHelpExpanded(!isHelpExpanded)}
       >
-        <i className="bi bi-book me-2"></i> 📚 {t.title || "Understanding Labor Law Calculations"}
+        📚 {t.title || "Understanding Labor Law Calculations"}
         <i
           className={`bi ms-2 ${isHelpExpanded ? 'bi-chevron-up' : 'bi-chevron-down'}`}
           style={{

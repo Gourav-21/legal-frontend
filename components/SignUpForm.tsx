@@ -47,7 +47,7 @@ export default function SignUpForm({ signupDict, lang }: SignUpFormProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password , name, phone_no:phone }), // Only sending email and password as per API spec
+        body: JSON.stringify({ email, password , name: name.trim(), phone_no: phone }), // Only sending email and password as per API spec
       });
 
       const data = await response.json();

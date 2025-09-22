@@ -25,10 +25,10 @@ export async function POST(
 ) {
   const { section } = await params;
   const body = await request.json();
-  const { param, label_en, label_he, description } = body;
+  const { param, label_en, label_he, description, type  } = body;
 
-  if (!param || !label_en || !label_he || !description) {
-    return new Response(JSON.stringify({ detail: 'Param, label_en, label_he, and description are required' }), {
+  if (!param || !label_en || !label_he || !description || !type) {
+    return new Response(JSON.stringify({ detail: 'Param, label_en, label_he, type and description are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -43,6 +43,6 @@ export async function POST(
 
   return proxyToBackend(request, `/api/dynamic-params/${section}`, {
     method: 'POST',
-    body: { param, label_en, label_he, description }
+    body: { param, label_en, label_he, description, type }
   });
 }

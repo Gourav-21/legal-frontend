@@ -9,10 +9,10 @@ export async function GET(request: NextRequest) {
 // POST /api/dynamic-params/{section} - Add a new parameter to a specific section
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { param, label_en, label_he, description } = body;
+  const { param, label_en, label_he, description, type } = body;
 
-  if (!param || !label_en || !label_he || !description) {
-    return new Response(JSON.stringify({ detail: 'Param, label_en, label_he, and description are required' }), {
+  if (!param || !label_en || !label_he || !description || !type) {
+    return new Response(JSON.stringify({ detail: 'Param, label_en, label_he, type and description are required' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -20,6 +20,6 @@ export async function POST(request: NextRequest) {
 
   return proxyToBackend(request, `/api/dynamic-params/${body.section || 'payslip'}`, {
     method: 'POST',
-    body: { param, label_en, label_he, description }
+    body: { param, label_en, label_he, description, type }
   });
 }

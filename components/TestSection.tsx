@@ -11,6 +11,7 @@ interface DynamicParam {
   label_en: string;
   label_he: string;
   description: string;
+  type: string;
 }
 
 interface TestResult {
@@ -38,7 +39,7 @@ interface DataCollectionPanelProps {
   onLoadSampleData: () => void;
 
   // Dictionary prop for internationalization
-  dictionary: any;
+  dictionary: Record<string, any>;
 
   // JSON upload props
   uploadedJson: string;

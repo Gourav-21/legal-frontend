@@ -24,7 +24,7 @@ interface TestResult {
 interface TestResultsProps {
   testResults: TestResult;
   isLoading: boolean;
-  dictionary: any;
+  dictionary: Record<string, any>;
   lang: string;
 }
 

@@ -3,12 +3,12 @@
 import { useState } from 'react';
 
 interface DynamicParametersTabProps {
-  dynamicParams: any;
-  paramOperationLoading: boolean;
+  dynamicParams: Record<string, any>;
+  paramOperationLoading?: boolean;
   paramOperationMessage: {type: 'success' | 'error', text: string} | null;
-  dictionary: any;
-  onAddDynamicParam: (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string) => Promise<void>;
-  onUpdateDynamicParam: (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string) => Promise<void>;
+  dictionary: Record<string, any>;
+  onAddDynamicParam: (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => Promise<void>;
+  onUpdateDynamicParam: (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => Promise<void>;
   onRemoveDynamicParam: (section: 'payslip' | 'attendance' | 'contract', paramName: string) => Promise<void>;
   onClearParamOperationMessage: () => void;
 }
@@ -32,11 +32,13 @@ export default function DynamicParametersTab({
   const [newParamLabelEn, setNewParamLabelEn] = useState('');
   const [newParamLabelHe, setNewParamLabelHe] = useState('');
   const [newParamDescription, setNewParamDescription] = useState('');
+  const [newParamType, setNewParamType] = useState('number');
   const [updateParamSection, setUpdateParamSection] = useState<'payslip' | 'attendance' | 'contract'>('payslip');
   const [updateParamName, setUpdateParamName] = useState('');
   const [updateLabelEn, setUpdateLabelEn] = useState('');
   const [updateLabelHe, setUpdateLabelHe] = useState('');
   const [updateDescription, setUpdateDescription] = useState('');
+  const [updateParamType, setUpdateParamType] = useState('number');
   const [removeParamSection, setRemoveParamSection] = useState<'payslip' | 'attendance' | 'contract'>('payslip');
   const [removeParamName, setRemoveParamName] = useState('');
 
@@ -259,6 +261,19 @@ export default function DynamicParametersTab({
                         />
                         <div className="form-text" style={{ color: 'rgba(15, 15, 20, 0.6)' }}>{dictionary.admin.dynamicParameters.descriptionOfTheParameter}</div>
                       </div>
+                      <div className="col-12 mb-3">
+                        <label className="form-label" style={{ fontFamily: "'Manrope', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.dynamicParameters.type}</label>
+                        <select
+                          className="form-select"
+                          style={{ borderRadius: '8px', border: '1px solid #0C756F' }}
+                          value={newParamType}
+                          onChange={(e) => setNewParamType(e.target.value)}
+                        >
+                          <option value="number">{dictionary.admin.dynamicParameters.number}</option>
+                          <option value="text">{dictionary.admin.dynamicParameters.text}</option>
+                        </select>
+                        <div className="form-text" style={{ color: 'rgba(15, 15, 20, 0.6)' }}>{dictionary.admin.dynamicParameters.typeDescription}</div>
+                      </div>
                     </div>
                     <div className="d-flex gap-2">
                       <button
@@ -270,11 +285,12 @@ export default function DynamicParametersTab({
                           if (newParamName && newParamLabelEn && newParamLabelHe && newParamDescription) {
                             onClearParamOperationMessage();
                             try {
-                              await onAddDynamicParam(newParamSection, newParamName, newParamLabelEn, newParamLabelHe, newParamDescription);
+                              await onAddDynamicParam(newParamSection, newParamName, newParamLabelEn, newParamLabelHe, newParamDescription, newParamType);
                               setNewParamName('');
                               setNewParamLabelEn('');
                               setNewParamLabelHe('');
                               setNewParamDescription('');
+                              setNewParamType('number');
                               setShowAddParamForm(false);
                             } catch (err) {
                               // Error handling is done in parent component
@@ -438,6 +454,7 @@ export default function DynamicParametersTab({
                             setUpdateLabelEn('');
                             setUpdateLabelHe('');
                             setUpdateDescription('');
+                            setUpdateParamType('number');
                           }}
                         >
                           <option value="payslip">{dictionary.admin.dynamicParameters.payslip}</option>
@@ -460,11 +477,13 @@ export default function DynamicParametersTab({
                                 setUpdateLabelEn(param.label_en || '');
                                 setUpdateLabelHe(param.label_he || '');
                                 setUpdateDescription(param.description || '');
+                                setUpdateParamType(param.type || 'number');
                               }
                             } else {
                               setUpdateLabelEn('');
                               setUpdateLabelHe('');
                               setUpdateDescription('');
+                              setUpdateParamType('number');
                             }
                           }}
                         >
@@ -507,6 +526,19 @@ export default function DynamicParametersTab({
                           onChange={(e) => setUpdateDescription(e.target.value)}
                         />
                       </div>
+                      <div className="col-12 mb-3">
+                        <label className="form-label" style={{ fontFamily: "'Manrope', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.dynamicParameters.type}</label>
+                        <select
+                          className="form-select"
+                          style={{ borderRadius: '8px', border: '1px solid #0C756F' }}
+                          value={updateParamType}
+                          onChange={(e) => setUpdateParamType(e.target.value)}
+                        >
+                          <option value="number">{dictionary.admin.dynamicParameters.number}</option>
+                          <option value="text">{dictionary.admin.dynamicParameters.text}</option>
+                        </select>
+                        <div className="form-text" style={{ color: 'rgba(15, 15, 20, 0.6)' }}>{dictionary.admin.dynamicParameters.typeDescription}</div>
+                      </div>
                     </div>
                     <div className="d-flex gap-2">
                       <button
@@ -518,11 +550,12 @@ export default function DynamicParametersTab({
                           if (updateParamName && updateLabelEn && updateLabelHe && updateDescription) {
                             onClearParamOperationMessage();
                             try {
-                              await onUpdateDynamicParam(updateParamSection, updateParamName, updateLabelEn, updateLabelHe, updateDescription);
+                              await onUpdateDynamicParam(updateParamSection, updateParamName, updateLabelEn, updateLabelHe, updateDescription, updateParamType);
                               setUpdateParamName('');
                               setUpdateLabelEn('');
                               setUpdateLabelHe('');
                               setUpdateDescription('');
+                              setUpdateParamType('number');
                               setShowUpdateParamForm(false);
                             } catch (err) {
                               // Error handling is done in parent component

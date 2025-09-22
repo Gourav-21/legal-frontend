@@ -8,7 +8,7 @@ import useAuthStore from '../store/authStore'; // Import the auth store
 
 interface SignInFormProps {
     lang: Locale;
-    dictionary: any
+    dictionary: Record<string, any>
 }
 
 export default function SignInForm({ lang, dictionary }: SignInFormProps) {

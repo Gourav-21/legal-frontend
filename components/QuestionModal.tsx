@@ -3,11 +3,9 @@
 import React, { useState } from 'react';
 import remarkGfm from 'remark-gfm';
 import ReactMarkdown from 'react-markdown';
-import { Locale } from "@/i18n-config";
 import { useAnalysisStore } from '@/store/analysisStore';
 
 interface QuestionModalProps {
-    lang: Locale;
     dictionary: Record<string, any>;
 }
 
@@ -132,7 +130,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ dictionary }) => {
                                     <ReactMarkdown
                                         remarkPlugins={[remarkGfm]}
                                         components={{
-                                            table: ({ node, ...props }) => (
+                                            table: ({ ...props }) => (
                                                 <table className="markdown-table" {...props} />
                                             )
                                         }}

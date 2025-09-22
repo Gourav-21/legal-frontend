@@ -3,10 +3,10 @@ import { Locale } from "@/i18n-config";
 
 interface LawyerModalProps {
   lang: Locale;
-  dictionary: any;
+  dictionary: Record<string, any>;
 }
 
-const LawyerModal: React.FC<LawyerModalProps> = ({ lang, dictionary }) => {
+const LawyerModal: React.FC<LawyerModalProps> = ({ dictionary }) => {
   return (
     <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div className="modal-dialog modal-lg modal-dialog-centered">

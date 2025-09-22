@@ -5,6 +5,7 @@ interface DynamicParam {
   label_en: string;
   label_he: string;
   description: string;
+  type: string;
 }
 
 interface ManualEntryFormProps {
@@ -21,7 +22,7 @@ interface ManualEntryFormProps {
   onIncludePayslipChange: (checked: boolean) => void;
   onIncludeContractChange: (checked: boolean) => void;
   onIncludeAttendanceChange: (checked: boolean) => void;
-  dictionary: any;
+  dictionary: Record<string, any>;
   lang: string;
 }
 
@@ -182,14 +183,14 @@ export default function ManualEntryForm({
             {dynamicParams.payslip
               .filter((p: any) => !['employee_id', 'month'].includes(p.param))
               .map((param: any) => {
-                const isCurrency = param.param.includes('rate') || param.param.includes('salary');
+                const inputType = param.type === 'number' ? 'number' : 'text';
                 return (
                   <div key={param.param} className="col-md-3 mb-2">
                     <label className="form-label small fw-bold" style={{ fontFamily: "'Manrope', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{getParamLabel(param)}</label>
                     <input
-                      type={isCurrency ? "number" : "number"}
-                      step={isCurrency ? "0.1" : "1"}
-                      min="0"
+                      type={inputType}
+                      step={inputType === 'number' ? "0.1" : undefined}
+                      min={inputType === 'number' ? "0" : undefined}
                       className="form-control form-control-sm"
                       style={{ borderRadius: '6px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
                       value={dynamicFormData.payslip[param.param] ?? ''}
@@ -198,7 +199,7 @@ export default function ManualEntryForm({
                         if (val === '') {
                           onDynamicInputChange('payslip', param.param, '');
                         } else {
-                          onDynamicInputChange('payslip', param.param, isCurrency ? parseFloat(val) : parseInt(val));
+                          onDynamicInputChange('payslip', param.param, param.type === 'number' ? parseFloat(val) : val);
                         }
                       }}
                     />
@@ -219,14 +220,14 @@ export default function ManualEntryForm({
             {dynamicParams.contract
               .filter((p: any) => !['employee_id', 'month'].includes(p.param))
               .map((param: any) => {
-                const isCurrency = param.param.includes('rate') || param.param.includes('salary');
+                const inputType = param.type === 'number' ? 'number' : 'text';
                 return (
                   <div key={param.param} className="col-md-3 mb-2">
                     <label className="form-label small fw-bold" style={{ fontFamily: "'Manrope', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{getParamLabel(param)}</label>
                     <input
-                      type={isCurrency ? "number" : "number"}
-                      step={isCurrency ? "0.1" : "1"}
-                      min="0"
+                      type={inputType}
+                      step={inputType === 'number' ? "0.1" : undefined}
+                      min={inputType === 'number' ? "0" : undefined}
                       className="form-control form-control-sm"
                       style={{ borderRadius: '6px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
                       value={dynamicFormData.contract[param.param] ?? ''}
@@ -235,7 +236,7 @@ export default function ManualEntryForm({
                         if (val === '') {
                           onDynamicInputChange('contract', param.param, '');
                         } else {
-                          onDynamicInputChange('contract', param.param, isCurrency ? parseFloat(val) : parseInt(val));
+                          onDynamicInputChange('contract', param.param, param.type === 'number' ? parseFloat(val) : val);
                         }
                       }}
                     />
@@ -255,26 +256,30 @@ export default function ManualEntryForm({
           <div className="row">
             {dynamicParams.attendance
               .filter((p: any) => !['employee_id', 'month'].includes(p.param))
-              .map((param: any) => (
-                <div key={param.param} className="col-md-3 mb-2">
-                  <label className="form-label small fw-bold" style={{ fontFamily: "'Manrope', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{getParamLabel(param)}</label>
-                  <input
-                    type="number"
-                    min="0"
-                    className="form-control form-control-sm"
-                    style={{ borderRadius: '6px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
-                    value={dynamicFormData.attendance[param.param] ?? ''}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val === '') {
-                        onDynamicInputChange('attendance', param.param, '');
-                      } else {
-                        onDynamicInputChange('attendance', param.param, parseInt(val));
-                      }
-                    }}
-                  />
-                </div>
-              ))}
+              .map((param: any) => {
+                const inputType = param.type === 'number' ? 'number' : 'text';
+                return (
+                  <div key={param.param} className="col-md-3 mb-2">
+                    <label className="form-label small fw-bold" style={{ fontFamily: "'Manrope', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{getParamLabel(param)}</label>
+                    <input
+                      type={inputType}
+                      step={inputType === 'number' ? "0.1" : undefined}
+                      min={inputType === 'number' ? "0" : undefined}
+                      className="form-control form-control-sm"
+                      style={{ borderRadius: '6px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
+                      value={dynamicFormData.attendance[param.param] ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                          onDynamicInputChange('attendance', param.param, '');
+                        } else {
+                          onDynamicInputChange('attendance', param.param, param.type === 'number' ? parseFloat(val) : val);
+                        }
+                      }}
+                    />
+                  </div>
+                );
+              })}
           </div>
         </div>
       )}

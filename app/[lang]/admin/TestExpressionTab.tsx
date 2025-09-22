@@ -5,17 +5,29 @@ import InputMethodSelector from '../../../components/InputMethodSelector';
 import JsonUploadForm from '../../../components/JsonUploadForm';
 import ManualEntryForm from '../../../components/ManualEntryForm';
 
+interface DynamicParam {
+  param: string;
+  label_en: string;
+  label_he: string;
+  description: string;
+  type: string;
+}
+
 interface TestExpressionTabProps {
   expression: string;
   expressionType: 'condition' | 'calculation';
   expressionResult: any;
   isEvaluating: boolean;
-  dynamicParams: any;
-  dynamicFormData: any;
+  dynamicParams: {
+    payslip: DynamicParam[];
+    contract: DynamicParam[];
+    attendance: DynamicParam[];
+  };
+  dynamicFormData: Record<string, any>;
   includePayslip: boolean;
   includeContract: boolean;
   includeAttendance: boolean;
-  dictionary: any;
+  dictionary: Record<string, any>;
   lang: string;
   onExpressionChange: (expression: string) => void;
   onExpressionTypeChange: (type: 'condition' | 'calculation') => void;

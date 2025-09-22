@@ -3,10 +3,8 @@ import React from 'react';
 import { useOcrEditorStore } from '../store/ocrEditorStore';
 import { MDXEditor, headingsPlugin, listsPlugin, markdownShortcutPlugin, tablePlugin, toolbarPlugin, UndoRedo, BoldItalicUnderlineToggles, InsertTable, ListsToggle, Separator } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
-import { Locale } from '@/i18n-config';
 
 interface OcrEditorModalProps {
-  lang: Locale;
   dictionary: Record<string, any>;
 }
 

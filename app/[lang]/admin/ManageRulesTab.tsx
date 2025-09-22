@@ -21,56 +21,81 @@ interface Rule {
   updated_date?: string;
 }
 
+interface DynamicParam {
+  param: string;
+  label_en: string;
+  label_he: string;
+  description: string;
+  type: string;
+}
+
+interface TestResult {
+  success: boolean;
+  rule_id: string;
+  rule_name: string;
+  total_violations: number;
+  total_amount_owed: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  check_results: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  context_used?: any;
+  error?: string;
+}
+
 interface ManageRulesTabProps {
   rules: Rule[];
   loading: boolean;
   error: string | null;
+  successMessage: string | null;
+  formSubmitError: string | null;
   isUnauthorized: boolean;
   selectedRule: Rule | null;
   showRuleForm: boolean;
   isEditing: boolean;
   editingRule: Rule | null;
   ruleFormData: {
-    rule_id: string;
+    rule_id?: string;
     name: string;
     law_reference: string;
     description: string;
     effective_from: string;
-    effective_to: string;
+    effective_to?: string;
   };
   formErrors: Record<string, string>;
   ruleChecks: {condition: string; amount_owed: string; violation_message: string}[];
   checkEditor: {condition: string; amount_owed: string; violation_message: string};
-  dynamicParams: any;
-  dynamicFormData: any;
+  dynamicParams: {
+    payslip: DynamicParam[];
+    contract: DynamicParam[];
+    attendance: DynamicParam[];
+  } | null;
+  dynamicFormData: Record<string, unknown>;
   includePayslip: boolean;
   includeContract: boolean;
   includeAttendance: boolean;
-  testResults: any;
+  testResults: TestResult | undefined;
   isTesting: boolean;
-  dictionary: any;
+  dictionary: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   lang: string;
   // Test-related props for individual rule testing
   testInputMethod: 'manual' | 'json' | 'sample';
   testUploadedJson: string;
-  testDynamicFormData: any;
+  testDynamicFormData: Record<string, unknown>;
   testIncludePayslip: boolean;
   testIncludeContract: boolean;
   testIncludeAttendance: boolean;
   onRuleSelect: (rule: Rule | null) => void;
-  onStartCreateRule: () => void;
   onStartEditRule: (rule: Rule) => void;
   onDeleteRule: (ruleId: string) => void;
-  onTestRule: (rule: Rule) => void;
   onTestRuleInForm: () => void;
   onFormDataChange: (data: Partial<ManageRulesTabProps['ruleFormData']>) => void;
   onFormSubmit: (e: React.FormEvent) => void;
   onAddCheck: () => void;
-  onUpdateCheck: (index: number, field: keyof ManageRulesTabProps['ruleChecks'][0], value: string) => void;
+  onUpdateCheck: (index: number, updatedCheck: {condition: string; amount_owed: string; violation_message: string}) => void;
   onUpdateCheckEditor: (field: keyof ManageRulesTabProps['checkEditor'], value: string) => void;
   onRemoveCheck: (index: number) => void;
   onCancelForm: () => void;
-  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract', param: string, value: any) => void;
+  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract', param: string, value: unknown) => void;
   onIncludePayslipChange: (checked: boolean) => void;
   onIncludeContractChange: (checked: boolean) => void;
   onIncludeAttendanceChange: (checked: boolean) => void;
@@ -80,7 +105,7 @@ interface ManageRulesTabProps {
   // Test-related handlers
   onTestInputMethodChange: (method: 'manual' | 'json' | 'sample') => void;
   onTestJsonChange: (json: string) => void;
-  onTestDynamicInputChange: (section: string, param: string, value: any) => void;
+  onTestDynamicInputChange: (section: string, param: string, value: unknown) => void;
   onTestIncludePayslipChange: (checked: boolean) => void;
   onTestIncludeContractChange: (checked: boolean) => void;
   onTestIncludeAttendanceChange: (checked: boolean) => void;
@@ -93,6 +118,8 @@ export default function ManageRulesTab({
   rules,
   loading,
   error,
+  successMessage,
+  formSubmitError,
   isUnauthorized,
   selectedRule,
   showRuleForm,
@@ -119,10 +146,8 @@ export default function ManageRulesTab({
   testIncludeContract,
   testIncludeAttendance,
   onRuleSelect,
-  onStartCreateRule,
   onStartEditRule,
   onDeleteRule,
-  onTestRule,
   onTestRuleInForm,
   onFormDataChange,
   onFormSubmit,
@@ -151,33 +176,6 @@ export default function ManageRulesTab({
 }: ManageRulesTabProps) {
   // Local state for showing test section
   const [showTestSection, setShowTestSection] = useState(false);
-  // Handle JSON upload
-  const handleJsonUpload = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const jsonText = event.target.value;
-    try {
-      const parsedData = JSON.parse(jsonText);
-      // Update parent form data
-      onDynamicInputChange('payslip', 'employee_id', parsedData.employee_id || 'TEST_001');
-      onDynamicInputChange('payslip', 'month', parsedData.month || '2024-07');
-      if (parsedData.payslip) {
-        Object.entries(parsedData.payslip).forEach(([key, value]) => {
-          onDynamicInputChange('payslip', key, value);
-        });
-      }
-      if (parsedData.attendance) {
-        Object.entries(parsedData.attendance).forEach(([key, value]) => {
-          onDynamicInputChange('attendance', key, value);
-        });
-      }
-      if (parsedData.contract) {
-        Object.entries(parsedData.contract).forEach(([key, value]) => {
-          onDynamicInputChange('contract', key, value);
-        });
-      }
-    } catch (err) {
-      console.error('Invalid JSON:', err);
-    }
-  };
 
   // Render the rules list
   const renderRulesList = () => {

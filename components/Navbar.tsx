@@ -24,9 +24,9 @@ const Navbar: React.FC<NavbarProps> = ({ lang, dictionary }) => {
   useEffect(() => {
     let bsCollapse: any = null;
 
-    // @ts-ignore
+    // @ts-expect-error
     if (typeof window !== 'undefined' && collapseRef.current && window.bootstrap) {
-      // @ts-ignore
+      // @ts-expect-error
       bsCollapse = new window.bootstrap.Collapse(collapseRef.current, {
         toggle: false
       });

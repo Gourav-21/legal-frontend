@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // GET /api/dynamic-params-sections - List available parameter sections
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const sections = ['payslip', 'attendance', 'contract'];
     return NextResponse.json({ sections });

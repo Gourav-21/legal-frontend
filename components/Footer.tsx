@@ -2,7 +2,7 @@ import { Locale } from "../i18n-config"; // Adjust path as needed
 
 interface FooterProps {
   lang: Locale;
-  dictionary: any; // Replace 'any' with a more specific type if you have one
+  dictionary: Record<string, any>;
 }
 
 const Footer: React.FC<FooterProps> = ({ lang, dictionary }) => {

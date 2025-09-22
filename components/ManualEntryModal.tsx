@@ -26,7 +26,7 @@ interface ManualEntryData {
 }
 
 interface ManualEntryModalProps {
-  dictionary: any;
+  dictionary: Record<string, any>;
   lang: string;
 }
 
@@ -54,7 +54,8 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
           if (obj[key] === null) {
             result[key] = '';
           } else if (typeof obj[key] === 'string') {
-            const cleaned = obj[key].replace(/,/g, '');
+            // Remove commas, currency, units, and percentage signs
+            const cleaned = obj[key].replace(/[,₪שעותימים%]/g, '').trim();
             const numValue = parseFloat(cleaned);
             if (!isNaN(numValue) && cleaned === numValue.toString()) {
               result[key] = numValue;
@@ -200,9 +201,50 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
     }
   };
 
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const validateForm = (): string | null => {
+    // 1. No timestamp (missing month)
+    const missingPayslipMonth = formData.payslips.some(p => !p.month);
+    const missingAttendanceMonth = formData.attendance.some(a => !a.month);
+    if (missingPayslipMonth || missingAttendanceMonth) {
+      return dictionary.manualEntryModal.validation.missingMonth || 'All entries must have a month.';
+    }
+
+    // 2. Attendance for a month but no payslip for same month
+    const payslipMonths = new Set(formData.payslips.map(p => p.month));
+    const attendanceMonths = formData.attendance.map(a => a.month);
+    for (const attMonth of attendanceMonths) {
+      if (!payslipMonths.has(attMonth)) {
+        return `${attMonth} ${dictionary.manualEntryModal.validation.attendanceWithoutPayslip || 'Attendance exists but no payslip for that month'}`;
+      }
+    }
+
+    // 3. Only contract, no payslip
+    const hasContract = Object.keys(formData.contract).length > 0;
+    const hasPayslip = formData.payslips.length > 2 && formData.payslips.some(p => p.month);
+    if (hasContract && !hasPayslip) {
+      console.log('Contract provided without payslip data'); // Debug log
+      return (
+        dictionary.manualEntryModal.validation.contractWithoutPayslip ||
+        'Contract data exists but no payslip data.'
+      );
+    }
+
+    return null;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Also update processingResult with the manual entry data
+    const error = validateForm();
+    if (error) {
+      setValidationError(error);
+      console.log('Validation error:', error); // Debug log
+      return;
+    }
+    // setTimeout(() => {
+    //   setValidationError(null);
+    // }, 1000);
     setProcessingResult({
       payslip_data: formData.payslips,
       contract_data: formData.contract,
@@ -215,12 +257,12 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
     if (!dynamicParams || !dynamicParams[section]) return [];
     return dynamicParams[section]
       .filter((p: any) => !['employee_id', 'month'].includes(p.param))
-      .map((p: any) => p.param);
+      .map((p: any) => p.param.trim()); // Trim to remove extra spaces
   };
 
   const getParamLabel = (section: string, param: string) => {
     if (!dynamicParams || !dynamicParams[section]) return param;
-    const paramObj = dynamicParams[section].find((p: any) => p.param === param);
+    const paramObj = dynamicParams[section].find((p: any) => p.param.trim() === param.trim()); // Trim for matching
     if (!paramObj) return param;
 
     // Use Hebrew label if language is Hebrew and it exists, otherwise use English
@@ -230,9 +272,22 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
     return paramObj.label_en || param;
   };
 
+  const getParamType = (section: string, param: string): string => {
+    if (!dynamicParams || !dynamicParams[section]) return 'number'; // Default to number
+    const paramObj = dynamicParams[section].find((p: any) => p.param.trim() === param.trim());
+    return paramObj?.type || 'number';
+  };
+
   const handleClose = () => {
     setShowManualEntryModal(false);
   };
+
+  // Clear validation error when form data changes
+  useEffect(() => {
+    if (validationError) {
+      setValidationError(null);
+    }
+  }, [formData]);
 
   if (!showManualEntryModal) return null;
 
@@ -247,7 +302,12 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
             </h5>
             <button type="button" className="btn-close" onClick={handleClose}></button>
           </div>
-          <div className="modal-body">
+          <div className="modal-body" style={{ position: 'relative' }}>
+            {validationError && (
+              <div style={{ position: 'sticky', top: 0, zIndex: 10 }} className="alert alert-danger mb-3" role="alert">
+                {validationError}
+              </div>
+            )}
             {/* Employee ID Always Visible */}
             <div className="row mb-4">
               <div className="col-12">
@@ -348,16 +408,17 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                         <div key={param} className="col-md-6">
                           <label className="form-label">{getParamLabel('payslip', param)}</label>
                           <input
-                            type="number"
+                            type={getParamType('payslip', param) === 'number' ? 'number' : 'text'}
                             className="form-control form-control-sm"
                             step="0.01"
                             value={formData.payslips[selectedPayslipIndex][param] ?? ''}
                             onChange={(e) => {
                               const v = e.target.value;
+                              const paramType = getParamType('payslip', param);
                               handlePayslipChange(
                                 selectedPayslipIndex,
                                 param,
-                                v === '' ? '' : parseFloat(v)
+                                v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v)
                               );
                             }}
                           />
@@ -419,16 +480,17 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                         <div key={param} className="col-md-6">
                           <label className="form-label">{getParamLabel('attendance', param)}</label>
                           <input
-                            type="number"
+                            type={getParamType('attendance', param) === 'number' ? 'number' : 'text'}
                             className="form-control form-control-sm"
                             step="0.01"
                             value={formData.attendance[selectedAttendanceIndex][param] ?? ''}
                             onChange={(e) => {
                               const v = e.target.value;
+                              const paramType = getParamType('attendance', param);
                               handleAttendanceChange(
                                 selectedAttendanceIndex,
                                 param as keyof typeof formData.attendance[number],
-                                v === '' ? '' : parseFloat(v)
+                                v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v)
                               );
                             }}
                           />
@@ -447,13 +509,14 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                       <div key={param} className="col-md-6">
                         <label className="form-label">{getParamLabel('contract', param)}</label>
                         <input
-                          type="number"
+                          type={getParamType('contract', param) === 'number' ? 'number' : 'text'}
                           className="form-control form-control-sm"
                           step="0.01"
                           value={formData.contract[param] ?? ''}
                           onChange={(e) => {
                             const v = e.target.value;
-                            handleContractChange(param, v === '' ? '' : parseFloat(v));
+                            const paramType = getParamType('contract', param);
+                            handleContractChange(param, v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v));
                           }}
                         />
                       </div>
@@ -463,6 +526,7 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
               )}
             </div>
           </div>
+          {/* Error alert is now only shown at the top of the modal body */}
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={handleClose}>
               {dictionary.manualEntryModal.cancel}

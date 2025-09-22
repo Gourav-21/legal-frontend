@@ -4,7 +4,7 @@ interface InputMethodSelectorProps {
   inputMethod: 'manual' | 'json' | 'sample';
   onInputMethodChange: (method: 'manual' | 'json' | 'sample') => void;
   onLoadSampleData: () => void;
-  dictionary: any;
+  dictionary: Record<string, any>;
 }
 
 export default function InputMethodSelector({

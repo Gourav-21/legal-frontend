@@ -4,7 +4,7 @@ import { useAnalysisStore } from '@/store/analysisStore';
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-export default function AiSummaryModal({ lang, dictionary }: { lang: Locale, dictionary: any }) {
+export default function AiSummaryModal({ dictionary }: { lang: Locale, dictionary: any }) {
   const { legalAnalysis } = useAnalysisStore();
   const [summaryContent, setSummaryContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -46,8 +46,8 @@ export default function AiSummaryModal({ lang, dictionary }: { lang: Locale, dic
     if (modalElement && modalElement.classList.contains('show')) {
       fetchSummary();
     } else if (modalElement) {
-      const observer = new MutationObserver((mutationsList, observerInstance) => {
-        for (let mutation of mutationsList) {
+      const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
           if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
             const targetElement = mutation.target as HTMLElement;
             if (targetElement.classList.contains('show')) {

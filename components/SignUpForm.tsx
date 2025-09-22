@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'; // Use next/navigation for App Rout
 import useAuthStore from '../store/authStore'; // Import the auth store
 
 interface SignUpFormProps {
-  signupDict: any; // Replace 'any' with a more specific type if available
+  signupDict: Record<string, any>; // Replace 'any' with a more specific type if available
   lang: string;
 }
 

@@ -1,14 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import InputMethodSelector from '../../../components/InputMethodSelector';
-import JsonUploadForm from '../../../components/JsonUploadForm';
-import ManualEntryForm from '../../../components/ManualEntryForm';
-import TestResults from '../../../components/TestResults';
-import { Locale } from "../../../i18n-config";
 import DynamicParametersTab from './DynamicParametersTab';
 import ManageRulesTab from './ManageRulesTab';
 import TestExpressionTab from './TestExpressionTab';
+import { Locale } from "../../../i18n-config";
 
 interface Rule {
   rule_id: string;
@@ -29,7 +25,7 @@ interface Rule {
 
 interface RulesManagementProps {
   lang: Locale;
-  dictionary: any;
+  dictionary: Record<string, any>;
 }
 
 type TabType = 'manage' | 'test' | 'params';
@@ -39,6 +35,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   const [rules, setRules] = useState<Rule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [formSubmitError, setFormSubmitError] = useState<string | null>(null);
   const [isUnauthorized, setIsUnauthorized] = useState(false);
 
   // For rule details view
@@ -50,13 +48,19 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   const [editingRule, setEditingRule] = useState<Rule | null>(null);
 
   // Form data for unified form
-  const [ruleFormData, setRuleFormData] = useState({
-    rule_id: '',
+  const [ruleFormData, setRuleFormData] = useState<{
+    rule_id?: string;
+    name: string;
+    law_reference: string;
+    description: string;
+    effective_from: string;
+    effective_to?: string;
+  }>({
     name: '',
     law_reference: '',
     description: '',
     effective_from: new Date().toISOString().split('T')[0],
-    effective_to: ''
+    effective_to: undefined
   });
 
   // For form validation
@@ -94,6 +98,11 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       }
 
       setRuleChecks(data.generated_checks);
+      // Clear the 'checks' validation error if checks are added
+      setFormErrors(prev => {
+        const { checks, ...rest } = prev;
+        return rest;
+      });
       return data.generated_checks;
     } catch (err) {
       console.error('Error generating AI checks:', err);
@@ -115,15 +124,6 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   // For testing functionality
   const [testResults, setTestResults] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
-  const [testData, setTestData] = useState({
-    employee_id: 'TEST_001',
-    month: '2024-07',
-    hourly_rate: 30.0,
-    base_salary: 4800.0,
-    overtime_rate: 35.0,
-    overtime_hours: 5,
-    regular_hours: 160
-  });
 
   // For expression tester
   const [expression, setExpression] = useState('');
@@ -132,12 +132,10 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   const [isEvaluating, setIsEvaluating] = useState(false);
 
   // For dynamic test data setup
-  const [inputMethod, setInputMethod] = useState<'manual' | 'json' | 'sample'>('manual');
   const [dynamicParams, setDynamicParams] = useState<any>(null);
   const [includePayslip, setIncludePayslip] = useState(true);
   const [includeContract, setIncludeContract] = useState(true);
   const [includeAttendance, setIncludeAttendance] = useState(true);
-  const [uploadedJson, setUploadedJson] = useState<string>('');
 
   // Dynamic form data
   const [dynamicFormData, setDynamicFormData] = useState({
@@ -163,14 +161,6 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   const [testIncludeAttendance, setTestIncludeAttendance] = useState(true);
 
   // For adding/removing dynamic parameters
-  const [newParamSection, setNewParamSection] = useState<'payslip' | 'attendance' | 'contract'>('payslip');
-  const [newParamName, setNewParamName] = useState('');
-  const [newParamLabel, setNewParamLabel] = useState('');
-  const [removeParamSection, setRemoveParamSection] = useState<'payslip' | 'attendance' | 'contract'>('payslip');
-  const [removeParamName, setRemoveParamName] = useState('');
-  const [showAddParamForm, setShowAddParamForm] = useState(true);
-  const [showRemoveParamForm, setShowRemoveParamForm] = useState(true);
-  const [paramOperationLoading, setParamOperationLoading] = useState(false);
   const [paramOperationMessage, setParamOperationMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
 
   // Test a rule with test data from manual entry
@@ -226,7 +216,10 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   // Test rule in form with current form data
   const testRuleInForm = async () => {
     if (ruleChecks.length === 0) {
-      setTestResults({ error: dictionary.admin.messages.addAtLeastOneRuleCheck });
+      const errorMessage = dictionary.admin.rulesManagement.messages.addAtLeastOneRuleCheck;
+      setTestResults({ error: errorMessage });
+      // Also show in form errors for better visibility
+      setFormErrors(prev => ({ ...prev, test: errorMessage }));
       return;
     }
 
@@ -260,8 +253,17 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
 
       const result = await response.json();
       setTestResults(result);
+      // Clear any test errors from form errors on success
+      setFormErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.test;
+        return newErrors;
+      });
     } catch (err) {
-      setTestResults({ error: err instanceof Error ? err.message : 'Test failed' });
+      const errorMessage = err instanceof Error ? err.message : 'Test failed';
+      setTestResults({ error: errorMessage });
+      // Also show in form errors for better visibility
+      setFormErrors(prev => ({ ...prev, test: errorMessage }));
     } finally {
       setIsTesting(false);
     }
@@ -439,26 +441,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
     });
   };
 
-  // Handle JSON upload
-  const handleJsonUpload = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const jsonText = event.target.value;
-    setUploadedJson(jsonText);
-    try {
-      const parsedData = JSON.parse(jsonText);
-      setDynamicFormData({
-        employee_id: parsedData.employee_id || 'TEST_001',
-        month: parsedData.month || '2024-07',
-        payslip: parsedData.payslip || {},
-        attendance: parsedData.attendance || {},
-        contract: parsedData.contract || {}
-      });
-    } catch (err) {
-      console.error('Invalid JSON:', err);
-    }
-  };
-
   // Add a new dynamic parameter
-  const addDynamicParam = async (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string) => {
+  const addDynamicParam = async (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => {
     try {
       const response = await fetch(`/api/dynamic-params/${section}`, {
         method: 'POST',
@@ -467,7 +451,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
           param: paramName,
           label_en: labelEn,
           label_he: labelHe,
-          description: description
+          description: description,
+          type: type
         })
       });
 
@@ -522,7 +507,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       });
 
       // Clear remove form
-      setRemoveParamName('');
+      // setRemoveParamName('');
 
       return result;
     } catch (err) {
@@ -532,7 +517,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   };
 
   // Update a dynamic parameter
-  const updateDynamicParam = async (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string) => {
+  const updateDynamicParam = async (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => {
     try {
       const response = await fetch(`/api/dynamic-params/${section}/${paramName}`, {
         method: 'PUT',
@@ -540,7 +525,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
         body: JSON.stringify({
           label_en: labelEn,
           label_he: labelHe,
-          description: description
+          description: description,
+          type: type
         })
       });
 
@@ -561,14 +547,6 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
     }
   };
 
-  // Get parameter names for a section
-  const getParamNames = (section: 'payslip' | 'attendance' | 'contract') => {
-    if (!dynamicParams) return [];
-    return dynamicParams[section]
-      .filter((p: any) => !['employee_id', 'month'].includes(p.param))
-      .map((p: any) => p.param);
-  };
-
   // Add a new rule
   const addRule = async (rule: Omit<Rule, 'rule_id' | 'created_date' | 'updated_date'>) => {
     try {
@@ -582,15 +560,20 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       });
 
       if (!response.ok) {
-        throw new Error(`${dictionary.admin.messages.errorAddingRule} ${response.statusText}`);
+        const errorData = await response.json();
+        const errorMessage = errorData.detail || errorData.message || response.statusText;
+        throw new Error(errorMessage);
       }
 
       const newRule = await response.json();
       setRules([...rules, newRule]);
       setError(null);
+      setSuccessMessage(dictionary.admin.rulesManagement.messages.ruleCreatedSuccessfully);
+      setTimeout(() => setSuccessMessage(null), 5000);
       return newRule;
     } catch (err) {
-      setError(err instanceof Error ? err.message : dictionary.admin.messages.failedToAddRule);
+      const errorMessage = err instanceof Error ? err.message : dictionary.admin.rulesManagement.messages.failedToAddRule;
+      setFormSubmitError(`${dictionary.admin.rulesManagement.messages.failedToAddRule}: ${errorMessage}`);
       console.error('Error adding rule:', err);
       return null;
     } finally {
@@ -611,15 +594,20 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       });
 
       if (!response.ok) {
-        throw new Error(`Error updating rule: ${response.statusText}`);
+        const errorData = await response.json();
+        const errorMessage = errorData.detail || errorData.message || response.statusText;
+        throw new Error(errorMessage);
       }
 
       const updatedRule = await response.json();
       setRules(rules.map(r => r.rule_id === rule.rule_id ? updatedRule : r));
       setError(null);
+      setSuccessMessage(dictionary.admin.rulesManagement.messages.ruleUpdatedSuccessfully);
+      setTimeout(() => setSuccessMessage(null), 5000);
       return updatedRule;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update rule');
+      const errorMessage = err instanceof Error ? err.message : dictionary.admin.rulesManagement.messages.failedToUpdateRule;
+      setFormSubmitError(`${dictionary.admin.rulesManagement.messages.failedToUpdateRule}: ${errorMessage}`);
       console.error('Error updating rule:', err);
       return null;
     } finally {
@@ -638,16 +626,21 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       });
 
       if (!response.ok) {
-        throw new Error(`Error deleting rule: ${response.statusText}`);
+        const errorData = await response.json();
+        const errorMessage = errorData.detail || errorData.message || response.statusText;
+        throw new Error(errorMessage);
       }
 
       const deletedRule = await response.json();
       setRules(rules.filter(rule => rule.rule_id !== ruleId));
       setSelectedRule(null);
       setError(null);
+      setSuccessMessage(dictionary.admin.rulesManagement.messages.ruleDeletedSuccessfully);
+      setTimeout(() => setSuccessMessage(null), 5000);
       return deletedRule;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete rule');
+      const errorMessage = err instanceof Error ? err.message : dictionary.admin.rulesManagement.messages.failedToDeleteRule;
+      setError(`${dictionary.admin.rulesManagement.messages.failedToDeleteRule}: ${errorMessage}`);
       console.error('Error deleting rule:', err);
       return null;
     } finally {
@@ -664,9 +657,11 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       law_reference: rule.law_reference,
       description: rule.description,
       effective_from: rule.effective_from,
-      effective_to: rule.effective_to || ''
+      effective_to: rule.effective_to || undefined
     });
     setRuleChecks(JSON.parse(JSON.stringify(rule.checks)));
+    setFormErrors({});
+    setFormSubmitError(null);
     setIsEditing(true);
     setShowRuleForm(true);
     setActiveTab('manage');
@@ -686,9 +681,11 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       law_reference: '',
       description: '',
       effective_from: new Date().toISOString().split('T')[0],
-      effective_to: ''
+      effective_to: undefined
     });
     setRuleChecks([]);
+    setFormErrors({});
+    setFormSubmitError(null);
     setIsEditing(false);
     setShowRuleForm(true);
     setActiveTab('manage');
@@ -709,24 +706,49 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       law_reference: '',
       description: '',
       effective_from: new Date().toISOString().split('T')[0],
-      effective_to: ''
+      effective_to: undefined
     });
     setRuleChecks([]);
     setFormErrors({});
+    setFormSubmitError(null);
     setTestResults(null); // Clear test results when cancelling form
   };
 
+
   // Add a new check item
   const addCheck = () => {
-    // Add the current editor content as a new check
     const newCheck = {
       condition: checkEditor.condition,
       amount_owed: checkEditor.amount_owed,
       violation_message: checkEditor.violation_message
     };
     setRuleChecks([...ruleChecks, newCheck]);
+    if (formErrors.checks) {
+      setFormErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.checks;
+        return newErrors;
+      });
+    }
+    setCheckEditor({
+      condition: '',
+      amount_owed: '',
+      violation_message: ''
+    });
+  };
 
-    // Clear the editor after adding
+  // Update a check item by index
+  const updateCheck = (index: number, updatedCheck: {condition: string; amount_owed: string; violation_message: string}) => {
+    const updatedChecks = ruleChecks.map((check, idx) => idx === index ? updatedCheck : check);
+    setRuleChecks(updatedChecks);
+    // Clear the checks error when a check is updated
+    if (formErrors.checks) {
+      setFormErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.checks;
+        return newErrors;
+      });
+    }
     setCheckEditor({
       condition: '',
       amount_owed: '',
@@ -742,18 +764,21 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
     }));
   };
 
-  // Update a check item
-  const updateCheck = (index: number, field: keyof typeof ruleChecks[0], value: string) => {
-    const updatedChecks = [...ruleChecks];
-    updatedChecks[index][field] = value;
-    setRuleChecks(updatedChecks);
-  };
+  // (Removed old updateCheck, now handled by new function above)
 
   // Remove a check item
   const removeCheck = (index: number) => {
     const updatedChecks = [...ruleChecks];
     updatedChecks.splice(index, 1);
     setRuleChecks(updatedChecks);
+
+    // If no checks remain, add the checks error
+    if (updatedChecks.length === 0) {
+      setFormErrors(prev => ({
+        ...prev,
+        checks: dictionary.admin.rulesManagement.validation.atLeastOneCheckIsRequired
+      }));
+    }
   };
 
   // Handle form submission
@@ -764,56 +789,49 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
     const errors: Record<string, string> = {};
 
     if (!ruleFormData?.name || !ruleFormData.name.trim()) {
-      errors.name = 'Rule name is required';
-    }
-    if (!ruleFormData?.law_reference || !ruleFormData.law_reference.trim()) {
-      errors.law_reference = 'Law reference is required';
+      errors.name = dictionary.admin.rulesManagement.validation.ruleNameIsRequired;
     }
     if (!ruleFormData?.description || !ruleFormData.description.trim()) {
-      errors.description = 'Description is required';
+      errors.description = dictionary.admin.rulesManagement.validation.descriptionIsRequired;
     }
     if (!ruleFormData?.effective_from) {
-      errors.effective_from = 'Effective from date is required';
+      errors.effective_from = dictionary.admin.rulesManagement.validation.effectiveFromDateIsRequired;
+    }
+    if (ruleFormData?.effective_from && ruleFormData?.effective_to && new Date(ruleFormData.effective_to) <= new Date(ruleFormData.effective_from)) {
+      errors.effective_to = dictionary.admin.rulesManagement.validation.effectiveToMustBeAfterEffectiveFrom;
     }
     if (ruleChecks.length === 0) {
-      errors.checks = 'At least one check is required';
+      errors.checks = dictionary.admin.rulesManagement.validation.atLeastOneCheckIsRequired;
     } else {
       ruleChecks.forEach((check, index) => {
         // Ensure check is a valid object
         if (!check || typeof check !== 'object') {
-          errors[`check_${index}_invalid`] = 'Invalid check data';
+          errors[`check_${index}_invalid`] = dictionary.admin.rulesManagement.validation.invalidCheckData;
           return;
         }
 
         if (!check?.condition || typeof check.condition !== 'string' || !check.condition.trim()) {
-          errors[`check_${index}_condition`] = 'Condition is required';
+          errors[`check_${index}_condition`] = dictionary.admin.rulesManagement.validation.conditionIsRequired;
         }
         if (!check?.amount_owed || typeof check.amount_owed !== 'string' || !check.amount_owed.trim()) {
-          errors[`check_${index}_amount_owed`] = 'Amount owed formula is required';
+          errors[`check_${index}_amount_owed`] = dictionary.admin.rulesManagement.validation.amountOwedFormulaIsRequired;
         }
         if (!check?.violation_message || typeof check.violation_message !== 'string' || !check.violation_message.trim()) {
-          errors[`check_${index}_violation`] = 'Violation message is required';
+          errors[`check_${index}_violation`] = dictionary.admin.rulesManagement.validation.violationMessageIsRequired;
         }
       });
     }
 
     setFormErrors(errors);
-    if (Object.keys(errors).length > 0) return;
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
 
     try {
       if (isEditing && editingRule) {
-        // Check if rule ID changed and if it's already taken
-        if (editingRule.rule_id !== ruleFormData.rule_id) {
-          const existingIds = rules.map(r => r.rule_id);
-          if (existingIds.includes(ruleFormData.rule_id)) {
-            setFormErrors({ rule_id: 'Rule ID already exists. Please choose a different ID.' });
-            return;
-          }
-        }
-
         const ruleToUpdate: Rule = {
           ...editingRule,
-          rule_id: ruleFormData.rule_id,
+          rule_id: ruleFormData.rule_id || editingRule.rule_id,
           name: ruleFormData.name,
           law_reference: ruleFormData.law_reference,
           description: ruleFormData.description,
@@ -847,525 +865,12 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save rule');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save rule';
+      setFormSubmitError(errorMessage);
     }
-  };
-
-  // Render the unified rule form
-  const renderRuleForm = () => {
-    if (!showRuleForm) return null;
-
-    return (
-      <div className="rule-form-modal">
-        <div className="card" style={{ backgroundColor: '#EFEADC', border: 'none', borderRadius: '15px' }}>
-          <div className="card-header d-flex justify-content-between align-items-center" style={{ backgroundColor: '#0C756F', color: 'white', border: 'none', borderRadius: '15px 15px 0 0' }}>
-            <h5 className="mb-0" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              {isEditing ? `${dictionary.admin.ruleForm.editTitle}: ${editingRule?.rule_id}` : dictionary.admin.ruleForm.createTitle}
-            </h5>
-            <button
-              className="btn btn-sm"
-              style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid white', borderRadius: '8px', fontFamily: "'Space Grotesk', sans-serif" }}
-              onClick={cancelForm}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            >
-              <i className="bi bi-x-circle me-1"></i> Cancel
-            </button>
-          </div>
-          <div className="card-body">
-            <form onSubmit={handleFormSubmit}>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="mb-3">
-                    <label htmlFor="ruleId" className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.rulesManagement.ruleId}{isEditing ? '*' : ' (Auto-generated)'}</label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.rule_id ? 'is-invalid' : ''}`}
-                      id="ruleId"
-                      value={ruleFormData.rule_id}
-                      onChange={(e) => setRuleFormData({...ruleFormData, rule_id: e.target.value})}
-                      placeholder={isEditing ? "e.g., OVERTIME_125" : "Will be auto-generated"}
-                      disabled={isEditing} // Don't allow changing ID when editing
-                      style={{ borderRadius: '8px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
-                    />
-                    {formErrors.rule_id && <div className="invalid-feedback">{formErrors.rule_id}</div>}
-                    {!isEditing && (
-                      <div className="form-text text-muted">
-                        {dictionary.admin.rulesManagement.ruleIdAutoGenerated}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="ruleName" className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.rulesManagement.ruleName}</label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.name ? 'is-invalid' : ''}`}
-                      id="ruleName"
-                      value={ruleFormData.name}
-                      onChange={(e) => setRuleFormData({...ruleFormData, name: e.target.value})}
-                      placeholder="e.g., First 2 hours overtime at 125%"
-                      style={{ borderRadius: '8px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
-                    />
-                    {formErrors.name && <div className="invalid-feedback">{formErrors.name}</div>}
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="lawReference" className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.rulesManagement.lawReferenceLabel}</label>
-                    <input
-                      type="text"
-                      className={`form-control ${formErrors.law_reference ? 'is-invalid' : ''}`}
-                      id="lawReference"
-                      value={ruleFormData.law_reference}
-                      onChange={(e) => setRuleFormData({...ruleFormData, law_reference: e.target.value})}
-                      placeholder="e.g., Section 16A"
-                      style={{ borderRadius: '8px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
-                    />
-                    {formErrors.law_reference && <div className="invalid-feedback">{formErrors.law_reference}</div>}
-                  </div>
-
-                  <div className="mb-3">
-                    <label htmlFor="description" className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.rulesManagement.description}</label>
-                    <textarea
-                      className={`form-control ${formErrors.description ? 'is-invalid' : ''}`}
-                      id="description"
-                      rows={3}
-                      value={ruleFormData.description}
-                      onChange={(e) => setRuleFormData({...ruleFormData, description: e.target.value})}
-                      placeholder="What this rule checks for"
-                      style={{ borderRadius: '8px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
-                    />
-                    {formErrors.description && <div className="invalid-feedback">{formErrors.description}</div>}
-                  </div>
-
-                  <div className="row">
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="effectiveFrom" className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.rulesManagement.effectiveFrom}</label>
-                      <input
-                        type="date"
-                        className={`form-control ${formErrors.effective_from ? 'is-invalid' : ''}`}
-                        id="effectiveFrom"
-                        value={ruleFormData.effective_from}
-                        onChange={(e) => setRuleFormData({...ruleFormData, effective_from: e.target.value})}
-                        style={{ borderRadius: '8px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
-                      />
-                      {formErrors.effective_from && <div className="invalid-feedback">{formErrors.effective_from}</div>}
-                    </div>
-
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="effectiveTo" className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.rulesManagement.effectiveTo}</label>
-                      <input
-                        type="date"
-                        className="form-control"
-                        id="effectiveTo"
-                        value={ruleFormData.effective_to}
-                        onChange={(e) => setRuleFormData({...ruleFormData, effective_to: e.target.value})}
-                        placeholder="YYYY-MM-DD or leave blank"
-                        style={{ borderRadius: '8px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-6">
-                  <div className="mb-3">
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                      <label className="form-label mb-0" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>Available Functions:</label>
-                    </div>
-                    <div className="small mb-2" style={{ color: 'rgba(15, 15, 20, 0.7)', fontFamily: "'Manrope', sans-serif" }}>
-                      <code style={{ backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px', color: '#0C756F' }}>min(), max(), abs(), round()</code>
-                    </div>
-
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                      <label className="form-label mb-0" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>Available Variables:</label>
-                    </div>
-                    <div className="small" style={{ color: 'rgba(15, 15, 20, 0.7)', fontFamily: "'Manrope', sans-serif" }}>
-                      <code style={{ backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px', color: '#0C756F' }}>payslip.*, attendance.*, contract.*</code><br/>
-                      <code style={{ backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px', color: '#0C756F' }}>employee_id, month, hourly_rate, overtime_hours, total_hours, etc.</code>
-                    </div>
-                  </div>
-
-                  {/* Test Expression Button */}
-                  <div className="mb-3">
-                    <button
-                      type="button"
-                      className="btn"
-                      style={{ backgroundColor: '#FDCF6F', color: '#0F0F14', border: 'none', borderRadius: '8px', fontFamily: "'Space Grotesk', sans-serif", transform: 'scale(1)', transition: 'all 0.2s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                      onClick={() => setActiveTab('test')}
-                    >
-                      🧪 Test Expression in Tab 2
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Test Rule Section within Form */}
-              <div className="mt-4">
-                <div className="card" style={{ backgroundColor: 'rgba(253, 207, 111, 0.1)', border: '1px solid #FDCF6F', borderRadius: '12px' }}>
-                  <div className="card-header" style={{ backgroundColor: '#FDCF6F', color: '#0F0F14', borderRadius: '12px 12px 0 0' }}>
-                    <h6 className="mb-0" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                      🧪 Test Rule (Manual Entry)
-                    </h6>
-                  </div>
-                  <div className="card-body">
-                    {/* Input Method Selection */}
-                    <InputMethodSelector
-                      inputMethod={inputMethod}
-                      onInputMethodChange={(method) => {
-                        setInputMethod(method);
-                        if (method === 'sample') {
-                          loadSampleData();
-                        }
-                      }}
-                      onLoadSampleData={loadSampleData}
-                      dictionary={dictionary}
-                    />
-
-                    {inputMethod === 'json' && (
-                      <JsonUploadForm
-                        uploadedJson={uploadedJson}
-                        onJsonChange={(json) => handleJsonUpload({ target: { value: json } } as any)}
-                      />
-                    )}
-
-                    {inputMethod === 'manual' && dynamicParams && (
-                      <ManualEntryForm
-                        dynamicParams={dynamicParams}
-                        dynamicFormData={dynamicFormData}
-                        onDynamicInputChange={(section: string, param: string, value: any) => handleDynamicInputChange(section as 'payslip' | 'attendance' | 'contract', param, value)}
-                        includePayslip={includePayslip}
-                        includeContract={includeContract}
-                        includeAttendance={includeAttendance}
-                        onIncludePayslipChange={setIncludePayslip}
-                        onIncludeContractChange={setIncludeContract}
-                        onIncludeAttendanceChange={setIncludeAttendance}
-                        dictionary={dictionary}
-                        lang={lang}
-                      />
-                    )}
-
-                    {/* Test Rule Button */}
-                    <div className="mb-3">
-                      <button
-                        type="button"
-                        className="btn"
-                        style={{ backgroundColor: '#0C756F', color: 'white', border: 'none', borderRadius: '8px', fontFamily: "'Space Grotesk', sans-serif", transform: 'scale(1)', transition: 'all 0.2s' }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        onClick={() => testRuleInForm()}
-                        disabled={isTesting || ruleChecks.length === 0}
-                      >
-                        {isTesting ? (
-                          <>
-                            <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                            Testing Rule...
-                          </>
-                        ) : (
-                          <>
-                            <i className="bi bi-play-circle-fill me-2"></i>Test Rule
-                          </>
-                        )}
-                      </button>
-                      {ruleChecks.length === 0 && (
-                        <small className="text-muted ms-2" style={{ fontFamily: "'Manrope', sans-serif" }}>
-                          {dictionary.admin.messages.addAtLeastOneCheckToTest}
-                        </small>
-                      )}
-                    </div>
-
-                    {/* Test Results */}
-                    {testResults && (
-                      <TestResults testResults={testResults} isLoading={isTesting} dictionary={dictionary} lang={lang} />
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Rule Checks Section */}
-              <div className="mt-4">
-                <h6 className="mb-3">Rule Checks</h6>
-
-                {/* Display current checks */}
-                {ruleChecks.length > 0 && (
-                  <div className="mb-3">
-                    <h6>Current Checks:</h6>
-                    {ruleChecks.map((check, index) => (
-                      <div key={index} className="card mb-2">
-                        <div className="card-body py-2 px-3">
-                          <div className="d-flex justify-content-between align-items-center mb-2">
-                            <strong>Check {index + 1}: {check.violation_message || 'No message'}</strong>
-                            <button
-                              type="button"
-                              className="btn btn-sm btn-danger"
-                              onClick={() => removeCheck(index)}
-                            >
-                              <i className="bi bi-trash"></i> Remove
-                            </button>
-                          </div>
-                          <div className="row">
-                            <div className="col-md-6">
-                              <small><strong>Condition:</strong></small><br/>
-                              <code>{check.condition || 'Not set'}</code>
-                            </div>
-                            <div className="col-md-6">
-                              <small><strong>Amount Owed:</strong></small><br/>
-                              <code>{check.amount_owed || 'Not set'}</code>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Add new check inputs */}
-                <div className="card mb-3">
-                  <div className="card-header">
-                    <strong>Add/Edit Check</strong>
-                  </div>
-                  <div className="card-body">
-                    <div className="row">
-                      <div className="col-md-6 mb-3">
-                        <label className="form-label">Condition</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="e.g., attendance.overtime_hours > 0"
-                          value={ruleChecks.length > 0 ? ruleChecks[ruleChecks.length - 1]?.condition || '' : ''}
-                          onChange={(e) => {
-                            if (ruleChecks.length === 0) {
-                              addCheck();
-                            }
-                            updateCheck(ruleChecks.length - 1, 'condition', e.target.value);
-                          }}
-                        />
-                        <div className="form-text">e.g., attendance.overtime_hours &gt; 0</div>
-                      </div>
-                      <div className="col-md-6 mb-3">
-                        <label className="form-label">Amount Owed Formula</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="(contract.hourly_rate * 1.25 - payslip.overtime_rate) * min(attendance.overtime_hours, 2)"
-                          value={ruleChecks.length > 0 ? ruleChecks[ruleChecks.length - 1]?.amount_owed || '' : ''}
-                          onChange={(e) => {
-                            if (ruleChecks.length === 0) {
-                              addCheck();
-                            }
-                            updateCheck(ruleChecks.length - 1, 'amount_owed', e.target.value);
-                          }}
-                        />
-                        <div className="form-text">e.g., (contract.hourly_rate * 1.25 - payslip.overtime_rate) * min(attendance.overtime_hours, 2)</div>
-                      </div>
-                    </div>
-                    <div className="mb-3">
-                      <label className="form-label">Violation Message</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="e.g., Overtime rate violation"
-                        value={ruleChecks.length > 0 ? ruleChecks[ruleChecks.length - 1]?.violation_message || '' : ''}
-                        onChange={(e) => {
-                          if (ruleChecks.length === 0) {
-                            addCheck();
-                          }
-                          updateCheck(ruleChecks.length - 1, 'violation_message', e.target.value);
-                        }}
-                      />
-                      <div className="form-text">e.g., Overtime rate violation</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action buttons */}
-                <div className="row">
-                  <div className="col-md-12">
-                    <div className="d-flex gap-2 justify-content-end">
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        onClick={addCheck}
-                      >
-                        <i className="bi bi-plus-circle"></i> Add Check
-                      </button>
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                      >
-                        <i className="bi bi-check-circle"></i> {isEditing ? 'Update Rule' : 'Create Rule'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   // Render the rule details
-  const renderRuleDetails = () => {
-    if (!selectedRule) return null;
-
-    return (
-      <div className="rule-details mt-4">
-        <div className="card" style={{ backgroundColor: '#EFEADC', border: '1px solid rgba(12, 117, 111, 0.2)', borderRadius: '12px' }}>
-          <div className="card-header d-flex justify-content-between align-items-center" style={{ backgroundColor: '#0C756F', color: 'white', borderRadius: '12px 12px 0 0' }}>
-            <h5 className="mb-0" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>Rule Details</h5>
-            <div>
-              <button
-                className="btn btn-sm me-2"
-                style={{ backgroundColor: '#FDCF6F', color: '#0C756F', border: 'none', borderRadius: '6px', transform: 'scale(1)', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                onClick={() => startEditRule(selectedRule)}
-              >
-                <i className="bi bi-pencil me-1"></i>Edit
-              </button>
-              <button
-                className="btn btn-sm"
-                style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '6px', transform: 'scale(1)', transition: 'all 0.2s' }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                onClick={() => deleteRule(selectedRule.rule_id)}
-              >
-                <i className="bi bi-trash me-1"></i>Delete
-              </button>
-            </div>
-          </div>
-          <div className="card-body" style={{ backgroundColor: '#EFEADC' }}>
-            <div className="row mb-3">
-              <div className="col-md-6">
-                <h6 style={{ color: '#0C756F', fontFamily: 'Space Grotesk, sans-serif' }}>{dictionary.admin.rulesManagement.expandedRow.basicInformation}</h6>
-                <p><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.id}</strong> {selectedRule.rule_id}</p>
-                <p><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.name}</strong> {selectedRule.name}</p>
-                <p><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.lawReference}</strong> {selectedRule.law_reference}</p>
-                <p><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.description}</strong> {selectedRule.description}</p>
-                <p>
-                  <strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.effectivePeriod}</strong> {selectedRule.effective_from} to {selectedRule.effective_to || dictionary.admin.rulesManagement.ongoing}
-                </p>
-                {selectedRule.created_date && (
-                  <p><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.created}</strong> {new Date(selectedRule.created_date).toLocaleString()}</p>
-                )}
-                {selectedRule.updated_date && (
-                  <p><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.lastUpdated}</strong> {new Date(selectedRule.updated_date).toLocaleString()}</p>
-                )}
-              </div>
-              <div className="col-md-6">
-                <h6 style={{ color: '#0C756F', fontFamily: 'Space Grotesk, sans-serif' }}>{dictionary.admin.rulesManagement.checks}</h6>
-                {selectedRule.checks.map((check, index) => (
-                  <div key={index} className="card mb-2" style={{ backgroundColor: 'white', border: '1px solid rgba(12, 117, 111, 0.1)', borderRadius: '8px' }}>
-                    <div className="card-body py-2 px-3">
-                      <p className="mb-1"><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.violation}</strong> {check.violation_message}</p>
-                      <p className="mb-1"><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.condition}</strong> <code style={{ backgroundColor: '#f8f9fa', color: '#0C756F' }}>{check.condition}</code></p>
-                      <p className="mb-0"><strong style={{ color: '#0C756F' }}>{dictionary.admin.rulesManagement.expandedRow.amountOwed}</strong> <code style={{ backgroundColor: '#f8f9fa', color: '#0C756F' }}>{check.amount_owed}</code></p>
-                    </div>
-                  </div>
-                ))}
-
-                <h6 className="mt-3" style={{ color: '#0C756F', fontFamily: 'Space Grotesk, sans-serif' }}>{dictionary.admin.rulesManagement.expandedRow.penaltyCalculation}</h6>
-                <div className="card" style={{ backgroundColor: 'white', border: '1px solid rgba(12, 117, 111, 0.1)', borderRadius: '8px' }}>
-                  <div className="card-body py-2 px-3">
-                    {selectedRule.penalty.map((line, index) => (
-                      <p key={index} className="mb-1"><code style={{ backgroundColor: '#f8f9fa', color: '#0C756F' }}>{line}</code></p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Render the rules list
-  const renderRulesList = () => {
-    if (loading) {
-      return (
-        <div className="text-center py-4">
-          <div className="spinner-border" style={{ color: '#0C756F' }} role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="mt-2" style={{ color: '#0C756F', fontFamily: 'Manrope, sans-serif' }}>Loading rules...</p>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="alert" style={{ backgroundColor: '#fef2f2', color: '#dc3545', border: '1px solid #fecaca', borderRadius: '8px' }} role="alert">
-          <i className="bi bi-exclamation-triangle-fill me-2"></i>
-          {error}
-        </div>
-      );
-    }
-
-    if (rules.length === 0) {
-      return (
-        <div className="text-center py-4">
-          <i className="bi bi-exclamation-circle fs-1" style={{ color: '#0C756F' }}></i>
-          <p className="mt-2" style={{ color: '#666', fontFamily: 'Manrope, sans-serif' }}>No labor law rules found. Create your first rule using the button above.</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="table-responsive">
-        <table className="table" style={{ backgroundColor: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-          <thead style={{ backgroundColor: '#0C756F', color: 'white' }}>
-            <tr>
-              <th style={{ fontFamily: "'Space Grotesk', sans-serif", border: 'none', padding: '12px' }}>{dictionary.admin.rulesManagement.name}</th>
-              <th style={{ fontFamily: "'Space Grotesk', sans-serif", border: 'none', padding: '12px' }}>{dictionary.admin.rulesManagement.lawReference}</th>
-              <th style={{ fontFamily: "'Space Grotesk', sans-serif", border: 'none', padding: '12px' }}>{dictionary.admin.rulesManagement.effectivePeriod}</th>
-              <th style={{ fontFamily: "'Space Grotesk', sans-serif", border: 'none', padding: '12px' }}>{dictionary.admin.rulesManagement.checks}</th>
-              <th className="text-end" style={{ fontFamily: "'Space Grotesk', sans-serif", border: 'none', padding: '12px' }}>{dictionary.admin.rulesManagement.actions}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rules.map(rule => (
-              <tr key={rule.rule_id} onClick={() => setSelectedRule(rule)} style={{ cursor: 'pointer', transition: 'all 0.2s', fontFamily: "'Manrope', sans-serif" }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(12, 117, 111, 0.05)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
-                <td style={{ padding: '12px', borderBottom: '1px solid rgba(12, 117, 111, 0.1)' }}>{rule.name}</td>
-                <td style={{ padding: '12px', borderBottom: '1px solid rgba(12, 117, 111, 0.1)' }}>{rule.law_reference}</td>
-                <td style={{ padding: '12px', borderBottom: '1px solid rgba(12, 117, 111, 0.1)' }}>{rule.effective_from} to {rule.effective_to || dictionary.admin.rulesManagement.ongoing}</td>
-                <td style={{ padding: '12px', borderBottom: '1px solid rgba(12, 117, 111, 0.1)' }}>
-                  <span className="badge" style={{ backgroundColor: '#0C756F', color: 'white', borderRadius: '12px', padding: '4px 8px' }}>
-                    {rule.checks.length}
-                  </span>
-                </td>
-                <td className="text-end" style={{ padding: '12px', borderBottom: '1px solid rgba(12, 117, 111, 0.1)' }}>
-                  <button
-                    className="btn btn-sm me-2"
-                    style={{ backgroundColor: '#0C756F', color: 'white', border: 'none', borderRadius: '6px', transform: 'scale(1)', transition: 'all 0.2s' }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                    onClick={(e) => { e.stopPropagation(); startEditRule(rule); }}
-                  >
-                    <i className="bi bi-pencil me-1"></i>{dictionary.admin.rulesManagement.edit}
-                  </button>
-                  <button
-                    className="btn btn-sm"
-                    style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '6px', transform: 'scale(1)', transition: 'all 0.2s' }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                    onClick={(e) => { e.stopPropagation(); deleteRule(rule.rule_id); }}
-                  >
-                    <i className="bi bi-trash me-1"></i>{dictionary.admin.rulesManagement.delete}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
 
   return (
     <div className="rules-management-container">
@@ -1426,6 +931,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             rules={rules}
             loading={loading}
             error={error}
+            successMessage={successMessage}
+            formSubmitError={formSubmitError}
             isUnauthorized={isUnauthorized}
             selectedRule={selectedRule}
             showRuleForm={showRuleForm}
@@ -1450,12 +957,41 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             testIncludeContract={testIncludeContract}
             testIncludeAttendance={testIncludeAttendance}
             onRuleSelect={handleRuleSelect}
-            onStartCreateRule={startCreateRule}
             onStartEditRule={startEditRule}
             onDeleteRule={deleteRule}
-            onTestRule={testRule}
             onTestRuleInForm={testRuleInForm}
-            onFormDataChange={(data) => setRuleFormData({...ruleFormData, ...data})}
+            onFormDataChange={(data) => {
+              setRuleFormData({...ruleFormData, ...data, effective_to: data.effective_to === '' ? undefined : data.effective_to});
+              
+              // Clear specific field error when user starts typing
+              const newErrors = { ...formErrors };
+              let hasChanges = false;
+              
+              if (data.name && newErrors.name) {
+                delete newErrors.name;
+                hasChanges = true;
+              }
+              if (data.law_reference && newErrors.law_reference) {
+                delete newErrors.law_reference;
+                hasChanges = true;
+              }
+              if (data.description && newErrors.description) {
+                delete newErrors.description;
+                hasChanges = true;
+              }
+              if (data.effective_from && newErrors.effective_from) {
+                delete newErrors.effective_from;
+                hasChanges = true;
+              }
+              if (data.effective_to && newErrors.effective_to) {
+                delete newErrors.effective_to;
+                hasChanges = true;
+              }
+              
+              if (hasChanges) {
+                setFormErrors(newErrors);
+              }
+            }}
             onFormSubmit={handleFormSubmit}
             onAddCheck={addCheck}
             onUpdateCheck={updateCheck}
@@ -1557,7 +1093,6 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
         {activeTab === 'params' && (
           <DynamicParametersTab
             dynamicParams={dynamicParams}
-            paramOperationLoading={paramOperationLoading}
             paramOperationMessage={paramOperationMessage}
             dictionary={dictionary}
             onAddDynamicParam={addDynamicParam}

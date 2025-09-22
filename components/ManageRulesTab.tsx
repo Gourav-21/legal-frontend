@@ -1,10 +1,6 @@
 'use client';
 
 import React from 'react';
-import InputMethodSelector from './InputMethodSelector';
-import JsonUploadForm from './JsonUploadForm';
-import ManualEntryForm from './ManualEntryForm';
-import TestResults from './TestResults';
 
 interface Rule {
   rule_id: string;
@@ -28,7 +24,29 @@ interface ManageRulesTabProps {
   loading: boolean;
   error: string | null;
   selectedRule: Rule | null;
+  onRuleSelect: (rule: Rule) => void;
+  onStartEditRule: (rule: Rule) => void;
+  onDeleteRule: (ruleId: string) => void;
   showRuleForm: boolean;
+  isEditing: boolean;
+  editingRule: Rule | null;
+  ruleFormData: {
+    name: string;
+    law_reference: string;
+    description: string;
+    effective_from: string;
+    effective_to?: string;
+  };
+  formErrors: Record<string, string>;
+  ruleChecks: {condition: string; amount_owed: string; violation_message: string}[];
+  checkEditor: {condition: string; amount_owed: string; violation_message: string};
+  onAddCheck: () => void;
+  onUpdateCheck: (index: number, updatedCheck: {condition: string; amount_owed: string; violation_message: string}) => void;
+  onUpdateCheckEditor: (field: keyof ManageRulesTabProps['checkEditor'], value: string) => void;
+  onRemoveCheck: (index: number) => void;
+  onFormDataChange: (data: Partial<ManageRulesTabProps['ruleFormData']>) => void;
+  onFormSubmit: (e: React.FormEvent) => void;
+  onCancelForm: () => void;
   dynamicParams: any;
   dynamicFormData: any;
   includePayslip: boolean;
@@ -36,18 +54,15 @@ interface ManageRulesTabProps {
   includeAttendance: boolean;
   testResults: any;
   isTesting: boolean;
-  onRuleSelect: (rule: Rule) => void;
-  onStartCreateRule: () => void;
-  onStartEditRule: (rule: Rule) => void;
-  onDeleteRule: (ruleId: string) => void;
-  onTestRule: (rule: Rule) => void;
+  dictionary: Record<string, any>;
   onTestRuleInForm: () => void;
-  onDynamicInputChange: (section: string, param: string, value: any) => void;
-  onIncludePayslipChange: (value: boolean) => void;
-  onIncludeContractChange: (value: boolean) => void;
-  onIncludeAttendanceChange: (value: boolean) => void;
+  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract', param: string, value: any) => void;
+  onIncludePayslipChange: (checked: boolean) => void;
+  onIncludeContractChange: (checked: boolean) => void;
+  onIncludeAttendanceChange: (checked: boolean) => void;
   onLoadSampleData: () => void;
   onSetActiveTab: (tab: string) => void;
+  onGenerateAIChecks?: () => Promise<{condition: string; amount_owed: string; violation_message: string}[] | null>;
 }
 
 export default function ManageRulesTab({
@@ -55,7 +70,23 @@ export default function ManageRulesTab({
   loading,
   error,
   selectedRule,
+  onRuleSelect,
+  onStartEditRule,
+  onDeleteRule,
   showRuleForm,
+  isEditing,
+  editingRule,
+  ruleFormData,
+  formErrors,
+  ruleChecks,
+  checkEditor,
+  onAddCheck,
+  onUpdateCheck,
+  onUpdateCheckEditor,
+  onRemoveCheck,
+  onFormDataChange,
+  onFormSubmit,
+  onCancelForm,
   dynamicParams,
   dynamicFormData,
   includePayslip,
@@ -63,18 +94,15 @@ export default function ManageRulesTab({
   includeAttendance,
   testResults,
   isTesting,
-  onRuleSelect,
-  onStartCreateRule,
-  onStartEditRule,
-  onDeleteRule,
-  onTestRule,
+  dictionary,
   onTestRuleInForm,
   onDynamicInputChange,
   onIncludePayslipChange,
   onIncludeContractChange,
   onIncludeAttendanceChange,
   onLoadSampleData,
-  onSetActiveTab
+  onSetActiveTab,
+  onGenerateAIChecks
 }: ManageRulesTabProps) {
   // Render the rules list
   const renderRulesList = () => {
@@ -244,7 +272,46 @@ export default function ManageRulesTab({
       {/* Rule Details */}
       {renderRuleDetails()}
 
-      {/* Rule Form would be handled separately */}
+      {/* Rule Form */}
+      {showRuleForm && (
+        <div className="mt-4">
+          {/* Import and render RuleForm here, passing all relevant props */}
+          {/* @ts-ignore: next-line for dynamic import or direct import */}
+          <RuleForm
+            showRuleForm={showRuleForm}
+            isEditing={isEditing}
+            editingRule={editingRule}
+            ruleFormData={ruleFormData}
+            formErrors={formErrors}
+            ruleChecks={ruleChecks}
+            checkEditor={checkEditor}
+            dynamicParams={dynamicParams}
+            dynamicFormData={dynamicFormData}
+            includePayslip={includePayslip}
+            includeContract={includeContract}
+            includeAttendance={includeAttendance}
+            testResults={testResults}
+            isTesting={isTesting}
+            onCancelForm={onCancelForm}
+            onFormDataChange={onFormDataChange}
+            onFormSubmit={onFormSubmit}
+            onAddCheck={onAddCheck}
+            onUpdateCheck={onUpdateCheck}
+            onUpdateCheckEditor={onUpdateCheckEditor}
+            onRemoveCheck={onRemoveCheck}
+            onGenerateAIChecks={onGenerateAIChecks}
+            onTestRuleInForm={onTestRuleInForm}
+            onDynamicInputChange={onDynamicInputChange}
+            onIncludePayslipChange={onIncludePayslipChange}
+            onIncludeContractChange={onIncludeContractChange}
+            onIncludeAttendanceChange={onIncludeAttendanceChange}
+            onLoadSampleData={onLoadSampleData}
+            onSetActiveTab={onSetActiveTab}
+            dictionary={dictionary}
+            lang={"en"} // Pass lang if needed
+          />
+        </div>
+      )}
     </div>
   );
 }

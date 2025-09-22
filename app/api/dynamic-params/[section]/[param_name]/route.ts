@@ -8,7 +8,7 @@ export async function PUT(
 ) {
   const { section, param_name } = await params;
   const body = await request.json();
-  const { label_en, label_he, description } = body;
+  const { label_en, label_he, description, type = 'number' } = body;
 
   if (!label_en || !label_he || !description) {
     return new Response(JSON.stringify({ detail: 'label_en, label_he, and description are required' }), {
@@ -26,7 +26,7 @@ export async function PUT(
 
   return proxyToBackend(request, `/api/dynamic-params/${section}/${param_name}`, {
     method: 'PUT',
-    body: { label_en, label_he, description }
+    body: { label_en, label_he, description, type }
   });
 }
 

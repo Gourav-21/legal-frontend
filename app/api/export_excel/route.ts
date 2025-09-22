@@ -48,10 +48,10 @@ export async function POST(request: NextRequest) {
       headers: responseHeaders
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('[Excel Export Error]', error);
-    return NextResponse.json({ 
-      detail: error.message || 'An unexpected error occurred during Excel export'
+    return NextResponse.json({
+      detail: error instanceof Error ? error.message : 'An unexpected error occurred during Excel export'
     }, { status: 500 });
   }
 }

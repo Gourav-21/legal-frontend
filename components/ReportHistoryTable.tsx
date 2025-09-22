@@ -17,7 +17,6 @@ interface ReportHistoryTableProps {
 export default function ReportHistoryTable({ reportsDict }: ReportHistoryTableProps) {
   const [reports, setReports] = useState<ReportHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedReport, setSelectedReport] = useState<ReportHistoryItem | null>(null);
   const [triggerRowDownloadFor, setTriggerRowDownloadFor] = useState<ReportHistoryItem | null>(null); // New state for triggering download from row
   const [html2pdf, setHtml2Pdf] = useState<any>(null); // State to hold the dynamically imported library
@@ -38,7 +37,7 @@ export default function ReportHistoryTable({ reportsDict }: ReportHistoryTablePr
         const data = await response.json();
         setReports(data);
       } catch (e: any) {
-        setError(e.message);
+        console.error('Error fetching report history:', e);
       } finally {
         setLoading(false);
       }

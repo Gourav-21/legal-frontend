@@ -8,9 +8,10 @@ interface FileUploadProps {
   title: string;
   text: string;
   buttonText: string;
-  lang: string;
   files: UploadedFile[];
-  onFilesChange: React.Dispatch<React.SetStateAction<UploadedFile[]>>; // Correct type for setState
+  onFilesChange: React.Dispatch<React.SetStateAction<UploadedFile[]>>;
+  maxFiles?: number;
+  accept?: string;
 }
 
 interface UploadedFile {
@@ -19,7 +20,7 @@ interface UploadedFile {
   progress: number;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, lang, files, onFilesChange }) => {
+const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, files, onFilesChange, maxFiles, accept }) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,30 +69,40 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, la
   };
 
   const handleFiles = useCallback(async (incomingFiles: FileList) => {
-    // Process files sequentially one at a time
-    for (const file of Array.from(incomingFiles)) {
+    let filesArray = Array.from(incomingFiles);
+    // Filter by accept type if provided
+    if (accept) {
+      const acceptTypes = accept.split(',').map(type => type.trim().toLowerCase());
+      filesArray = filesArray.filter(file => {
+        const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+        return acceptTypes.includes(file.type.toLowerCase()) || acceptTypes.includes(ext);
+      });
+    }
+    // Limit number of files if maxFiles is set
+    if (typeof maxFiles === 'number') {
+      const remainingSlots = maxFiles - files.length;
+      if (remainingSlots <= 0) return;
+      filesArray = filesArray.slice(0, remainingSlots);
+    }
+    for (const file of filesArray) {
       const id = `${file.name}-${Date.now()}`;
-      // Add file with initial progress of 0
       onFilesChange(prevFiles => [
         ...prevFiles,
         {
           id,
           file,
           progress: 0
-        }]);
+        }
+      ]);
       const processedFile = await compressImageFile(file, id);
-
-      // Update the file reference with the processed file
       onFilesChange(prevFiles =>
         prevFiles.map(f => f.id === id ? { ...f, file: processedFile } : f)
       );
     }
-    
-    // Reset the file input to allow re-uploading the same file
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, [onFilesChange]); // Add onFilesChange to dependency array
+  }, [onFilesChange, maxFiles, accept, files.length]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -175,8 +186,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ id, title, text, buttonText, la
           type="file"
           id={id}
           ref={fileInputRef}
-          multiple
+          multiple={typeof maxFiles === 'number' ? maxFiles > 1 : true}
           hidden
+          accept={accept}
           onChange={handleFileInputChange}
         />
         <button type="button" className="btn btn-sm without-icon btn-fileupload" onClick={(e) => { e.stopPropagation(); handleUploadBoxClick(); }}>

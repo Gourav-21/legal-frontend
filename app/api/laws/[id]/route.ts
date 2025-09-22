@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { proxyToBackend } from '../../utils/proxyToBackend';
 
 // PUT /api/laws/[id] - Update a law by ID

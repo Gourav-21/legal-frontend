@@ -6,20 +6,6 @@ interface ReportsPageProps {
   params: Promise<{ lang: Locale }>;
 }
 
-interface ReportModalProps {
-  show: boolean;
-  onHide: () => void;
-  report: {
-    date: string;
-    type: string;
-    status: string;
-    isCompliant: boolean;
-    reference: string;
-    summary: string;
-    content: string;
-  };
-}
-
 export default async function ReportsPage(props: ReportsPageProps) {
   const params = await props.params;
   const { lang } = params;

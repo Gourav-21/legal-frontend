@@ -262,9 +262,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
 
       const result = await response.json();
       console.log(result)
-  setProcessingResult(result); // Store the successful result
-  // Automatically open manual entry modal which will read from processingResult
-  setShowManualEntryModal(true);
+      setProcessingResult(result); // Store the successful result
+      setShowManualEntryModal(true);
 
       // Update the last processed files tracker
       setLastProcessedFiles({
@@ -293,25 +292,19 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
       return;
     }
 
-    let documentsData = processingResult; // Try to use existing processed data
+    let documentsData = processingResult; 
 
-    // If documents haven't been processed yet (processingResult is null), process them now.
     if (!documentsData) {
       console.log("No existing processing result, calling handleProcessDocuments...");
-      // handleProcessDocuments will set its own isProcessing and processingError states.
-      // It will also update processingResult state upon success.
       const newlyProcessedData = await handleProcessDocuments();
       if (!newlyProcessedData) {
-        // If handleProcessDocuments failed or returned no data,
-        // an error message should have been set by it.
-        // We don't need to set isProcessing to false here for handleCreateReport's
-        // own processing, as we are returning early.
         console.error('Document processing failed or returned no data. Aborting report creation.');
-        return; // Abort report creation if document processing failed
+        return; 
       }
-      documentsData = newlyProcessedData; // Use the freshly processed data
-    }    // At this point, documentsData should contain the necessary information.
-    // Now, proceed with the report creation specific logic.
+      documentsData = newlyProcessedData; 
+      return; 
+    }    
+
     setIsVisible(false); // Hide any previous analysis
     setIsProcessingReport(true); // Set loading state for report creation
     setProcessingError(null); // Clear previous errors before report creation    console.log("Data being used for report API:", documentsData);
@@ -374,7 +367,6 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             title={dictionary.hero.payslipUploadTitle}
             text={dictionary.hero.payslipUploadText}
             buttonText={dictionary.hero.uploadButton}
-            lang={lang}
             files={payslipFiles}
             onFilesChange={setPayslipFiles}
           />
@@ -387,8 +379,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             title={dictionary.hero.contractUploadTitle}
             text={dictionary.hero.contractUploadText}
             buttonText={dictionary.hero.uploadButton}
-            lang={lang}
             files={contractFiles}
+            maxFiles={1}
             onFilesChange={setContractFiles}
           />
         </div>
@@ -400,8 +392,8 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
             title={dictionary.hero.attendanceUploadTitle}
             text={dictionary.hero.attendanceUploadText}
             buttonText={dictionary.hero.uploadButton}
-            lang={lang}
             files={attendanceFiles}
+            accept=".xlsx,.xls"
             onFilesChange={setAttendanceFiles}
           />
         </div>
@@ -688,7 +680,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-              table: ({ node, ...props }) => (
+              table: ({ ...props }) => (
                 <table className="markdown-table" {...props} />
               )
             }}

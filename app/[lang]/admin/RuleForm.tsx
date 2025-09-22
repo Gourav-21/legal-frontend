@@ -171,7 +171,7 @@ export default function RuleForm({
       <div className="card" style={{ backgroundColor: '#EFEADC', border: 'none', borderRadius: '15px' }}>
         <div className="card-header d-flex justify-content-between align-items-center" style={{ backgroundColor: '#0C756F', color: 'white', border: 'none', borderRadius: '15px 15px 0 0' }}>
           <h5 className="mb-0 d-flex align-items-center" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            {isEditing ? `${dictionary.admin.ruleForm.editTitle}: ${editingRule?.rule_id}` : dictionary.admin.ruleForm.createTitle}
+            {isEditing ? `${dictionary.admin.ruleForm.editTitle}: ${editingRule?.name}` : dictionary.admin.ruleForm.createTitle}
           </h5>
           <button
             className="btn btn-sm"

@@ -41,6 +41,12 @@ export default function DynamicParametersTab({
   const [updateParamType, setUpdateParamType] = useState('number');
   const [removeParamSection, setRemoveParamSection] = useState<'payslip' | 'attendance' | 'contract'>('payslip');
   const [removeParamName, setRemoveParamName] = useState('');
+  const [addErrorMessage, setAddErrorMessage] = useState<string | null>(null);
+  const [removeErrorMessage, setRemoveErrorMessage] = useState<string | null>(null);
+  const [updateErrorMessage, setUpdateErrorMessage] = useState<string | null>(null);
+  const [addLoading, setAddLoading] = useState(false);
+  const [removeLoading, setRemoveLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   // Get parameter names for a section
   const getParamNames = (section: 'payslip' | 'attendance' | 'contract') => {
@@ -284,6 +290,8 @@ export default function DynamicParametersTab({
                         onClick={async () => {
                           if (newParamName && newParamLabelEn && newParamLabelHe && newParamDescription) {
                             onClearParamOperationMessage();
+                            setAddErrorMessage(null);
+                            setAddLoading(true);
                             try {
                               await onAddDynamicParam(newParamSection, newParamName, newParamLabelEn, newParamLabelHe, newParamDescription, newParamType);
                               setNewParamName('');
@@ -292,17 +300,21 @@ export default function DynamicParametersTab({
                               setNewParamDescription('');
                               setNewParamType('number');
                               setShowAddParamForm(false);
+                              setAddErrorMessage(null);
                             } catch (err) {
-                              // Error handling is done in parent component
+                              console.error('Error adding dynamic parameter:', err);
+                              setAddErrorMessage(err instanceof Error ? err.message : 'An error occurred while adding the parameter');
+                            } finally {
+                              setAddLoading(false);
                             }
                           }
                         }}
-                        disabled={!newParamName || !newParamLabelEn || !newParamLabelHe || !newParamDescription || paramOperationLoading}
+                        disabled={!newParamName || !newParamLabelEn || !newParamLabelHe || !newParamDescription || addLoading}
                       >
-                        {paramOperationLoading ? (
+                        {addLoading ? (
                           <>
                             <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                            {dictionary.admin.dynamicParameters.adding}
+                            <i className="bi bi-plus-circle me-2"></i>{dictionary.admin.dynamicParameters.adding}
                           </>
                         ) : (
                           <>
@@ -319,11 +331,26 @@ export default function DynamicParametersTab({
                           setNewParamLabelHe('');
                           setNewParamDescription('');
                           onClearParamOperationMessage();
+                          setAddErrorMessage(null);
                         }}
                       >
                         {dictionary.admin.dynamicParameters.clear}
                       </button>
                     </div>
+
+                    {/* Add Parameter Error Message */}
+                    {addErrorMessage && (
+                      <div className="alert alert-danger mt-3" style={{ borderRadius: '12px', border: 'none' }}>
+                        <i className="bi bi-exclamation-triangle me-2"></i>
+                        {addErrorMessage}
+                        <button
+                          type="button"
+                          className="btn-close float-end"
+                          onClick={() => setAddErrorMessage(null)}
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -388,21 +415,27 @@ export default function DynamicParametersTab({
                         onClick={async () => {
                           if (removeParamName) {
                             onClearParamOperationMessage();
+                            setRemoveErrorMessage(null);
+                            setRemoveLoading(true);
                             try {
                               await onRemoveDynamicParam(removeParamSection, removeParamName);
                               setRemoveParamName('');
                               setShowRemoveParamForm(false);
+                              setRemoveErrorMessage(null);
                             } catch (err) {
-                              // Error handling is done in parent component
+                              console.error('Error removing dynamic parameter:', err);
+                              setRemoveErrorMessage(err instanceof Error ? err.message : 'An error occurred while removing the parameter');
+                            } finally {
+                              setRemoveLoading(false);
                             }
                           }
                         }}
-                        disabled={!removeParamName || paramOperationLoading}
+                        disabled={!removeParamName || removeLoading}
                       >
-                        {paramOperationLoading ? (
+                        {removeLoading ? (
                           <>
                             <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                            {dictionary.admin.dynamicParameters.removing}
+                            <i className="bi bi-trash me-2"></i>{dictionary.admin.dynamicParameters.removing}
                           </>
                         ) : (
                           <>
@@ -416,11 +449,26 @@ export default function DynamicParametersTab({
                         onClick={() => {
                           setRemoveParamName('');
                           onClearParamOperationMessage();
+                          setRemoveErrorMessage(null);
                         }}
                       >
                         Clear
                       </button>
                     </div>
+
+                    {/* Remove Parameter Error Message */}
+                    {removeErrorMessage && (
+                      <div className="alert alert-danger mt-3" style={{ borderRadius: '12px', border: 'none' }}>
+                        <i className="bi bi-exclamation-triangle me-2"></i>
+                        {removeErrorMessage}
+                        <button
+                          type="button"
+                          className="btn-close float-end"
+                          onClick={() => setRemoveErrorMessage(null)}
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -549,6 +597,8 @@ export default function DynamicParametersTab({
                         onClick={async () => {
                           if (updateParamName && updateLabelEn && updateLabelHe && updateDescription) {
                             onClearParamOperationMessage();
+                            setUpdateErrorMessage(null);
+                            setUpdateLoading(true);
                             try {
                               await onUpdateDynamicParam(updateParamSection, updateParamName, updateLabelEn, updateLabelHe, updateDescription, updateParamType);
                               setUpdateParamName('');
@@ -557,17 +607,21 @@ export default function DynamicParametersTab({
                               setUpdateDescription('');
                               setUpdateParamType('number');
                               setShowUpdateParamForm(false);
+                              setUpdateErrorMessage(null);
                             } catch (err) {
-                              // Error handling is done in parent component
+                              console.error('Error updating dynamic parameter:', err);
+                              setUpdateErrorMessage(err instanceof Error ? err.message : 'An error occurred while updating the parameter');
+                            } finally {
+                              setUpdateLoading(false);
                             }
                           }
                         }}
-                        disabled={!updateParamName || !updateLabelEn || !updateLabelHe || !updateDescription || paramOperationLoading}
+                        disabled={!updateParamName || !updateLabelEn || !updateLabelHe || !updateDescription || updateLoading}
                       >
-                        {paramOperationLoading ? (
+                        {updateLoading ? (
                           <>
                             <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                            {dictionary.admin.dynamicParameters.updating}
+                            <i className="bi bi-pencil me-2"></i>{dictionary.admin.dynamicParameters.updating}
                           </>
                         ) : (
                           <>
@@ -584,11 +638,26 @@ export default function DynamicParametersTab({
                           setUpdateLabelHe('');
                           setUpdateDescription('');
                           onClearParamOperationMessage();
+                          setUpdateErrorMessage(null);
                         }}
                       >
                         {dictionary.admin.dynamicParameters.clear}
                       </button>
                     </div>
+
+                    {/* Update Parameter Error Message */}
+                    {updateErrorMessage && (
+                      <div className="alert alert-danger mt-3" style={{ borderRadius: '12px', border: 'none' }}>
+                        <i className="bi bi-exclamation-triangle me-2"></i>
+                        {updateErrorMessage}
+                        <button
+                          type="button"
+                          className="btn-close float-end"
+                          onClick={() => setUpdateErrorMessage(null)}
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

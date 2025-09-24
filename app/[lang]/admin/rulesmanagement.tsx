@@ -97,13 +97,19 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
         return null;
       }
 
-      setRuleChecks(data.generated_checks);
+      const trimmedChecks = data.generated_checks.map((check: {condition: string; amount_owed: string; violation_message: string}) => ({
+        condition: check.condition.trim(),
+        amount_owed: check.amount_owed.trim(),
+        violation_message: check.violation_message.trim()
+      }));
+
+      setRuleChecks(trimmedChecks);
       // Clear the 'checks' validation error if checks are added
       setFormErrors(prev => {
         const { checks, ...rest } = prev;
         return rest;
       });
-      return data.generated_checks;
+      return trimmedChecks;
     } catch (err) {
       console.error('Error generating AI checks:', err);
       setFormErrors(prev => ({ ...prev, ai_generation: err instanceof Error ? err.message : 'AI generation failed' }));
@@ -659,7 +665,11 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       effective_from: rule.effective_from,
       effective_to: rule.effective_to || undefined
     });
-    setRuleChecks(JSON.parse(JSON.stringify(rule.checks)));
+    setRuleChecks(JSON.parse(JSON.stringify(rule.checks)).map((check: {condition: string; amount_owed: string; violation_message: string}) => ({
+      condition: check.condition.trim(),
+      amount_owed: check.amount_owed.trim(),
+      violation_message: check.violation_message.trim()
+    })));
     setFormErrors({});
     setFormSubmitError(null);
     setIsEditing(true);
@@ -718,8 +728,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   // Add a new check item
   const addCheck = () => {
     const newCheck = {
-      condition: checkEditor.condition,
-      amount_owed: checkEditor.amount_owed,
+      condition: checkEditor.condition.trim(),
+      amount_owed: checkEditor.amount_owed.trim(),
       violation_message: checkEditor.violation_message
     };
     setRuleChecks([...ruleChecks, newCheck]);

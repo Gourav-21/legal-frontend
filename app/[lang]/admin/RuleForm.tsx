@@ -116,7 +116,11 @@ export default function RuleForm({
 
     if (editingCheckIndex !== null && typeof onUpdateCheck === 'function') {
       // Update existing check using parent handler
-      onUpdateCheck(editingCheckIndex, { ...checkEditor });
+      onUpdateCheck(editingCheckIndex, { 
+        condition: checkEditor.condition.trim(),
+        amount_owed: checkEditor.amount_owed.trim(),
+        violation_message: checkEditor.violation_message.trim()
+      });
       setEditingCheckIndex(null);
       onUpdateCheckEditor('condition', '');
       onUpdateCheckEditor('amount_owed', '');

@@ -2,7 +2,6 @@ import Image from "next/image";
 import { Locale } from "../../i18n-config"; // Import Locale type
 import { getDictionary } from "../../get-dictionary"; // Import dictionary loader
 import FileAnalysis from "@/components/FileAnalysis";
-import OcrEditorModal from "@/components/OcrEditorModal";
 import LawyerModal from "@/components/LawyerModal";
 import AiSummaryModal from "@/components/AiSummary";
 import QuestionModal from "@/components/QuestionModal";
@@ -166,7 +165,6 @@ export default async function Home(props: HomeProps) {
 
         <ManualEntryModal dictionary={dictionary} lang={lang} />
 
-        <OcrEditorModal dictionary={dictionary} />
       </main>
     </div>
   );

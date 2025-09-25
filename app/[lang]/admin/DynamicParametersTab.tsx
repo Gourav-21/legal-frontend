@@ -7,9 +7,10 @@ interface DynamicParametersTabProps {
   paramOperationLoading?: boolean;
   paramOperationMessage: {type: 'success' | 'error', text: string} | null;
   dictionary: Record<string, any>;
-  onAddDynamicParam: (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => Promise<void>;
-  onUpdateDynamicParam: (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => Promise<void>;
-  onRemoveDynamicParam: (section: 'payslip' | 'attendance' | 'contract', paramName: string) => Promise<void>;
+  onAddDynamicParam: (section: 'payslip' | 'attendance' | 'contract' | 'employee', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => Promise<void>;
+  onUpdateDynamicParam: (section: 'payslip' | 'attendance' | 'contract' | 'employee', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => Promise<void>;
+  onRemoveDynamicParam: (section: 'payslip' | 'attendance' | 'contract' | 'employee', paramName: string) => Promise<void>;
+  // Note: updated in parent to accept 'employee' as well
   onClearParamOperationMessage: () => void;
 }
 
@@ -27,19 +28,19 @@ export default function DynamicParametersTab({
   const [showAddParamForm, setShowAddParamForm] = useState(true);
   const [showUpdateParamForm, setShowUpdateParamForm] = useState(true);
   const [showRemoveParamForm, setShowRemoveParamForm] = useState(true);
-  const [newParamSection, setNewParamSection] = useState<'payslip' | 'attendance' | 'contract'>('payslip');
+  const [newParamSection, setNewParamSection] = useState<'payslip' | 'attendance' | 'contract' | 'employee'>('payslip');
   const [newParamName, setNewParamName] = useState('');
   const [newParamLabelEn, setNewParamLabelEn] = useState('');
   const [newParamLabelHe, setNewParamLabelHe] = useState('');
   const [newParamDescription, setNewParamDescription] = useState('');
   const [newParamType, setNewParamType] = useState('number');
-  const [updateParamSection, setUpdateParamSection] = useState<'payslip' | 'attendance' | 'contract'>('payslip');
+  const [updateParamSection, setUpdateParamSection] = useState<'payslip' | 'attendance' | 'contract' | 'employee'>('payslip');
   const [updateParamName, setUpdateParamName] = useState('');
   const [updateLabelEn, setUpdateLabelEn] = useState('');
   const [updateLabelHe, setUpdateLabelHe] = useState('');
   const [updateDescription, setUpdateDescription] = useState('');
   const [updateParamType, setUpdateParamType] = useState('number');
-  const [removeParamSection, setRemoveParamSection] = useState<'payslip' | 'attendance' | 'contract'>('payslip');
+  const [removeParamSection, setRemoveParamSection] = useState<'payslip' | 'attendance' | 'contract' | 'employee'>('payslip');
   const [removeParamName, setRemoveParamName] = useState('');
   const [addErrorMessage, setAddErrorMessage] = useState<string | null>(null);
   const [removeErrorMessage, setRemoveErrorMessage] = useState<string | null>(null);
@@ -49,7 +50,7 @@ export default function DynamicParametersTab({
   const [updateLoading, setUpdateLoading] = useState(false);
 
   // Get parameter names for a section
-  const getParamNames = (section: 'payslip' | 'attendance' | 'contract') => {
+  const getParamNames = (section: 'payslip' | 'attendance' | 'contract' | 'employee') => {
     if (!dynamicParams) return [];
     return dynamicParams[section]
       .filter((p: any) => !['employee_id', 'month'].includes(p.param))
@@ -70,7 +71,7 @@ export default function DynamicParametersTab({
             <div className="card-body">
               {dynamicParams ? (
                 <div className="row">
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <h6 className="text-primary" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0C756F' }}>
                       {dictionary.admin.dynamicParameters.payslipParameters}
                     </h6>
@@ -103,7 +104,7 @@ export default function DynamicParametersTab({
                       ))}
                     </ul>
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <h6 className="text-success" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0C756F' }}>
                       {dictionary.admin.dynamicParameters.attendanceParameters}
                     </h6>
@@ -136,12 +137,47 @@ export default function DynamicParametersTab({
                       ))}
                     </ul>
                   </div>
-                  <div className="col-md-4">
+                  <div className="col-md-3">
                     <h6 className="text-info" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0C756F' }}>
                       {dictionary.admin.dynamicParameters.contractParameters}
                     </h6>
                     <ul className="list-group list-group-flush">
                       {dynamicParams.contract.map((param: any) => (
+                        <li key={param.param} className="list-group-item d-flex justify-content-between align-items-start px-0 py-3" style={{ backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+                          <div className="flex-grow-1">
+                            <div className="d-flex align-items-center mb-2">
+                              <code className="text-muted me-2" style={{ color: 'rgba(15, 15, 20, 0.7)', fontSize: '0.9em' }}>{param.param}</code>
+                              {param.param === 'employee_id' && (
+                                <span className="badge bg-secondary" style={{ backgroundColor: '#6c757d', fontSize: '0.75em' }}>
+                                  {dictionary.admin.dynamicParameters.required}
+                                </span>
+                              )}
+                            </div>
+                            <div className="mb-1">
+                              <strong className="text-primary" style={{ fontSize: '0.85em', color: '#0C756F' }}>EN:</strong>
+                              <span className="ms-1" style={{ color: 'rgba(15, 15, 20, 0.8)' }}>{param.label_en}</span>
+                            </div>
+                            <div className="mb-1">
+                              <strong className="text-primary" style={{ fontSize: '0.85em', color: '#0C756F' }}>HE:</strong>
+                              <span className="ms-1" style={{ color: 'rgba(15, 15, 20, 0.8)' }}>{param.label_he}</span>
+                            </div>
+                            <div>
+                              <strong className="text-muted" style={{ fontSize: '0.8em' }}>{dictionary.admin.dynamicParameters.description}:</strong>
+                              <span className="ms-1 text-muted" style={{ fontSize: '0.8em' }}>{param.description}</span>
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Employee Parameters Column */}
+                  <div className="col-md-3">
+                    <h6 className="text-warning" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0C756F' }}>
+                      {dictionary.admin.dynamicParameters.employeeParameters}
+                    </h6>
+                    <ul className="list-group list-group-flush">
+                      {(dynamicParams.employee || []).map((param: any) => (
                         <li key={param.param} className="list-group-item d-flex justify-content-between align-items-start px-0 py-3" style={{ backgroundColor: 'transparent', border: 'none', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
                           <div className="flex-grow-1">
                             <div className="d-flex align-items-center mb-2">
@@ -208,15 +244,16 @@ export default function DynamicParametersTab({
                     <div className="row">
                       <div className="col-12 mb-3">
                         <label className="form-label" style={{ fontFamily: "'Manrope', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{dictionary.admin.dynamicParameters.section}</label>
-                        <select
+                          <select
                           className="form-select"
                           style={{ borderRadius: '8px', border: '1px solid #0C756F' }}
                           value={newParamSection}
-                          onChange={(e) => setNewParamSection(e.target.value as 'payslip' | 'attendance' | 'contract')}
+                          onChange={(e) => setNewParamSection(e.target.value as 'payslip' | 'attendance' | 'contract' | 'employee')}
                         >
                           <option value="payslip">{dictionary.admin.dynamicParameters.payslip}</option>
                           <option value="attendance">{dictionary.admin.dynamicParameters.attendance}</option>
                           <option value="contract">{dictionary.admin.dynamicParameters.contract}</option>
+                          <option value="employee">{dictionary.admin.dynamicParameters.employee || 'Employee'}</option>
                         </select>
                       </div>
                       <div className="col-12 mb-3">
@@ -379,13 +416,14 @@ export default function DynamicParametersTab({
                           style={{ borderRadius: '8px', border: '1px solid #0C756F' }}
                           value={removeParamSection}
                           onChange={(e) => {
-                            setRemoveParamSection(e.target.value as 'payslip' | 'attendance' | 'contract');
+                            setRemoveParamSection(e.target.value as 'payslip' | 'attendance' | 'contract' | 'employee');
                             setRemoveParamName('');
                           }}
                         >
                           <option value="payslip">{dictionary.admin.dynamicParameters.payslip}</option>
                           <option value="attendance">{dictionary.admin.dynamicParameters.attendance}</option>
                           <option value="contract">{dictionary.admin.dynamicParameters.contract}</option>
+                          <option value="employee">{dictionary.admin.dynamicParameters.employee || 'Employee'}</option>
                         </select>
                       </div>
                       <div className="col-12 mb-3">
@@ -497,7 +535,7 @@ export default function DynamicParametersTab({
                           style={{ borderRadius: '8px', border: '1px solid #0C756F' }}
                           value={updateParamSection}
                           onChange={(e) => {
-                            setUpdateParamSection(e.target.value as 'payslip' | 'attendance' | 'contract');
+                            setUpdateParamSection(e.target.value as 'payslip' | 'attendance' | 'contract' | 'employee');
                             setUpdateParamName('');
                             setUpdateLabelEn('');
                             setUpdateLabelHe('');
@@ -508,6 +546,7 @@ export default function DynamicParametersTab({
                           <option value="payslip">{dictionary.admin.dynamicParameters.payslip}</option>
                           <option value="attendance">{dictionary.admin.dynamicParameters.attendance}</option>
                           <option value="contract">{dictionary.admin.dynamicParameters.contract}</option>
+                          <option value="employee">{dictionary.admin.dynamicParameters.employee || 'Employee'}</option>
                         </select>
                       </div>
                       <div className="col-12 mb-3">

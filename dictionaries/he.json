@@ -509,6 +509,15 @@
     "cancelButton": "בטל",
     "saveChangesButton": "שמור שינויים"
   },
+  "aiSuggestionHelp": {
+    "title": "הצעה והסבר AI",
+    "subtitle": "קבל הצעות מבוססות AI עבור פרמטרים ונוסחאות",
+    "descriptionLabel": "תאר את דרישת החוק שלך",
+    "descriptionPlaceholder": "תאר את דרישת חוק העבודה או החוק שעבורו אתה צריך פרמטרים ונוסחאות...",
+    "loading": "מקבל הצעת AI...",
+    "getSuggestion": "קבל הצעת AI",
+    "aiResponse": "תגובת AI"
+  },
   "admin": {
     "page": {
       "title": "לוח בקרה למנהל",
@@ -633,6 +642,7 @@
       "payslipParameters": "💰 פרמטרי תלוש שכר",
       "attendanceParameters": "⏰ פרמטרי נוכחות",
       "contractParameters": "📋 פרמטרי חוזה",
+  "employeeParameters": "👤 פרמטרי עובד",
       "required": "נדרש",
       "en": "אנגלית:",
       "he": "עברית:",
@@ -642,6 +652,7 @@
       "payslip": "💰 תלוש שכר",
       "attendance": "⏰ נוכחות",
       "contract": "📋 חוזה",
+  "employee": "👤 עובד",
       "parameterNameSnakeCase": "שם פרמטר (snake_case)",
       "egBonusAmount": "למשל, bonus_amount",
       "useLowercaseWithUnderscoresNoSpaces": "השתמש באותיות קטנות עם קווים תחתונים, ללא רווחים",
@@ -695,6 +706,7 @@
       "payslipParameters": "פרמטרי תלוש שכר",
       "attendanceParameters": "פרמטרי נוכחות",
       "contractParameters": "פרמטרי חוזה",
+  "employeeParameters": "פרמטרי עובד",
       "testExpressionButton": "🧪 בדוק ביטוי בטאב 2",
       "ruleChecks": "בדיקות חוק",
       "currentChecks": "בדיקות נוכחיות",
@@ -752,7 +764,9 @@
       "manualEntry": "הזנה ידנית",
       "jsonUpload": "העלאת JSON",
       "sampleData": "נתוני דוגמה",
-      "employeeInformation": "מידע על העובד",
+  "employeeInformation": "מידע על העובד",
+  "employeeData": "נתוני עובד",
+  "employeeDetails": "פרטי עובד",
       "dataSections": "מקטעי נתונים",
       "payslipData": "נתוני תלוש שכר",
       "contractData": "נתוני חוזה",
@@ -785,6 +799,7 @@
   },
   "manualEntryModal": {
     "title": "הזנה ידנית",
+    "employee": "עובד",
     "employeeId": "מזהה עובד",
     "payslips": "תלושי שכר",
     "attendance": "נוכחות",

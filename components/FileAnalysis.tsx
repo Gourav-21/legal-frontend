@@ -331,6 +331,7 @@ const FileAnalysis: React.FC<FileAnalysisProps> = ({ lang, dictionary }) => {
           payslip_text: finalData.payslip_data,
           contract_text: finalData.contract_data,
           attendance_text: finalData.attendance_data,
+          employee_text: finalData.employee_data,
           type: type
         })
       });

@@ -19,12 +19,14 @@ interface ManualEntryData {
   payslips: PayslipData[];
   attendance: AttendanceData[];
   contract: ContractData;
+  employee?: Record<string, any>;
 }
 
 interface ApiResponse {
   payslip_data?: any[];
   contract_data?: any;
   attendance_data?: any[];
+  employee_data?: any;
 }
 
 interface ManualEntryStore {

@@ -12,15 +12,18 @@ interface ManualEntryFormProps {
   dynamicParams: {
     payslip: DynamicParam[];
     contract: DynamicParam[];
+    employee?: DynamicParam[];
     attendance: DynamicParam[];
   } | null;
   dynamicFormData: Record<string, any>;
-  onDynamicInputChange: (section: string, param: string, value: any) => void;
+  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract' | 'employee', param: string, value: any) => void;
   includePayslip: boolean;
   includeContract: boolean;
+  includeEmployee?: boolean;
   includeAttendance: boolean;
   onIncludePayslipChange: (checked: boolean) => void;
   onIncludeContractChange: (checked: boolean) => void;
+  onIncludeEmployeeChange?: (checked: boolean) => void;
   onIncludeAttendanceChange: (checked: boolean) => void;
   dictionary: Record<string, any>;
   lang: string;
@@ -32,9 +35,11 @@ export default function ManualEntryForm({
   onDynamicInputChange,
   includePayslip,
   includeContract,
+  includeEmployee,
   includeAttendance,
   onIncludePayslipChange,
   onIncludeContractChange,
+  onIncludeEmployeeChange,
   onIncludeAttendanceChange,
   dictionary,
   lang
@@ -58,7 +63,7 @@ export default function ManualEntryForm({
           {dictionary.admin.testExpression.employeeInformation}
         </h6>
         <div className="row">
-          {dynamicParams.payslip
+            {dynamicParams.payslip
             .filter((p: any) => ['employee_id', 'month'].includes(p.param))
             .map((param: any) => (
               <div key={param.param} className="col-md-6 mb-3">
@@ -98,7 +103,7 @@ export default function ManualEntryForm({
           {dictionary.admin.testExpression.dataSections}
         </h6>
         <div className="row">
-          <div className="col-4">
+          <div className="col-3">
             <div className={`${lang === 'he' ? '' : 'form-check'} mb-2`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
               <input
                 className={`form-check-input ${lang === 'he' ? 'mx-2' : ''}`}
@@ -146,7 +151,31 @@ export default function ManualEntryForm({
               </label>
             </div>
           </div>
-          <div className="col-4">
+          <div className="col-3">
+            <div className={`${lang === 'he' ? '' : 'form-check'} mb-2`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
+              <input
+                className={`form-check-input ${lang === 'he' ? 'mx-2' : ''}`}
+                type="checkbox"
+                id="form-include-employee"
+                checked={includeEmployee}
+                onChange={(e) => onIncludeEmployeeChange && onIncludeEmployeeChange(e.target.checked)}
+                style={{
+                  accentColor: '#0C756F',
+                  transform: 'scale(1.2)',
+                  cursor: 'pointer'
+                }}
+              />
+              <label className="form-check-label fw-bold" htmlFor="form-include-employee" style={{
+                fontFamily: "'Manrope', sans-serif",
+                color: 'rgba(15, 15, 20, 0.7)',
+                cursor: 'pointer',
+                fontSize: '0.95rem'
+              }}>
+                👤 {dictionary.admin.testExpression.employeeData}
+              </label>
+            </div>
+          </div>
+          <div className="col-3">
             <div className={`${lang === 'he' ? '' : 'form-check'} mb-2`} dir={lang === 'he' ? 'rtl' : 'ltr'}>
               <input
                 className={`form-check-input ${lang === 'he' ? 'mx-2' : ''}`}
@@ -237,6 +266,43 @@ export default function ManualEntryForm({
                           onDynamicInputChange('contract', param.param, '');
                         } else {
                           onDynamicInputChange('contract', param.param, param.type === 'number' ? parseFloat(val) : val);
+                        }
+                      }}
+                    />
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      {/* Dynamic Employee Data */}
+      {includeEmployee && dynamicParams.employee && (
+        <div className="mb-3">
+          <h6 className="mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0C756F' }}>
+            <i className="bi bi-person-lines-fill me-1"></i>{dictionary.admin.testExpression.employeeDetails}
+          </h6>
+          <div className="row">
+            {dynamicParams.employee
+              .filter((p: any) => !['employee_id', 'month'].includes(p.param))
+              .map((param: any) => {
+                const inputType = param.type === 'number' ? 'number' : 'text';
+                return (
+                  <div key={param.param} className="col-md-3 mb-2">
+                    <label className="form-label small fw-bold" style={{ fontFamily: "'Manrope', sans-serif", color: 'rgba(15, 15, 20, 0.7)' }}>{getParamLabel(param)}</label>
+                    <input
+                      type={inputType}
+                      step={inputType === 'number' ? "0.1" : undefined}
+                      min={inputType === 'number' ? "0" : undefined}
+                      className="form-control form-control-sm"
+                      style={{ borderRadius: '6px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif" }}
+                      value={dynamicFormData.employee?.[param.param] ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === '') {
+                          onDynamicInputChange('employee', param.param, '');
+                        } else {
+                          onDynamicInputChange('employee', param.param, param.type === 'number' ? parseFloat(val) : val);
                         }
                       }}
                     />

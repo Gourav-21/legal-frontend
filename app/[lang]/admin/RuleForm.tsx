@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import DataCollectionPanel from '../../../components/TestSection';
 import LaborLawHelp from '../../../components/LaborLawHelp';
+import AiSuggestionHelp from '../../../components/AiSuggestionHelp';
 
 interface Rule {
   rule_id: string;
@@ -39,6 +40,7 @@ interface RuleFormProps {
   dynamicFormData: any;
   includePayslip: boolean;
   includeContract: boolean;
+  includeEmployee?: boolean;
   includeAttendance: boolean;
   testResults: any;
   isTesting: boolean;
@@ -51,9 +53,10 @@ interface RuleFormProps {
   onRemoveCheck: (index: number) => void;
   onGenerateAIChecks?: () => Promise<{condition: string; amount_owed: string; violation_message: string}[] | null>;
   onTestRuleInForm: () => void;
-  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract', param: string, value: any) => void;
+  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract' | 'employee', param: string, value: any) => void;
   onIncludePayslipChange: (checked: boolean) => void;
   onIncludeContractChange: (checked: boolean) => void;
+  onIncludeEmployeeChange?: (checked: boolean) => void;
   onIncludeAttendanceChange: (checked: boolean) => void;
   onLoadSampleData: () => void;
   onSetActiveTab: (tab: string) => void;
@@ -73,6 +76,7 @@ export default function RuleForm({
   dynamicFormData,
   includePayslip,
   includeContract,
+  includeEmployee,
   includeAttendance,
   testResults,
   isTesting,
@@ -87,6 +91,7 @@ export default function RuleForm({
   onDynamicInputChange,
   onIncludePayslipChange,
   onIncludeContractChange,
+  onIncludeEmployeeChange,
   onIncludeAttendanceChange,
   onLoadSampleData,
   onSetActiveTab,
@@ -161,6 +166,11 @@ export default function RuleForm({
       if (parsedData.contract) {
         Object.entries(parsedData.contract).forEach(([key, value]) => {
           onDynamicInputChange('contract', key, value);
+        });
+      }
+      if (parsedData.employee) {
+        Object.entries(parsedData.employee).forEach(([key, value]) => {
+          onDynamicInputChange('employee', key, value);
         });
       }
     } catch (err) {
@@ -345,7 +355,7 @@ export default function RuleForm({
                 {/* Dynamic Parameters Reference */}
                 {dynamicParams && (
                   <div className="mb-3">
-                    <h6 style={{ color: '#0C756F', fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.9rem', fontWeight: '600', marginBottom: '12px', letterSpacing: '0.3px' }}>
+                    <h6 style={{ color: '#0C756F', fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.9rem', fontWeight: '600', marginBottom: '12px', letterSpacing: '0.3px' }}>
                       <i className="bi bi-database me-2"></i>All Dynamic Parameters
                     </h6>
                     <div className="card" style={{ backgroundColor: 'rgba(12, 117, 111, 0.05)', border: '1px solid rgba(12, 117, 111, 0.1)', borderRadius: '8px', maxHeight: '300px', overflowY: 'auto' }}>
@@ -355,7 +365,7 @@ export default function RuleForm({
                           <div className="mb-3">
                             <div className="d-flex align-items-center mb-2">
                               <i className="bi bi-cash-stack me-2" style={{ color: '#0C756F', fontSize: '0.8rem' }}></i>
-                              <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.8rem', fontWeight: '600', color: '#0C756F' }}>{dictionary.admin.ruleForm.payslipParameters}</span>
+                              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.8rem', fontWeight: '600', color: '#0C756F' }}>{dictionary.admin.ruleForm.payslipParameters}</span>
                             </div>
                             <div className="d-flex flex-wrap gap-1">
                               {dynamicParams.payslip.map((param: any) => (
@@ -380,7 +390,7 @@ export default function RuleForm({
                           <div className="mb-3">
                             <div className="d-flex align-items-center mb-2">
                               <i className="bi bi-calendar-check me-2" style={{ color: '#0C756F', fontSize: '0.8rem' }}></i>
-                              <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.8rem', fontWeight: '600', color: '#0C756F' }}>{dictionary.admin.ruleForm.attendanceParameters}</span>
+                              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.8rem', fontWeight: '600', color: '#0C756F' }}>{dictionary.admin.ruleForm.attendanceParameters}</span>
                             </div>
                             <div className="d-flex flex-wrap gap-1">
                               {dynamicParams.attendance.map((param: any) => (
@@ -401,11 +411,11 @@ export default function RuleForm({
                         )}
 
                         {/* Contract Parameters */}
-                        {dynamicParams.contract && dynamicParams.contract.length > 0 && (
+              {dynamicParams.contract && dynamicParams.contract.length > 0 && (
                           <div className="mb-3">
                             <div className="d-flex align-items-center mb-2">
                               <i className="bi bi-file-earmark-text me-2" style={{ color: '#0C756F', fontSize: '0.8rem' }}></i>
-                              <span style={{ fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.8rem', fontWeight: '600', color: '#0C756F' }}>{dictionary.admin.ruleForm.contractParameters}</span>
+                              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.8rem', fontWeight: '600', color: '#0C756F' }}>{dictionary.admin.ruleForm.contractParameters}</span>
                             </div>
                             <div className="d-flex flex-wrap gap-1">
                               {dynamicParams.contract.map((param: any) => (
@@ -419,6 +429,31 @@ export default function RuleForm({
                                   border: '1px solid rgba(12, 117, 111, 0.2)'
                                 }}>
                                   contract.{param.param}
+                                </code>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Employee Parameters */}
+                        {dynamicParams.employee && dynamicParams.employee.length > 0 && (
+                          <div className="mb-3">
+                            <div className="d-flex align-items-center mb-2">
+                              <i className="bi bi-person-lines-fill me-2" style={{ color: '#0C756F', fontSize: '0.8rem' }}></i>
+                              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: '0.8rem', fontWeight: '600', color: '#0C756F' }}>{dictionary.admin.ruleForm.employeeParameters}</span>
+                            </div>
+                            <div className="d-flex flex-wrap gap-1">
+                              {dynamicParams.employee.map((param: any) => (
+                                <code key={`employee-${param.param}`} style={{
+                                  backgroundColor: 'rgba(12, 117, 111, 0.1)',
+                                  color: '#0C756F',
+                                  padding: '2px 6px',
+                                  borderRadius: '4px',
+                                  fontSize: '0.7rem',
+                                  fontWeight: '500',
+                                  border: '1px solid rgba(12, 117, 111, 0.2)'
+                                }}>
+                                  employee.{param.param}
                                 </code>
                               ))}
                             </div>
@@ -611,7 +646,7 @@ export default function RuleForm({
                 <div className="card-body" style={{ padding: '20px' }}>
                   <div className="row">
                     <div className="col-md-6 mb-3">
-                      <label className="form-label" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'rgba(15, 15, 20, 0.7)', fontSize: '0.85rem', fontWeight: '600' }}>
+                      <label className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)', fontSize: '0.85rem', fontWeight: '600' }}>
                         <i className="bi bi-code-slash me-1"></i>{dictionary.admin.ruleForm.conditionLabel}*
                       </label>
                       <input
@@ -627,7 +662,7 @@ export default function RuleForm({
                         </div>
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label className="form-label" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'rgba(15, 15, 20, 0.7)', fontSize: '0.85rem', fontWeight: '600' }}>
+                      <label className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)', fontSize: '0.85rem', fontWeight: '600' }}>
                         <i className="bi bi-calculator me-1"></i>{dictionary.admin.ruleForm.amountOwedFormula}*
                       </label>
                       <input
@@ -636,7 +671,7 @@ export default function RuleForm({
                         placeholder={dictionary.admin.ruleForm.amountOwedPlaceholder}
                         value={checkEditor.amount_owed}
                         onChange={(e) => onUpdateCheckEditor('amount_owed', e.target.value)}
-                        style={{ borderRadius: '8px', border: '1px solid #0C756F', fontFamily: 'Manrope, sans-serif', fontSize: '0.85rem' }}
+                        style={{ borderRadius: '8px', border: '1px solid #0C756F', fontFamily: "'Manrope', sans-serif", fontSize: '0.85rem' }}
                       />
                         <div className="form-text" style={{ fontSize: '0.75rem', color: 'rgba(15, 15, 20, 0.6)' }}>
                           {dictionary.admin.ruleForm.amountOwedHelp}
@@ -644,7 +679,7 @@ export default function RuleForm({
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label" style={{ fontFamily: 'Space Grotesk, sans-serif', color: 'rgba(15, 15, 20, 0.7)', fontSize: '0.85rem', fontWeight: '600' }}>
+                    <label className="form-label" style={{ fontFamily: "'Space Grotesk', sans-serif", color: 'rgba(15, 15, 20, 0.7)', fontSize: '0.85rem', fontWeight: '600' }}>
                       <i className="bi bi-exclamation-triangle me-1"></i>{dictionary.admin.ruleForm.violationMessage}*
                     </label>
                     <input
@@ -793,12 +828,14 @@ export default function RuleForm({
                   // Manual entry props
                   dynamicParams={dynamicParams}
                   dynamicFormData={dynamicFormData}
-                  onDynamicInputChange={(section: string, param: string, value: any) => onDynamicInputChange(section as 'payslip' | 'attendance' | 'contract', param, value)}
+                  onDynamicInputChange={(section: string, param: string, value: any) => onDynamicInputChange(section as 'payslip' | 'attendance' | 'contract' | 'employee', param, value)}
                   includePayslip={includePayslip}
                   includeContract={includeContract}
                   includeAttendance={includeAttendance}
+                  includeEmployee={includeEmployee}
                   onIncludePayslipChange={onIncludePayslipChange}
                   onIncludeContractChange={onIncludeContractChange}
+                  onIncludeEmployeeChange={onIncludeEmployeeChange}
                   onIncludeAttendanceChange={onIncludeAttendanceChange}
 
                   // Test execution props
@@ -815,6 +852,7 @@ export default function RuleForm({
 
             {/* Help Section - At the very bottom */}
             <div className="mt-4">
+              <AiSuggestionHelp dictionary={dictionary} />
               <LaborLawHelp dictionary={dictionary} />
             </div>
           </form>

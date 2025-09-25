@@ -23,6 +23,7 @@ interface ManualEntryData {
   payslips: PayslipData[];
   attendance: AttendanceData[];
   contract: ContractData;
+  employee: Record<string, any>;
 }
 
 interface ManualEntryModalProps {
@@ -37,6 +38,9 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
   const [selectedPayslipIndex, setSelectedPayslipIndex] = useState(0);
   const [selectedAttendanceIndex, setSelectedAttendanceIndex] = useState(0);
 
+  // Get current month in YYYY-MM format
+  const currentMonth = new Date().toISOString().slice(0, 7);
+
   // Populate form data from the current processingResult when modal opens
   useEffect(() => {
     if (showManualEntryModal && processingResult) {
@@ -46,6 +50,8 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
         payslips: [],
         attendance: [],
         contract: {}
+        ,
+        employee: {}
       };
 
       const convertApiData = (obj: any): any => {
@@ -90,9 +96,25 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
         newFormData.contract = convertApiData((initial as any).contract_data);
       }
 
-      setFormData(newFormData);
+      if ((initial as any).employee_data) {
+        if (!newFormData.employee_id) newFormData.employee_id = (initial as any).employee_data.employee_id || '';
+        newFormData.employee = convertApiData((initial as any).employee_data);
+      }
+
+      // Only populate if formData is in its initial empty state
+      const isFormDataEmpty = formData.employee_id === '' &&
+                             formData.payslips.length === 1 && 
+                             Object.keys(formData.payslips[0]).length <= 1 && // only month or empty
+                             formData.payslips[0].month === currentMonth &&
+                             formData.attendance.length === 0 &&
+                             Object.keys(formData.contract).length === 0 &&
+                             Object.keys(formData.employee).length === 0;
+
+      if (isFormDataEmpty) {
+        setFormData(newFormData);
+      }
     }
-  }, [showManualEntryModal, processingResult]);
+  }, [showManualEntryModal, processingResult, currentMonth]);
 
   // Fetch dynamic params when modal opens
   useEffect(() => {
@@ -106,20 +128,17 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
           } else {
             console.error('Failed to fetch dynamic params');
             // Set empty params to allow basic functionality
-            setDynamicParams({ payslip: [], attendance: [], contract: [] });
+              setDynamicParams({ payslip: [], attendance: [], contract: [], employee: [] });
           }
         } catch (err) {
           console.error('Error fetching dynamic params:', err);
           // Set empty params to allow basic functionality
-          setDynamicParams({ payslip: [], attendance: [], contract: [] });
+            setDynamicParams({ payslip: [], attendance: [], contract: [], employee: [] });
         }
       };
       fetchDynamicParams();
     }
   }, [showManualEntryModal, dynamicParams, setDynamicParams]);
-
-  // Get current month in YYYY-MM format
-  const currentMonth = new Date().toISOString().slice(0, 7);
 
   const [formData, setFormData] = useState<ManualEntryData>({
     employee_id: '',
@@ -128,6 +147,8 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
     }],
     attendance: [],
     contract: {}
+    ,
+    employee: {}
   });
 
   const handleEmployeeIdChange = (value: string) => {
@@ -158,6 +179,13 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
       contract: { ...prev.contract, [field]: value }
     }));
   };
+
+    const handleEmployeeChange = (field: string, value: any) => {
+      setFormData(prev => ({
+        ...prev,
+        employee: { ...prev.employee, [field]: value }
+      }));
+    };
 
   const addPayslip = () => {
     const newPayslip: PayslipData = {
@@ -231,6 +259,15 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
       );
     }
 
+    // 4. Only employee data, no payslip
+    const hasEmployee = Object.keys(formData.employee).length > 0;
+    if (hasEmployee && !hasPayslip) {
+      console.log('Employee data provided without payslip data'); // Debug log
+      return (
+        'Employee data exists but no payslip data.'
+      );
+    }
+
     return null;
   };
 
@@ -248,7 +285,8 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
     setProcessingResult({
       payslip_data: formData.payslips,
       contract_data: formData.contract,
-      attendance_data: formData.attendance
+      attendance_data: formData.attendance,
+      employee_data: formData.employee
     });
     setShowManualEntryModal(false);
   };
@@ -351,6 +389,16 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                 >
                   <i className="bi bi-file-text me-1"></i>
                   {dictionary.manualEntryModal.contract}
+                </button>
+              </li>
+              <li className="nav-item" role="presentation">
+                <button
+                  className={`nav-link ${activeTab === 'employee' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('employee')}
+                  type="button"
+                >
+                  <i className="bi bi-person-lines-fill me-1"></i>
+                  {dictionary.manualEntryModal.employee || 'Employee'}
                 </button>
               </li>
             </ul>
@@ -521,6 +569,28 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                             const v = e.target.value;
                             const paramType = getParamType('contract', param);
                             handleContractChange(param, v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v));
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {activeTab === 'employee' && (
+                <div className="tab-pane fade show active">
+                  <div className="row g-3">
+                    {getParamNames('employee').map((param: string) => (
+                      <div key={param} className="col-md-6">
+                        <label className="form-label">{getParamLabel('employee', param)}</label>
+                        <input
+                          type={getParamType('employee', param) === 'number' ? 'number' : 'text'}
+                          className="form-control form-control-sm"
+                          step="0.01"
+                          value={formData.employee[param] ?? ''}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            const paramType = getParamType('employee', param);
+                            handleEmployeeChange(param, v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v));
                           }}
                         />
                       </div>

@@ -512,6 +512,15 @@
     "cancelButton": "Cancel",
     "saveChangesButton": "Save Changes"
   },
+  "aiSuggestionHelp": {
+    "title": "AI Suggestion and Explanation",
+    "subtitle": "Get AI-powered suggestions for parameters and formulas",
+    "descriptionLabel": "Describe your rule requirement",
+    "descriptionPlaceholder": "Describe the labor law requirement or rule you need parameters and formulas for...",
+    "loading": "Getting AI Suggestion...",
+    "getSuggestion": "Get AI Suggestion",
+    "aiResponse": "AI Response"
+  },
   "admin": {
     "page": {
       "title": "Admin Dashboard",
@@ -657,6 +666,7 @@
       "payslipParameters": "Payslip Parameters",
       "attendanceParameters": "Attendance Parameters",
       "contractParameters": "Contract Parameters",
+  "employeeParameters": "Employee Parameters",
       "testExpressionButton": "🧪 Test Expression in Tab 2",
       "ruleChecks": "Rule Checks",
       "currentChecks": "Current Checks",
@@ -692,6 +702,7 @@
       "payslipParameters": "💰 Payslip Parameters",
       "attendanceParameters": "⏰ Attendance Parameters",
       "contractParameters": "📋 Contract Parameters",
+  "employeeParameters": "👤 Employee Parameters",
       "required": "Required",
       "en": "EN:",
       "he": "HE:",
@@ -701,6 +712,7 @@
       "payslip": "💰 Payslip",
       "attendance": "⏰ Attendance",
       "contract": "📋 Contract",
+  "employee": "👤 Employee",
       "parameterNameSnakeCase": "Parameter Name (snake_case)",
       "egBonusAmount": "e.g., bonus_amount",
       "useLowercaseWithUnderscoresNoSpaces": "Use lowercase with underscores, no spaces",
@@ -772,7 +784,9 @@
       "manualEntry": "Manual Entry",
       "jsonUpload": "JSON Upload",
       "sampleData": "Sample Data",
-      "employeeInformation": "Employee Information",
+  "employeeInformation": "Employee Information",
+  "employeeData": "Employee Data",
+  "employeeDetails": "Employee Details",
       "dataSections": "Data Sections",
       "payslipData": "Payslip Data",
       "contractData": "Contract Data",
@@ -805,6 +819,7 @@
   },
   "manualEntryModal": {
     "title": "Manual Entry",
+    "employee": "Employee",
     "employeeId": "Employee ID",
     "payslips": "Payslips",
     "attendance": "Attendance",

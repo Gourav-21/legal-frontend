@@ -68,11 +68,13 @@ interface ManageRulesTabProps {
     payslip: DynamicParam[];
     contract: DynamicParam[];
     attendance: DynamicParam[];
+    employee?: DynamicParam[];
   } | null;
   dynamicFormData: Record<string, unknown>;
   includePayslip: boolean;
   includeContract: boolean;
   includeAttendance: boolean;
+  includeEmployee?: boolean;
   testResults: TestResult | undefined;
   isTesting: boolean;
   dictionary: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -84,6 +86,7 @@ interface ManageRulesTabProps {
   testIncludePayslip: boolean;
   testIncludeContract: boolean;
   testIncludeAttendance: boolean;
+  testIncludeEmployee?: boolean;
   onRuleSelect: (rule: Rule | null) => void;
   onStartEditRule: (rule: Rule) => void;
   onDeleteRule: (ruleId: string) => void;
@@ -95,20 +98,22 @@ interface ManageRulesTabProps {
   onUpdateCheckEditor: (field: keyof ManageRulesTabProps['checkEditor'], value: string) => void;
   onRemoveCheck: (index: number) => void;
   onCancelForm: () => void;
-  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract', param: string, value: unknown) => void;
+  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract' | 'employee', param: string, value: unknown) => void;
   onIncludePayslipChange: (checked: boolean) => void;
   onIncludeContractChange: (checked: boolean) => void;
   onIncludeAttendanceChange: (checked: boolean) => void;
+  onIncludeEmployeeChange?: (checked: boolean) => void;
   onLoadSampleData: () => void;
   onSetActiveTab: (tab: string) => void;
   onGenerateAIChecks?: () => Promise<{condition: string; amount_owed: string; violation_message: string}[] | null>;
   // Test-related handlers
   onTestInputMethodChange: (method: 'manual' | 'json' | 'sample') => void;
   onTestJsonChange: (json: string) => void;
-  onTestDynamicInputChange: (section: string, param: string, value: unknown) => void;
+  onTestDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract' | 'employee', param: string, value: unknown) => void;
   onTestIncludePayslipChange: (checked: boolean) => void;
   onTestIncludeContractChange: (checked: boolean) => void;
   onTestIncludeAttendanceChange: (checked: boolean) => void;
+  onTestIncludeEmployeeChange?: (checked: boolean) => void;
   onTestLoadSampleData: () => void;
   onExecuteRuleTest: (rule: Rule) => void;
   onClearTestResults?: () => void;
@@ -134,6 +139,7 @@ export default function ManageRulesTab({
   includePayslip,
   includeContract,
   includeAttendance,
+  includeEmployee,
   testResults,
   isTesting,
   dictionary,
@@ -145,6 +151,7 @@ export default function ManageRulesTab({
   testIncludePayslip,
   testIncludeContract,
   testIncludeAttendance,
+  testIncludeEmployee,
   onRuleSelect,
   onStartEditRule,
   onDeleteRule,
@@ -160,6 +167,7 @@ export default function ManageRulesTab({
   onIncludePayslipChange,
   onIncludeContractChange,
   onIncludeAttendanceChange,
+  onIncludeEmployeeChange,
   onLoadSampleData,
   onSetActiveTab,
   onGenerateAIChecks,
@@ -170,6 +178,7 @@ export default function ManageRulesTab({
   onTestIncludePayslipChange,
   onTestIncludeContractChange,
   onTestIncludeAttendanceChange,
+  onTestIncludeEmployeeChange,
   onTestLoadSampleData,
   onExecuteRuleTest,
   onClearTestResults
@@ -501,9 +510,11 @@ export default function ManageRulesTab({
                               includePayslip={testIncludePayslip}
                               includeContract={testIncludeContract}
                               includeAttendance={testIncludeAttendance}
+                              includeEmployee={testIncludeEmployee}
                               onIncludePayslipChange={onTestIncludePayslipChange}
                               onIncludeContractChange={onTestIncludeContractChange}
                               onIncludeAttendanceChange={onTestIncludeAttendanceChange}
+                              onIncludeEmployeeChange={onTestIncludeEmployeeChange}
                               onExecuteTest={() => {
                                 // Clear any existing test results first
                                 if (onClearTestResults) {
@@ -550,6 +561,7 @@ export default function ManageRulesTab({
           includePayslip={includePayslip}
           includeContract={includeContract}
           includeAttendance={includeAttendance}
+          includeEmployee={includeEmployee}
           testResults={testResults}
           isTesting={isTesting}
           onCancelForm={onCancelForm}
@@ -564,6 +576,7 @@ export default function ManageRulesTab({
           onIncludePayslipChange={onIncludePayslipChange}
           onIncludeContractChange={onIncludeContractChange}
           onIncludeAttendanceChange={onIncludeAttendanceChange}
+          onIncludeEmployeeChange={onIncludeEmployeeChange}
           onLoadSampleData={onLoadSampleData}
           onSetActiveTab={onSetActiveTab}
           onGenerateAIChecks={onGenerateAIChecks}

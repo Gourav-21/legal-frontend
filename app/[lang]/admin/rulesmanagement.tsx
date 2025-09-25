@@ -141,6 +141,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   const [dynamicParams, setDynamicParams] = useState<any>(null);
   const [includePayslip, setIncludePayslip] = useState(true);
   const [includeContract, setIncludeContract] = useState(true);
+  const [includeEmployee, setIncludeEmployee] = useState(true);
   const [includeAttendance, setIncludeAttendance] = useState(true);
 
   // Dynamic form data
@@ -149,7 +150,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
     month: '2024-07',
     payslip: {} as Record<string, any>,
     attendance: {} as Record<string, any>,
-    contract: {} as Record<string, any>
+    contract: {} as Record<string, any>,
+    employee: {} as Record<string, any>
   });
 
   // Test-related state for individual rule testing in expanded rows
@@ -160,10 +162,12 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
     month: '2024-07',
     payslip: {} as Record<string, any>,
     attendance: {} as Record<string, any>,
-    contract: {} as Record<string, any>
+    contract: {} as Record<string, any>,
+    employee: {} as Record<string, any>
   });
   const [testIncludePayslip, setTestIncludePayslip] = useState(true);
   const [testIncludeContract, setTestIncludeContract] = useState(true);
+  const [testIncludeEmployee, setTestIncludeEmployee] = useState(true);
   const [testIncludeAttendance, setTestIncludeAttendance] = useState(true);
 
   // For adding/removing dynamic parameters
@@ -196,6 +200,10 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
           employee_id: testDynamicFormData.employee_id,
           month: testDynamicFormData.month,
           ...testDynamicFormData.contract
+        } : {},
+        employee: testIncludeEmployee ? {
+          employee_id: testDynamicFormData.employee_id,
+          ...testDynamicFormData.employee
         } : {}
       };
 
@@ -244,6 +252,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
         payslip: includePayslip ? dynamicFormData.payslip : {},
         attendance: includeAttendance ? dynamicFormData.attendance : {},
         contract: includeContract ? dynamicFormData.contract : {}
+        ,
+        employee: includeEmployee ? dynamicFormData.employee : {}
       };
 
       const response = await fetch('/api/test-rule', {
@@ -290,6 +300,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
         payslip: includePayslip ? dynamicFormData.payslip : {},
         attendance: includeAttendance ? dynamicFormData.attendance : {},
         contract: includeContract ? dynamicFormData.contract : {}
+        ,
+        employee: includeEmployee ? dynamicFormData.employee : {}
       };
 
       const response = await fetch('/api/test-expression', {
@@ -384,7 +396,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       setDynamicParams({
         payslip: [],
         attendance: [],
-        contract: []
+        contract: [],
+        employee: []
       });
     }
   };
@@ -399,7 +412,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   };
 
   // Handle dynamic form data changes
-  const handleDynamicInputChange = (section: 'payslip' | 'attendance' | 'contract', param: string, value: any) => {
+  const handleDynamicInputChange = (section: 'payslip' | 'attendance' | 'contract' | 'employee', param: string, value: any) => {
     setDynamicFormData(prev => {
       const newData = {
         ...prev,
@@ -410,16 +423,20 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       };
       
       // If updating employee_id or month in payslip section, automatically update attendance and contract sections
-      if (section === 'payslip' && (param === 'employee_id' || param === 'month')) {
-        newData.attendance = {
-          ...newData.attendance,
-          [param]: value
-        };
-        newData.contract = {
-          ...newData.contract,
-          [param]: value
-        };
-      }
+        if (section === 'payslip' && (param === 'employee_id' || param === 'month')) {
+          newData.attendance = {
+            ...newData.attendance,
+            [param]: value
+          };
+          newData.contract = {
+            ...newData.contract,
+            [param]: value
+          };
+          newData.employee = {
+            ...newData.employee,
+            [param]: value
+          };
+        }
       
       return newData;
     });
@@ -443,12 +460,13 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
       },
       contract: {
         hourly_rate: 30.0
-      }
+      },
+      employee: {}
     });
   };
 
   // Add a new dynamic parameter
-  const addDynamicParam = async (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => {
+  const addDynamicParam = async (section: 'payslip' | 'attendance' | 'contract' | 'employee', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => {
     try {
       const response = await fetch(`/api/dynamic-params/${section}`, {
         method: 'POST',
@@ -489,7 +507,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   };
 
   // Remove a dynamic parameter
-  const removeDynamicParam = async (section: 'payslip' | 'attendance' | 'contract', paramName: string) => {
+  const removeDynamicParam = async (section: 'payslip' | 'attendance' | 'contract' | 'employee', paramName: string) => {
     try {
       const response = await fetch(`/api/dynamic-params/${section}/${paramName}`, {
         method: 'DELETE'
@@ -523,7 +541,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   };
 
   // Update a dynamic parameter
-  const updateDynamicParam = async (section: 'payslip' | 'attendance' | 'contract', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => {
+  const updateDynamicParam = async (section: 'payslip' | 'attendance' | 'contract' | 'employee', paramName: string, labelEn: string, labelHe: string, description: string, type: string) => {
     try {
       const response = await fetch(`/api/dynamic-params/${section}/${paramName}`, {
         method: 'PUT',
@@ -956,6 +974,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             includePayslip={includePayslip}
             includeContract={includeContract}
             includeAttendance={includeAttendance}
+            includeEmployee={includeEmployee}
             testResults={testResults}
             isTesting={isTesting}
             dictionary={dictionary}
@@ -966,6 +985,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             testIncludePayslip={testIncludePayslip}
             testIncludeContract={testIncludeContract}
             testIncludeAttendance={testIncludeAttendance}
+            testIncludeEmployee={testIncludeEmployee}
             onRuleSelect={handleRuleSelect}
             onStartEditRule={startEditRule}
             onDeleteRule={deleteRule}
@@ -1010,6 +1030,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             onDynamicInputChange={handleDynamicInputChange}
             onIncludePayslipChange={setIncludePayslip}
             onIncludeContractChange={setIncludeContract}
+            onIncludeEmployeeChange={setIncludeEmployee}
             onIncludeAttendanceChange={setIncludeAttendance}
             onLoadSampleData={loadSampleData}
             onSetActiveTab={(tab: string) => setActiveTab(tab as TabType)}
@@ -1017,7 +1038,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             onTestInputMethodChange={setTestInputMethod}
             onTestJsonChange={setTestUploadedJson}
             onTestDynamicInputChange={(section, param, value) => {
-              const validSection = section as 'payslip' | 'attendance' | 'contract';
+              const validSection = section as 'payslip' | 'attendance' | 'contract' | 'employee';
               setTestDynamicFormData(prev => {
                 const newData = {
                   ...prev,
@@ -1028,22 +1049,27 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
                 };
                 
                 // If updating employee_id or month in payslip section, automatically update attendance and contract sections
-                if (validSection === 'payslip' && (param === 'employee_id' || param === 'month')) {
-                  newData.attendance = {
-                    ...newData.attendance,
-                    [param]: value
-                  };
-                  newData.contract = {
-                    ...newData.contract,
-                    [param]: value
-                  };
-                }
+                  if (validSection === 'payslip' && (param === 'employee_id' || param === 'month')) {
+                    newData.attendance = {
+                      ...newData.attendance,
+                      [param]: value
+                    };
+                    newData.contract = {
+                      ...newData.contract,
+                      [param]: value
+                    };
+                    newData.employee = {
+                      ...newData.employee,
+                      [param]: value
+                    };
+                  }
                 
                 return newData;
               });
             }}
             onTestIncludePayslipChange={setTestIncludePayslip}
             onTestIncludeContractChange={setTestIncludeContract}
+            onTestIncludeEmployeeChange={setTestIncludeEmployee}
             onTestIncludeAttendanceChange={setTestIncludeAttendance}
             onTestLoadSampleData={() => {
               // Load sample data for test
@@ -1063,7 +1089,8 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
                 contract: {
                   hourly_rate: 30.0,
                   employee_id: 'TEST_001'
-                }
+                },
+                employee: {}
               });
             }}
             onExecuteRuleTest={testRule}
@@ -1086,6 +1113,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             includePayslip={includePayslip}
             includeContract={includeContract}
             includeAttendance={includeAttendance}
+            includeEmployee={includeEmployee}
             dictionary={dictionary}
             lang={lang}
             onExpressionChange={setExpression}
@@ -1094,6 +1122,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             onDynamicInputChange={handleDynamicInputChange}
             onIncludePayslipChange={setIncludePayslip}
             onIncludeContractChange={setIncludeContract}
+            onIncludeEmployeeChange={setIncludeEmployee}
             onIncludeAttendanceChange={setIncludeAttendance}
             onLoadSampleData={loadSampleData}
           />

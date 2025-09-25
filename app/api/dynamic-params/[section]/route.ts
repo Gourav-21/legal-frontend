@@ -8,8 +8,8 @@ export async function GET(
 ) {
   const { section } = await params;
 
-  if (!['payslip', 'attendance', 'contract'].includes(section)) {
-    return new Response(JSON.stringify({ detail: 'Invalid section. Must be payslip, attendance, or contract' }), {
+  if (!['payslip', 'attendance', 'contract', 'employee'].includes(section)) {
+    return new Response(JSON.stringify({ detail: 'Invalid section. Must be payslip, attendance, contract, or employee' }), {
       status: 404,
       headers: { 'Content-Type': 'application/json' }
     });
@@ -34,8 +34,8 @@ export async function POST(
     });
   }
 
-  if (!['payslip', 'attendance', 'contract'].includes(section)) {
-    return new Response(JSON.stringify({ detail: 'Invalid section. Must be payslip, attendance, or contract' }), {
+  if (!['payslip', 'attendance', 'contract', 'employee'].includes(section)) {
+    return new Response(JSON.stringify({ detail: 'Invalid section. Must be payslip, attendance, contract, or employee' }), {
       status: 404,
       headers: { 'Content-Type': 'application/json' }
     });

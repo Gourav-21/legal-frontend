@@ -49,17 +49,20 @@ interface DataCollectionPanelProps {
   dynamicParams?: {
     payslip: DynamicParam[];
     contract: DynamicParam[];
+    employee?: DynamicParam[];
     attendance: DynamicParam[];
   } | null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dynamicFormData: Record<string, any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onDynamicInputChange: (section: string, param: string, value: any) => void;
+  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract' | 'employee', param: string, value: any) => void;
   includePayslip: boolean;
   includeContract: boolean;
+  includeEmployee?: boolean;
   includeAttendance: boolean;
   onIncludePayslipChange: (checked: boolean) => void;
   onIncludeContractChange: (checked: boolean) => void;
+  onIncludeEmployeeChange?: (checked: boolean) => void;
   onIncludeAttendanceChange: (checked: boolean) => void;
 
   // Test execution props
@@ -96,9 +99,11 @@ export default function DataCollectionPanel({
   onDynamicInputChange,
   includePayslip,
   includeContract,
+  includeEmployee,
   includeAttendance,
   onIncludePayslipChange,
   onIncludeContractChange,
+  onIncludeEmployeeChange,
   onIncludeAttendanceChange,
 
   // Test execution props
@@ -175,9 +180,11 @@ export default function DataCollectionPanel({
             onDynamicInputChange={onDynamicInputChange}
             includePayslip={includePayslip}
             includeContract={includeContract}
+            includeEmployee={includeEmployee}
             includeAttendance={includeAttendance}
             onIncludePayslipChange={onIncludePayslipChange}
             onIncludeContractChange={onIncludeContractChange}
+            onIncludeEmployeeChange={onIncludeEmployeeChange}
             onIncludeAttendanceChange={onIncludeAttendanceChange}
             dictionary={dictionary}
             lang={lang}

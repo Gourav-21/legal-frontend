@@ -51,14 +51,16 @@ interface ManageRulesTabProps {
   dynamicFormData: any;
   includePayslip: boolean;
   includeContract: boolean;
+  includeEmployee?: boolean;
   includeAttendance: boolean;
   testResults: any;
   isTesting: boolean;
   dictionary: Record<string, any>;
   onTestRuleInForm: () => void;
-  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract', param: string, value: any) => void;
+  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract' | 'employee', param: string, value: any) => void;
   onIncludePayslipChange: (checked: boolean) => void;
   onIncludeContractChange: (checked: boolean) => void;
+  onIncludeEmployeeChange?: (checked: boolean) => void;
   onIncludeAttendanceChange: (checked: boolean) => void;
   onLoadSampleData: () => void;
   onSetActiveTab: (tab: string) => void;
@@ -91,6 +93,7 @@ export default function ManageRulesTab({
   dynamicFormData,
   includePayslip,
   includeContract,
+  includeEmployee,
   includeAttendance,
   testResults,
   isTesting,
@@ -99,6 +102,7 @@ export default function ManageRulesTab({
   onDynamicInputChange,
   onIncludePayslipChange,
   onIncludeContractChange,
+  onIncludeEmployeeChange,
   onIncludeAttendanceChange,
   onLoadSampleData,
   onSetActiveTab,
@@ -289,6 +293,7 @@ export default function ManageRulesTab({
             dynamicFormData={dynamicFormData}
             includePayslip={includePayslip}
             includeContract={includeContract}
+            includeEmployee={includeEmployee}
             includeAttendance={includeAttendance}
             testResults={testResults}
             isTesting={isTesting}
@@ -304,6 +309,7 @@ export default function ManageRulesTab({
             onDynamicInputChange={onDynamicInputChange}
             onIncludePayslipChange={onIncludePayslipChange}
             onIncludeContractChange={onIncludeContractChange}
+            onIncludeEmployeeChange={onIncludeEmployeeChange}
             onIncludeAttendanceChange={onIncludeAttendanceChange}
             onLoadSampleData={onLoadSampleData}
             onSetActiveTab={onSetActiveTab}

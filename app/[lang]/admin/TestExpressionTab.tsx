@@ -22,19 +22,22 @@ interface TestExpressionTabProps {
     payslip: DynamicParam[];
     contract: DynamicParam[];
     attendance: DynamicParam[];
+    employee?: DynamicParam[];
   };
   dynamicFormData: Record<string, any>;
   includePayslip: boolean;
   includeContract: boolean;
   includeAttendance: boolean;
+  includeEmployee?: boolean;
   dictionary: Record<string, any>;
   lang: string;
   onExpressionChange: (expression: string) => void;
   onExpressionTypeChange: (type: 'condition' | 'calculation') => void;
   onEvaluateExpression: () => void;
-  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract', param: string, value: any) => void;
+  onDynamicInputChange: (section: 'payslip' | 'attendance' | 'contract' | 'employee', param: string, value: any) => void;
   onIncludePayslipChange: (checked: boolean) => void;
   onIncludeContractChange: (checked: boolean) => void;
+  onIncludeEmployeeChange?: (checked: boolean) => void;
   onIncludeAttendanceChange: (checked: boolean) => void;
   onLoadSampleData: () => void;
 }
@@ -57,6 +60,8 @@ export default function TestExpressionTab({
   onDynamicInputChange,
   onIncludePayslipChange,
   onIncludeContractChange,
+  includeEmployee,
+  onIncludeEmployeeChange,
   onIncludeAttendanceChange,
   onLoadSampleData
 }: TestExpressionTabProps) {
@@ -144,7 +149,7 @@ export default function TestExpressionTab({
                 />
                 <div className="form-text">
                   <small style={{ color: 'rgba(15, 15, 20, 0.6)', fontFamily: "'Manrope', sans-serif" }}>
-                    {dictionary.admin.testExpression.useVariablesLike} <code style={{ color: '#0C756F', backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px' }}>payslip.*</code>, <code style={{ color: '#0C756F', backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px' }}>attendance.*</code>, <code style={{ color: '#0C756F', backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px' }}>contract.*</code>
+                    {dictionary.admin.testExpression.useVariablesLike} <code style={{ color: '#0C756F', backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px' }}>payslip.*</code>, <code style={{ color: '#0C756F', backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px' }}>attendance.*</code>, <code style={{ color: '#0C756F', backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px' }}>contract.*</code>, <code style={{ color: '#0C756F', backgroundColor: 'rgba(12, 117, 111, 0.1)', padding: '2px 4px', borderRadius: '3px' }}>employee.*</code>
                   </small>
                 </div>
               </div>
@@ -339,12 +344,14 @@ export default function TestExpressionTab({
                 <ManualEntryForm
                   dynamicParams={dynamicParams}
                   dynamicFormData={dynamicFormData}
-                  onDynamicInputChange={(section: string, param: string, value: any) => onDynamicInputChange(section as "payslip" | "attendance" | "contract", param, value)}
+                  onDynamicInputChange={(section: string, param: string, value: any) => onDynamicInputChange(section as "payslip" | "attendance" | "contract" | "employee", param, value)}
                   includePayslip={includePayslip}
                   includeContract={includeContract}
+                  includeEmployee={includeEmployee}
                   includeAttendance={includeAttendance}
                   onIncludePayslipChange={onIncludePayslipChange}
                   onIncludeContractChange={onIncludeContractChange}
+                  onIncludeEmployeeChange={onIncludeEmployeeChange}
                   onIncludeAttendanceChange={onIncludeAttendanceChange}
                   dictionary={dictionary}
                   lang={lang}

@@ -151,8 +151,8 @@ export default function RuleForm({
     try {
       const parsedData = JSON.parse(jsonText);
       // Update parent form data
-      onDynamicInputChange('payslip', 'employee_id', parsedData.employee_id || 'TEST_001');
-      onDynamicInputChange('payslip', 'month', parsedData.month || '2024-07');
+      onDynamicInputChange('payslip', 'מזהה_עובד', parsedData['מזהה_עובד'] || 'TEST_001');
+      onDynamicInputChange('payslip', 'חודש', parsedData['חודש'] || '2024-07');
       if (parsedData.payslip) {
         Object.entries(parsedData.payslip).forEach(([key, value]) => {
           onDynamicInputChange('payslip', key, value);
@@ -378,7 +378,7 @@ export default function RuleForm({
                                   fontWeight: '500',
                                   border: '1px solid rgba(12, 117, 111, 0.2)'
                                 }}>
-                                  payslip.{param.param}
+                                  {'תלוש'}.{param.param}
                                 </code>
                               ))}
                             </div>
@@ -403,7 +403,7 @@ export default function RuleForm({
                                   fontWeight: '500',
                                   border: '1px solid rgba(12, 117, 111, 0.2)'
                                 }}>
-                                  attendance.{param.param}
+                                  {'נוכחות'}.{param.param}
                                 </code>
                               ))}
                             </div>
@@ -428,7 +428,7 @@ export default function RuleForm({
                                   fontWeight: '500',
                                   border: '1px solid rgba(12, 117, 111, 0.2)'
                                 }}>
-                                  contract.{param.param}
+                                  {'חוזה'}.{param.param}
                                 </code>
                               ))}
                             </div>
@@ -453,7 +453,7 @@ export default function RuleForm({
                                   fontWeight: '500',
                                   border: '1px solid rgba(12, 117, 111, 0.2)'
                                 }}>
-                                  employee.{param.param}
+                                  {'עובד'}.{param.param}
                                 </code>
                               ))}
                             </div>

@@ -15,7 +15,6 @@ interface ContractData {
 }
 
 interface ManualEntryData {
-  employee_id: string;
   payslips: PayslipData[];
   attendance: AttendanceData[];
   contract: ContractData;

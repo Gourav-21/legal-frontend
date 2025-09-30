@@ -146,8 +146,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
 
   // Dynamic form data
   const [dynamicFormData, setDynamicFormData] = useState({
-    employee_id: 'TEST_001',
-    month: '2024-07',
+    // employee_id and month moved into payslip only
     payslip: {} as Record<string, any>,
     attendance: {} as Record<string, any>,
     contract: {} as Record<string, any>,
@@ -158,8 +157,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   const [testInputMethod, setTestInputMethod] = useState<'manual' | 'json' | 'sample'>('manual');
   const [testUploadedJson, setTestUploadedJson] = useState<string>('');
   const [testDynamicFormData, setTestDynamicFormData] = useState({
-    employee_id: 'TEST_001',
-    month: '2024-07',
+    // For testing, keep employee_id inside payslip only
     payslip: {} as Record<string, any>,
     attendance: {} as Record<string, any>,
     contract: {} as Record<string, any>,
@@ -186,25 +184,10 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
           amount_owed: check.amount_owed,
           violation_message: check.violation_message
         })),
-        payslip: testIncludePayslip ? {
-          employee_id: testDynamicFormData.employee_id,
-          month: testDynamicFormData.month,
-          ...testDynamicFormData.payslip
-        } : {},
-        attendance: testIncludeAttendance ? {
-          employee_id: testDynamicFormData.employee_id,
-          month: testDynamicFormData.month,
-          ...testDynamicFormData.attendance
-        } : {},
-        contract: testIncludeContract ? {
-          employee_id: testDynamicFormData.employee_id,
-          month: testDynamicFormData.month,
-          ...testDynamicFormData.contract
-        } : {},
-        employee: testIncludeEmployee ? {
-          employee_id: testDynamicFormData.employee_id,
-          ...testDynamicFormData.employee
-        } : {}
+        payslip: testIncludePayslip ? { ...testDynamicFormData.payslip } : {},
+        attendance: testIncludeAttendance ? { ...testDynamicFormData.attendance } : {},
+        contract: testIncludeContract ? { ...testDynamicFormData.contract } : {},
+        employee: testIncludeEmployee ? { ...testDynamicFormData.employee } : {}
       };
 
       const response = await fetch('/api/test-rule', {
@@ -421,22 +404,7 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
           [param]: value
         }
       };
-      
-      // If updating employee_id or month in payslip section, automatically update attendance and contract sections
-        if (section === 'payslip' && (param === 'employee_id' || param === 'month')) {
-          newData.attendance = {
-            ...newData.attendance,
-            [param]: value
-          };
-          newData.contract = {
-            ...newData.contract,
-            [param]: value
-          };
-          newData.employee = {
-            ...newData.employee,
-            [param]: value
-          };
-        }
+      // Note: employee_id and month are kept inside payslip only. Do not propagate into attendance/contract/employee.
       
       return newData;
     });
@@ -445,21 +413,21 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
   // Load sample data
   const loadSampleData = () => {
     setDynamicFormData({
-      employee_id: 'TEST_001',
-      month: '2024-07',
       payslip: {
-        hourly_rate: 30.0,
-        base_salary: 4800.0,
-        overtime_rate: 35.0,
-        total_hours: 165
+        מזהה_עובד: 'TEST_001',
+        חודש: '2024-07',
+        משכורת_בסיס: 4800.0,
+        שיעור_נוספות_משולם: 35.0,
+        שיעור_שעתי: 30.0,
+        שעות_עבודה: 165
       },
       attendance: {
-        overtime_hours: 5,
-        regular_hours: 160,
-        total_hours: 165
+        שעות_נוספות: 5,
+        שעות_רגילות: 160,
+        סהכ_שעות: 165
       },
       contract: {
-        hourly_rate: 30.0
+        שיעור_שעתי: 30.0
       },
       employee: {}
     });
@@ -1074,21 +1042,20 @@ export default function RulesManagement({ lang, dictionary }: RulesManagementPro
             onTestLoadSampleData={() => {
               // Load sample data for test
               setTestDynamicFormData({
-                employee_id: 'TEST_001',
-                month: '2024-07',
                 payslip: {
-                  base_salary: 4800.0,
-                  overtime_rate: 35.0,
-                  hourly_rate: 30.0
+                  מזהה_עובד: 'TEST_001',
+                  חודש: '2024-07',
+                  משכורת_בסיס: 4800.0,
+                  שיעור_נוספות_משולם: 35.0,
+                  שיעור_שעתי: 30.0
                 },
                 attendance: {
-                  overtime_hours: 5,
-                  regular_hours: 160,
-                  total_hours: 165
+                  שעות_נוספות: 5,
+                  שעות_רגילות: 160,
+                  סהכ_שעות: 165
                 },
                 contract: {
-                  hourly_rate: 30.0,
-                  employee_id: 'TEST_001'
+                  שיעור_שעתי: 30.0
                 },
                 employee: {}
               });

@@ -41,6 +41,38 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
   // Get current month in YYYY-MM format
   const currentMonth = new Date().toISOString().slice(0, 7);
 
+  // Key mapping between Hebrew and English
+  const hebrewToEnglishKeyMap: Record<string, string> = {
+    'מזהה_עובד': 'employee_id',
+    'חודש': 'month'
+  };
+
+  const englishToHebrewKeyMap: Record<string, string> = {
+    'employee_id': 'מזהה_עובד',
+    'month': 'חודש'
+  };
+
+  // Convert Hebrew keys to English keys for internal use
+  const convertHebrewKeysToEnglish = (obj: any): any => {
+    const result: any = {};
+    for (const key in obj) {
+      const englishKey = hebrewToEnglishKeyMap[key] || key;
+      result[englishKey] = obj[key];
+    }
+    return result;
+
+  };
+
+  // Convert English keys to Hebrew keys for submission
+  const convertEnglishKeysToHebrew = (obj: any): any => {
+    const result: any = {};
+    for (const key in obj) {
+      const hebrewKey = englishToHebrewKeyMap[key] || key;
+      result[hebrewKey] = obj[key];
+    }
+    return result;
+  };
+
   // Populate form data from the current processingResult when modal opens
   useEffect(() => {
     if (showManualEntryModal && processingResult) {
@@ -49,58 +81,62 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
         employee_id: '',
         payslips: [],
         attendance: [],
-        contract: {}
-        ,
+        contract: {},
         employee: {}
       };
 
       const convertApiData = (obj: any): any => {
+        // First convert Hebrew keys to English
+        const convertedKeys = convertHebrewKeysToEnglish(obj);
         const result: any = {};
-        for (const key in obj) {
-          if (obj[key] === null) {
+        for (const key in convertedKeys) {
+          if (convertedKeys[key] === null) {
             result[key] = '';
-          } else if (typeof obj[key] === 'string') {
+          } else if (typeof convertedKeys[key] === 'string') {
             // Remove commas, currency, units, and percentage signs
-            const cleaned = obj[key].replace(/[,₪שעותימים%]/g, '').trim();
+            const cleaned = convertedKeys[key].replace(/[,₪שעותימים%]/g, '').trim();
             const numValue = parseFloat(cleaned);
             if (!isNaN(numValue) && cleaned === numValue.toString()) {
               result[key] = numValue;
             } else {
-              result[key] = obj[key];
+              result[key] = convertedKeys[key];
             }
           } else {
-            result[key] = obj[key];
+            result[key] = convertedKeys[key];
           }
         }
         return result;
       };
 
       if ((initial as any).payslip_data && (initial as any).payslip_data.length > 0) {
+        // employee_id is expected to be present only in payslip_data now
         newFormData.employee_id = (initial as any).payslip_data[0].employee_id || '';
         newFormData.payslips = (initial as any).payslip_data.map((p: any) => ({
           ...convertApiData(p),
-          month: p.month || ''
+          month: convertApiData(p).month || ''
         }));
       }
 
       if ((initial as any).attendance_data && (initial as any).attendance_data.length > 0) {
-        if (!newFormData.employee_id) newFormData.employee_id = (initial as any).attendance_data[0].employee_id || '';
+        // attendance_data no longer contains employee_id; only map values
         newFormData.attendance = (initial as any).attendance_data.map((a: any) => ({
           ...convertApiData(a),
-          month: a.month || ''
+          month: convertApiData(a).month || ''
         }));
+        console.log(newFormData.attendance)
       }
 
       if ((initial as any).contract_data) {
-        if (!newFormData.employee_id) newFormData.employee_id = (initial as any).contract_data.employee_id || '';
+        // contract_data no longer contains employee_id
         newFormData.contract = convertApiData((initial as any).contract_data);
       }
 
       if ((initial as any).employee_data) {
-        if (!newFormData.employee_id) newFormData.employee_id = (initial as any).employee_data.employee_id || '';
+        // employee_data no longer contains employee_id
         newFormData.employee = convertApiData((initial as any).employee_data);
       }
 
+      console.log(newFormData)
       // Only populate if formData is in its initial empty state
       const isFormDataEmpty = formData.employee_id === '' &&
                              formData.payslips.length === 1 && 
@@ -115,6 +151,7 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
       }
     }
   }, [showManualEntryModal, processingResult, currentMonth]);
+
 
   // Fetch dynamic params when modal opens
   useEffect(() => {
@@ -279,14 +316,21 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
       console.log('Validation error:', error); // Debug log
       return;
     }
-    // setTimeout(() => {
-    //   setValidationError(null);
-    // }, 1000);
+    
+    // Convert payslips back to Hebrew keys before submission
+    const convertedPayslips = formData.payslips.map(payslip => convertEnglishKeysToHebrew(payslip));
+    const convertedAttendance = formData.attendance.map(attendance => convertEnglishKeysToHebrew(attendance));
+    const convertedContract = convertEnglishKeysToHebrew(formData.contract);
+    const convertedEmployee = convertEnglishKeysToHebrew(formData.employee);
+    
+    console.log("converted data",convertedPayslips)
+    console.log("attendance:",convertedAttendance)
+    
     setProcessingResult({
-      payslip_data: formData.payslips,
-      contract_data: formData.contract,
-      attendance_data: formData.attendance,
-      employee_data: formData.employee
+      payslip_data: convertedPayslips,
+      contract_data: convertedContract,
+      attendance_data: convertedAttendance,
+      employee_data: convertedEmployee
     });
     setShowManualEntryModal(false);
   };
@@ -294,7 +338,10 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
   const getParamNames = (section: string) => {
     if (!dynamicParams || !dynamicParams[section]) return [];
     return dynamicParams[section]
-      .filter((p: any) => !['employee_id', 'month'].includes(p.param))
+      .filter((p: any) => {
+        const englishParam = hebrewToEnglishKeyMap[p.param] || p.param;
+        return !['employee_id', 'month'].includes(englishParam);
+      })
       .map((p: any) => p.param.trim()); // Trim to remove extra spaces
   };
 
@@ -454,26 +501,29 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                           onChange={(e) => handlePayslipChange(selectedPayslipIndex, 'month', e.target.value)}
                         />
                       </div>
-                      {getParamNames('payslip').map((param: string) => (
-                        <div key={param} className="col-md-6">
-                          <label className="form-label">{getParamLabel('payslip', param)}</label>
-                          <input
-                            type={getParamType('payslip', param) === 'number' ? 'number' : 'text'}
-                            className="form-control form-control-sm"
-                            step="0.01"
-                            value={formData.payslips[selectedPayslipIndex][param] ?? ''}
-                            onChange={(e) => {
-                              const v = e.target.value;
-                              const paramType = getParamType('payslip', param);
-                              handlePayslipChange(
-                                selectedPayslipIndex,
-                                param,
-                                v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v)
-                              );
-                            }}
-                          />
-                        </div>
-                      ))}
+                      {getParamNames('payslip').map((param: string) => {
+                        const englishParam = hebrewToEnglishKeyMap[param] || param;
+                        return (
+                          <div key={param} className="col-md-6">
+                            <label className="form-label">{getParamLabel('payslip', param)}</label>
+                            <input
+                              type={getParamType('payslip', param) === 'number' ? 'number' : 'text'}
+                              className="form-control form-control-sm"
+                              step="0.01"
+                              value={formData.payslips[selectedPayslipIndex][englishParam] ?? ''}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                const paramType = getParamType('payslip', param);
+                                handlePayslipChange(
+                                  selectedPayslipIndex,
+                                  englishParam,
+                                  v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v)
+                                );
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -528,26 +578,29 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
                           onChange={(e) => handleAttendanceChange(selectedAttendanceIndex, 'month', e.target.value)}
                         />
                       </div>
-                      {getParamNames('attendance').map((param: string) => (
-                        <div key={param} className="col-md-6">
-                          <label className="form-label">{getParamLabel('attendance', param)}</label>
-                          <input
-                            type={getParamType('attendance', param) === 'number' ? 'number' : 'text'}
-                            className="form-control form-control-sm"
-                            step="0.01"
-                            value={formData.attendance[selectedAttendanceIndex][param] ?? ''}
-                            onChange={(e) => {
-                              const v = e.target.value;
-                              const paramType = getParamType('attendance', param);
-                              handleAttendanceChange(
-                                selectedAttendanceIndex,
-                                param as keyof typeof formData.attendance[number],
-                                v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v)
-                              );
-                            }}
-                          />
-                        </div>
-                      ))}
+                      {getParamNames('attendance').map((param: string) => {
+                        const englishParam = hebrewToEnglishKeyMap[param] || param;
+                        return (
+                          <div key={param} className="col-md-6">
+                            <label className="form-label">{getParamLabel('attendance', param)}</label>
+                            <input
+                              type={getParamType('attendance', param) === 'number' ? 'number' : 'text'}
+                              className="form-control form-control-sm"
+                              step="0.01"
+                              value={formData.attendance[selectedAttendanceIndex][englishParam] ?? ''}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                const paramType = getParamType('attendance', param);
+                                handleAttendanceChange(
+                                  selectedAttendanceIndex,
+                                  englishParam as keyof typeof formData.attendance[number],
+                                  v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v)
+                                );
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -557,44 +610,50 @@ const ManualEntryModal: React.FC<ManualEntryModalProps> = ({ dictionary, lang })
               {activeTab === 'contract' && (
                 <div className="tab-pane fade show active">
                   <div className="row g-3">
-                    {getParamNames('contract').map((param: string) => (
-                      <div key={param} className="col-md-6">
-                        <label className="form-label">{getParamLabel('contract', param)}</label>
-                        <input
-                          type={getParamType('contract', param) === 'number' ? 'number' : 'text'}
-                          className="form-control form-control-sm"
-                          step="0.01"
-                          value={formData.contract[param] ?? ''}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            const paramType = getParamType('contract', param);
-                            handleContractChange(param, v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v));
-                          }}
-                        />
-                      </div>
-                    ))}
+                    {getParamNames('contract').map((param: string) => {
+                      const englishParam = hebrewToEnglishKeyMap[param] || param;
+                      return (
+                        <div key={param} className="col-md-6">
+                          <label className="form-label">{getParamLabel('contract', param)}</label>
+                          <input
+                            type={getParamType('contract', param) === 'number' ? 'number' : 'text'}
+                            className="form-control form-control-sm"
+                            step="0.01"
+                            value={formData.contract[englishParam] ?? ''}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              const paramType = getParamType('contract', param);
+                              handleContractChange(englishParam, v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v));
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
               {activeTab === 'employee' && (
                 <div className="tab-pane fade show active">
                   <div className="row g-3">
-                    {getParamNames('employee').map((param: string) => (
-                      <div key={param} className="col-md-6">
-                        <label className="form-label">{getParamLabel('employee', param)}</label>
-                        <input
-                          type={getParamType('employee', param) === 'number' ? 'number' : 'text'}
-                          className="form-control form-control-sm"
-                          step="0.01"
-                          value={formData.employee[param] ?? ''}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            const paramType = getParamType('employee', param);
-                            handleEmployeeChange(param, v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v));
-                          }}
-                        />
-                      </div>
-                    ))}
+                    {getParamNames('employee').map((param: string) => {
+                      const englishParam = hebrewToEnglishKeyMap[param] || param;
+                      return (
+                        <div key={param} className="col-md-6">
+                          <label className="form-label">{getParamLabel('employee', param)}</label>
+                          <input
+                            type={getParamType('employee', param) === 'number' ? 'number' : 'text'}
+                            className="form-control form-control-sm"
+                            step="0.01"
+                            value={formData.employee[englishParam] ?? ''}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              const paramType = getParamType('employee', param);
+                              handleEmployeeChange(englishParam, v === '' ? '' : (paramType === 'number' ? parseFloat(v) : v));
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

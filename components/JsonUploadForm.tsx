@@ -30,18 +30,18 @@ export default function JsonUploadForm({ uploadedJson, onJsonChange }: JsonUploa
         value={uploadedJson}
         onChange={(e) => onJsonChange(e.target.value)}
         placeholder={`{
-  "employee_id": "TEST_001",
-  "month": "2024-07",
+  "מזהה_עובד": "TEST_001",
+  "חודש": "2024-07",
   "payslip": {
-    "hourly_rate": 30.0,
-    "base_salary": 4800.0
+    "שיעור_שעתי": 30.0,
+    "משכורת_בסיס": 4800.0
   },
   "attendance": {
-    "overtime_hours": 5,
-    "regular_hours": 160
+    "שעות_נוספות": 5,
+    "שעות_רגילות": 160
   },
   "contract": {
-    "hourly_rate": 30.0
+    "שיעור_שעתי": 30.0
   }
 }`}
       />
